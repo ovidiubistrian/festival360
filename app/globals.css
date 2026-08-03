@@ -1,0 +1,226 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* =========================================================================
+   Festival Hub — Design System
+   Paletă PRISPA: verde închis, crem cald, teracotă, auriu, cărbune, alb cald
+   ========================================================================= */
+
+:root {
+  /* Brand palette */
+  --prispa-green: #183c32;
+  --prispa-green-700: #204a3d;
+  --prispa-green-600: #2c5f4f;
+  --cream: #f5efe3;
+  --cream-200: #ece3d1;
+  --terracotta: #b85c3b;
+  --terracotta-600: #a24e30;
+  --gold: #c99a45;
+  --gold-600: #b3852f;
+  --charcoal: #202522;
+  --warm-white: #fcfaf6;
+
+  /* Semantic tokens (shadcn-compatible) */
+  --background: #fcfaf6;
+  --foreground: #202522;
+
+  --card: #ffffff;
+  --card-foreground: #202522;
+
+  --popover: #ffffff;
+  --popover-foreground: #202522;
+
+  --primary: #183c32;
+  --primary-foreground: #f5efe3;
+
+  --secondary: #f5efe3;
+  --secondary-foreground: #183c32;
+
+  --muted: #f2ece0;
+  --muted-foreground: #6b6f66;
+
+  --accent: #c99a45;
+  --accent-foreground: #202522;
+
+  --destructive: #b4432b;
+  --destructive-foreground: #fcfaf6;
+
+  --border: #e7dece;
+  --input: #e7dece;
+  --ring: #183c32;
+
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand utilities */
+  --color-prispa-green: var(--prispa-green);
+  --color-cream: var(--cream);
+  --color-terracotta: var(--terracotta);
+  --color-gold: var(--gold);
+  --color-charcoal: var(--charcoal);
+  --color-warm-white: var(--warm-white);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 12px);
+
+  --animate-fade-in: fade-in 0.6s ease-out both;
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-accordion-down: accordion-down 0.25s ease-out;
+  --animate-accordion-up: accordion-up 0.25s ease-out;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--gold) 35%, transparent);
+}
+
+/* Editorial headings */
+.font-serif {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+}
+
+/* Focus visibility (accessibility) */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Thin premium scrollbars */
+@media (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--cream-200) transparent;
+  }
+}
+
+/* Prose helper for article bodies */
+.prose-editorial {
+  max-width: 68ch;
+  line-height: 1.75;
+  color: var(--charcoal);
+}
+.prose-editorial p {
+  margin-block: 1.1em;
+}
+.prose-editorial h2 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  margin-block: 1.6em 0.5em;
+  color: var(--prispa-green);
+}
+.prose-editorial h3 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  margin-block: 1.3em 0.4em;
+  color: var(--prispa-green);
+}
+.prose-editorial ul {
+  list-style: disc;
+  padding-left: 1.4em;
+  margin-block: 1em;
+}
+.prose-editorial li {
+  margin-block: 0.35em;
+}
+.prose-editorial blockquote {
+  border-left: 3px solid var(--gold);
+  padding-left: 1.1em;
+  font-style: italic;
+  color: var(--prispa-green);
+  margin-block: 1.4em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

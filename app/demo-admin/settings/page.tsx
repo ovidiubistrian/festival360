@@ -1,0 +1,352 @@
+"use client";
+
+import * as React from "react";
+import { Save, RotateCcw } from "lucide-react";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { ConfirmDelete } from "@/components/admin/confirm-delete";
+import { Field } from "@/components/admin/field";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ImageWithFallback } from "@/components/shared/image-with-fallback";
+import {
+  resetDemoData,
+  updateSettings,
+  useAdminData,
+  type AdminSettings,
+} from "@/lib/admin/store";
+import { toast } from "sonner";
+
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={/^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000"}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-11 w-12 shrink-0 cursor-pointer rounded-lg border border-input bg-card p-1"
+          aria-label={`${label} — selector culoare`}
+        />
+        <Input value={value} onChange={(e) => onChange(e.target.value)} />
+      </div>
+    </div>
+  );
+}
+
+export default function SettingsPage() {
+  const data = useAdminData();
+  const [form, setForm] = React.useState<AdminSettings>(data.settings);
+  // Resync the form when the stored settings reference changes (e.g. after a
+  // demo reset), adjusted during render instead of in a set-state effect.
+  const [syncedSettings, setSyncedSettings] = React.useState(data.settings);
+  if (data.settings !== syncedSettings) {
+    setSyncedSettings(data.settings);
+    setForm(data.settings);
+  }
+
+  function set<K extends keyof AdminSettings>(key: K, value: AdminSettings[K]) {
+    setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function saveSection(keys: (keyof AdminSettings)[], message: string) {
+    const patch: Partial<AdminSettings> = {};
+    for (const k of keys) {
+      patch[k] = form[k];
+    }
+    updateSettings(patch);
+    toast.success(message);
+  }
+
+  function handleReset() {
+    resetDemoData();
+    toast.success("Datele demo au fost resetate.");
+  }
+
+  return (
+    <AdminShell
+      title="Setări"
+      description="Configurează informațiile festivalului și identitatea vizuală. Modificările se salvează în browser (demo)."
+    >
+      <Tabs defaultValue="general">
+        <TabsList>
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="contact">Contact & social</TabsTrigger>
+          <TabsTrigger value="brand">Identitate vizuală</TabsTrigger>
+        </TabsList>
+
+        {/* General */}
+        <TabsContent value="general">
+          <Card>
+            <CardHeader>
+              <CardTitle>Informații generale</CardTitle>
+              <CardDescription>
+                Numele, descrierea și datele festivalului.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Nume festival">
+                  <Input
+                    value={form.name}
+                    onChange={(e) => set("name", e.target.value)}
+                  />
+                </Field>
+                <Field label="Text logo">
+                  <Input
+                    value={form.logoText}
+                    onChange={(e) => set("logoText", e.target.value)}
+                  />
+                </Field>
+                <Field label="Slogan" className="sm:col-span-2">
+                  <Input
+                    value={form.tagline}
+                    onChange={(e) => set("tagline", e.target.value)}
+                  />
+                </Field>
+                <Field label="Descriere scurtă" className="sm:col-span-2">
+                  <Textarea
+                    value={form.shortDescription}
+                    onChange={(e) => set("shortDescription", e.target.value)}
+                    rows={3}
+                  />
+                </Field>
+                <Field label="Data început">
+                  <Input
+                    type="date"
+                    value={form.startDate}
+                    onChange={(e) => set("startDate", e.target.value)}
+                  />
+                </Field>
+                <Field label="Data sfârșit">
+                  <Input
+                    type="date"
+                    value={form.endDate}
+                    onChange={(e) => set("endDate", e.target.value)}
+                  />
+                </Field>
+                <Field label="Locație">
+                  <Input
+                    value={form.locationName}
+                    onChange={(e) => set("locationName", e.target.value)}
+                  />
+                </Field>
+                <Field label="Oraș">
+                  <Input
+                    value={form.city}
+                    onChange={(e) => set("city", e.target.value)}
+                  />
+                </Field>
+                <Field label="Județ">
+                  <Input
+                    value={form.county}
+                    onChange={(e) => set("county", e.target.value)}
+                  />
+                </Field>
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  variant="gold"
+                  onClick={() =>
+                    saveSection(
+                      [
+                        "name",
+                        "logoText",
+                        "tagline",
+                        "shortDescription",
+                        "startDate",
+                        "endDate",
+                        "locationName",
+                        "city",
+                        "county",
+                      ],
+                      "Informațiile generale au fost salvate."
+                    )
+                  }
+                >
+                  <Save className="h-4 w-4" />
+                  Salvează
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Contact & social */}
+        <TabsContent value="contact">
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact & rețele sociale</CardTitle>
+              <CardDescription>
+                Datele de contact și linkurile către rețelele sociale.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Email">
+                  <Input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => set("email", e.target.value)}
+                  />
+                </Field>
+                <Field label="Telefon">
+                  <Input
+                    value={form.phone}
+                    onChange={(e) => set("phone", e.target.value)}
+                  />
+                </Field>
+                <Field label="Facebook">
+                  <Input
+                    value={form.facebook}
+                    onChange={(e) => set("facebook", e.target.value)}
+                    placeholder="https://facebook.com/..."
+                  />
+                </Field>
+                <Field label="Instagram">
+                  <Input
+                    value={form.instagram}
+                    onChange={(e) => set("instagram", e.target.value)}
+                    placeholder="https://instagram.com/..."
+                  />
+                </Field>
+                <Field label="YouTube" className="sm:col-span-2">
+                  <Input
+                    value={form.youtube}
+                    onChange={(e) => set("youtube", e.target.value)}
+                    placeholder="https://youtube.com/..."
+                  />
+                </Field>
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  variant="gold"
+                  onClick={() =>
+                    saveSection(
+                      ["email", "phone", "facebook", "instagram", "youtube"],
+                      "Datele de contact au fost salvate."
+                    )
+                  }
+                >
+                  <Save className="h-4 w-4" />
+                  Salvează
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Brand */}
+        <TabsContent value="brand">
+          <Card>
+            <CardHeader>
+              <CardTitle>Identitate vizuală</CardTitle>
+              <CardDescription>
+                Culorile temei și imaginea principală (hero).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-3">
+                <ColorField
+                  label="Culoare primară"
+                  value={form.primaryColor}
+                  onChange={(v) => set("primaryColor", v)}
+                />
+                <ColorField
+                  label="Culoare secundară"
+                  value={form.secondaryColor}
+                  onChange={(v) => set("secondaryColor", v)}
+                />
+                <ColorField
+                  label="Culoare auriu"
+                  value={form.goldColor}
+                  onChange={(v) => set("goldColor", v)}
+                />
+              </div>
+              <Field label="Imagine hero (URL)">
+                <Input
+                  value={form.heroImage}
+                  onChange={(e) => set("heroImage", e.target.value)}
+                  placeholder="https://..."
+                />
+              </Field>
+              {form.heroImage ? (
+                <div className="relative aspect-[16/7] w-full overflow-hidden rounded-xl bg-secondary">
+                  <ImageWithFallback
+                    src={form.heroImage}
+                    alt="Previzualizare imagine hero"
+                    fill
+                    unoptimized
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    className="object-cover"
+                    fallbackLabel="Previzualizare hero"
+                  />
+                </div>
+              ) : null}
+              <div className="flex justify-end">
+                <Button
+                  variant="gold"
+                  onClick={() =>
+                    saveSection(
+                      [
+                        "primaryColor",
+                        "secondaryColor",
+                        "goldColor",
+                        "heroImage",
+                      ],
+                      "Identitatea vizuală a fost salvată."
+                    )
+                  }
+                >
+                  <Save className="h-4 w-4" />
+                  Salvează
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Danger zone */}
+      <Card className="border-destructive/30">
+        <CardHeader>
+          <CardTitle className="text-destructive">Zonă sensibilă</CardTitle>
+          <CardDescription>
+            Resetează întregul conținut demonstrativ la valorile inițiale. Toate
+            modificările salvate în browser vor fi pierdute.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ConfirmDelete
+            itemLabel="toate datele demo (revenire la conținutul inițial)"
+            onConfirm={handleReset}
+            trigger={
+              <Button variant="destructive">
+                <RotateCcw className="h-4 w-4" />
+                Resetează datele demo
+              </Button>
+            }
+          />
+        </CardContent>
+      </Card>
+    </AdminShell>
+  );
+}
