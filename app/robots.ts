@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: "/demo-admin",
     },
-    sitemap: "https://festival-hub.vercel.app/sitemap.xml",
+    sitemap: "https://festival360.vercel.app/sitemap.xml",
   };
 }

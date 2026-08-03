@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { tenants } from "@/lib/tenants";
 
-const BASE = "https://festival-hub.vercel.app";
+const BASE = "https://festival360.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [

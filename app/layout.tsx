@@ -16,7 +16,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://festival-hub.vercel.app"),
+  metadataBase: new URL("https://festival360.vercel.app"),
   title: {
     default: "Festival Hub — Platforma digitală pentru festivaluri",
     template: "%s · Festival Hub",
