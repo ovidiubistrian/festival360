@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: festival360-db
+    environment:
+      POSTGRES_USER: festival
+      POSTGRES_PASSWORD: festival
+      POSTGRES_DB: festival360
+    ports:
+      - "5432:5432"
+    volumes:
+      - festival360_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U festival -d festival360"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  festival360_pgdata:

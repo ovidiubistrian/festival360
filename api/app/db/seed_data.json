@@ -1,0 +1,1834 @@
+{
+  "tenant": {
+    "id": "prispa",
+    "slug": "prispa",
+    "name": "PRISPA",
+    "tagline": "România autentică se întâlnește la PRISPA",
+    "short_description": "Descoperă gusturi locale, meșteșuguri, tradiții și unele dintre cele mai frumoase destinații ale României.",
+    "long_description": "PRISPA este festivalul care aduce în inima Brașovului esența satului românesc: producători cu poveste, meșteșugari care păstrează gesturi vechi de sute de ani, bucătari care gătesc după rețete moștenite și destinații turistice care așteaptă să fie descoperite. Timp de trei zile, Piața Sfatului devine o prispă uriașă, un loc de întâlnire între tradiție și prezent, între oameni și locurile care îi definesc.",
+    "start_date": "2025-09-12",
+    "end_date": "2025-09-14",
+    "location_name": "Piața Sfatului",
+    "city": "Brașov",
+    "county": "Brașov",
+    "hero_image": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=2000&q=80",
+    "hero_badge": "Tradiții • Gastronomie • Turism",
+    "logo_text": "PRISPA",
+    "theme_primary": "#183C32",
+    "theme_secondary": "#F5EFE3",
+    "theme_terracotta": "#B85C3B",
+    "theme_gold": "#C99A45",
+    "theme_charcoal": "#202522",
+    "theme_background": "#FCFAF6",
+    "social_facebook": "https://facebook.com/festivalprispa",
+    "social_instagram": "https://instagram.com/festivalprispa",
+    "social_youtube": "https://youtube.com/@festivalprispa",
+    "social_website": "https://prispa.ro",
+    "contact_email": "contact@prispa.ro",
+    "contact_phone": "+40 368 000 100",
+    "contact_address": "Piața Sfatului nr. 1",
+    "contact_city": "Brașov",
+    "contact_county": "Brașov",
+    "contact_map_query": "Piața Sfatului, Brașov",
+    "navigation": [
+      {
+        "label": "Despre",
+        "href": "/despre"
+      },
+      {
+        "label": "Program",
+        "href": "/program"
+      },
+      {
+        "label": "Expozanți",
+        "href": "/expozanti"
+      },
+      {
+        "label": "Produse",
+        "href": "/produse"
+      },
+      {
+        "label": "Destinații",
+        "href": "/destinatii"
+      },
+      {
+        "label": "Parteneri",
+        "href": "/parteneri"
+      },
+      {
+        "label": "Galerie",
+        "href": "/galerie"
+      },
+      {
+        "label": "Noutăți",
+        "href": "/noutati"
+      },
+      {
+        "label": "Contact",
+        "href": "/contact"
+      }
+    ],
+    "sections": [
+      {
+        "id": "hero",
+        "label": "Hero",
+        "visible": true
+      },
+      {
+        "id": "about",
+        "label": "Despre festival",
+        "visible": true
+      },
+      {
+        "id": "experiences",
+        "label": "Zone și experiențe",
+        "visible": true
+      },
+      {
+        "id": "program",
+        "label": "Program",
+        "visible": true
+      },
+      {
+        "id": "exhibitors",
+        "label": "Expozanți",
+        "visible": true
+      },
+      {
+        "id": "products",
+        "label": "Produse locale",
+        "visible": true
+      },
+      {
+        "id": "destinations",
+        "label": "Destinații turistice",
+        "visible": true
+      },
+      {
+        "id": "partners",
+        "label": "Parteneri și sponsori",
+        "visible": true
+      },
+      {
+        "id": "gallery",
+        "label": "Galerie",
+        "visible": true
+      },
+      {
+        "id": "news",
+        "label": "Noutăți",
+        "visible": true
+      },
+      {
+        "id": "newsletter",
+        "label": "Newsletter",
+        "visible": true
+      }
+    ],
+    "stats": [
+      {
+        "label": "Expozanți",
+        "value": "100+",
+        "icon": "Store"
+      },
+      {
+        "label": "Zone turistice",
+        "value": "20",
+        "icon": "MapPin"
+      },
+      {
+        "label": "Zile de festival",
+        "value": "3",
+        "icon": "CalendarDays"
+      },
+      {
+        "label": "Vizitatori",
+        "value": "30.000+",
+        "icon": "Users"
+      }
+    ],
+    "experiences": [
+      {
+        "id": "gastronomie",
+        "title": "Gastronomie locală",
+        "description": "Preparate gătite pe loc, după rețete moștenite din bucătăria satului românesc.",
+        "icon": "UtensilsCrossed",
+        "image": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        "id": "produse",
+        "title": "Produse tradiționale",
+        "description": "Brânzeturi, miere, dulcețuri și afumături de la producători cu certificare și poveste.",
+        "icon": "ShoppingBasket",
+        "image": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        "id": "mestesuguri",
+        "title": "Meșteșuguri",
+        "description": "Ateliere de ceramică, țesut și lemn, unde gesturile vechi prind viață sub ochii tăi.",
+        "icon": "Hammer",
+        "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        "id": "turism",
+        "title": "Turism și natură",
+        "description": "Destinații de munte, sate autentice și experiențe în inima naturii românești.",
+        "icon": "Mountain",
+        "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80"
+      },
+      {
+        "id": "muzica",
+        "title": "Muzică și spectacole",
+        "description": "Concerte de folclor reinventat, fanfare și seri de muzică sub cerul liber.",
+        "icon": "Music",
+        "image": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80"
+      },
+      {
+        "id": "copii",
+        "title": "Ateliere pentru copii",
+        "description": "Un colț dedicat celor mici, cu ateliere creative și jocuri din alte vremuri.",
+        "icon": "Baby",
+        "image": "https://images.unsplash.com/photo-1541692641319-981cc79ee10a?auto=format&fit=crop&w=1400&q=80"
+      }
+    ]
+  },
+  "exhibitors": [
+    {
+      "id": "ex-1",
+      "tenant_id": "prispa",
+      "slug": "stana-din-poiana",
+      "name": "Stâna din Poiana",
+      "category": "Brânzeturi",
+      "town": "Poiana Mărului",
+      "county": "Caraș-Severin",
+      "region": "Banatul Montan",
+      "short_description": "Brânzeturi maturate din lapte de oaie, de la o stână crescută în inima munților Țarcu.",
+      "description": "La 1.200 de metri altitudine, familia Munteanu duce mai departe o tradiție de patru generații. Oile pasc pe pășunile alpine ale Munților Țarcu, iar laptele se transformă în cașcaval afumat, telemea și brânză frământată după rețete nescrise. Fiecare roată de cașcaval maturează minimum trei luni în beciuri de piatră, iar afumarea se face doar cu lemn de fag.",
+      "image": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "certified": true,
+      "featured": true,
+      "product_ids": [
+        "pr-1",
+        "pr-2"
+      ],
+      "contact_phone": "+40 745 111 222",
+      "contact_website": "https://stanadinpoiana.ro",
+      "status": "published",
+      "sort_order": 0
+    },
+    {
+      "id": "ex-2",
+      "tenant_id": "prispa",
+      "slug": "brutaria-cu-prispa",
+      "name": "Brutăria cu Prispă",
+      "category": "Panificație",
+      "town": "Armeniș",
+      "county": "Caraș-Severin",
+      "region": "Banatul Montan",
+      "short_description": "Pâine cu maia crescută lent și cozonaci copți în cuptor pe vatră.",
+      "description": "Brutăria cu Prispă coace pâine folosind doar maia naturală, făină de la moara de pe Timiș și apă de izvor. Aluatul dospește 24 de ore, iar pâinile se coc pe vatra de cărămidă, la foc de lemne. Alături de pâinea de casă, brutăria aduce la festival cozonaci cu nucă, plăcinte și covrigi trași cu mâna.",
+      "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": true,
+      "featured": true,
+      "product_ids": [
+        "pr-3",
+        "pr-4"
+      ],
+      "contact_phone": "+40 746 333 444",
+      "contact_website": "",
+      "status": "published",
+      "sort_order": 1
+    },
+    {
+      "id": "ex-3",
+      "tenant_id": "prispa",
+      "slug": "prisaca-de-la-munte",
+      "name": "Prisaca de la Munte",
+      "category": "Miere & Apicultură",
+      "town": "Muntele Mic",
+      "county": "Caraș-Severin",
+      "region": "Banatul Montan",
+      "short_description": "Miere poliflora și de salcâm din stupine mutate după înflorire, sus în munte.",
+      "description": "Familia Pavel practică apicultura pastorală: stupii urcă vara pe pajiștile Muntelui Mic, unde albinele culeg din zeci de plante de munte. Rezultatul este o miere densă, aromată, alături de propolis, polen și făgure natural. Toate produsele sunt analizate în laborator și poartă certificare de produs montan.",
+      "image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "certified": true,
+      "featured": false,
+      "product_ids": [
+        "pr-5",
+        "pr-6"
+      ],
+      "contact_phone": "+40 747 555 666",
+      "contact_website": "https://prisacamunte.ro",
+      "status": "published",
+      "sort_order": 2
+    },
+    {
+      "id": "ex-4",
+      "tenant_id": "prispa",
+      "slug": "atelierul-de-lut",
+      "name": "Atelierul de Lut",
+      "category": "Ceramică & Meșteșuguri",
+      "town": "Baia Mare",
+      "county": "Maramureș",
+      "region": "Maramureș",
+      "short_description": "Ceramică modelată la roată și smălțuită manual, cu motive maramureșene.",
+      "description": "Ana și Vasile modelează la roată vase de lut ars, farfurii și căni pictate cu motive tradiționale maramureșene. Fiecare piesă este unicat, arsă în cuptor la peste 1.000 de grade și smălțuită cu culori obținute din oxizi naturali. La festival organizează ateliere deschise, unde vizitatorii pot modela prima lor cană.",
+      "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": false,
+      "featured": true,
+      "product_ids": [
+        "pr-7"
+      ],
+      "contact_phone": "",
+      "contact_website": "https://atelieruldelut.ro",
+      "status": "published",
+      "sort_order": 3
+    },
+    {
+      "id": "ex-5",
+      "tenant_id": "prispa",
+      "slug": "dulceturi-de-bucovina",
+      "name": "Dulcețuri de Bucovina",
+      "category": "Dulcețuri & Siropuri",
+      "town": "Vatra Dornei",
+      "county": "Suceava",
+      "region": "Bucovina",
+      "short_description": "Dulcețuri fierte la ceaun și siropuri din fructe de pădure culese manual.",
+      "description": "Din livezile și pădurile Bucovinei, familia Ursachi culege afine, zmeură, coacăze și măceșe pe care le transformă în dulcețuri fierte încet, la ceaun de aramă. Fără conservanți și fără coloranți, doar fruct, zahăr și răbdare. Siropul de soc și cel de cătină sunt vedetele fiecărei ediții.",
+      "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": true,
+      "featured": false,
+      "product_ids": [
+        "pr-8",
+        "pr-9"
+      ],
+      "contact_phone": "+40 748 777 888",
+      "contact_website": "",
+      "status": "published",
+      "sort_order": 4
+    },
+    {
+      "id": "ex-6",
+      "tenant_id": "prispa",
+      "slug": "podgoria-recas-mic",
+      "name": "Podgoria Recaș Mic",
+      "category": "Vinuri & Băuturi",
+      "town": "Recaș",
+      "county": "Timiș",
+      "region": "Banat",
+      "short_description": "Vinuri de autor și must proaspăt dintr-o podgorie de familie din Banat.",
+      "description": "Podgoria Recaș Mic cultivă soiuri autohtone și internaționale pe dealurile Banatului. La festival aduce vinuri de autor, must proaspăt și degustări ghidate. Producția este limitată, iar fiecare an este vinificat separat, pentru a păstra caracterul locului.",
+      "image": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": false,
+      "featured": false,
+      "product_ids": [
+        "pr-10"
+      ],
+      "contact_phone": "",
+      "contact_website": "https://recasmic.ro",
+      "status": "published",
+      "sort_order": 5
+    },
+    {
+      "id": "ex-7",
+      "tenant_id": "prispa",
+      "slug": "pensiunea-la-prispa",
+      "name": "Pensiunea La Prispă",
+      "category": "Turism & Ospitalitate",
+      "town": "Poiana Mărului",
+      "county": "Caraș-Severin",
+      "region": "Banatul Montan",
+      "short_description": "Experiențe gastronomice și cazare autentică la poalele Munților Țarcu.",
+      "description": "Pensiunea La Prispă oferă mai mult decât cazare: cine cu produse din curte, drumeții ghidate spre lacul Poiana Mărului și seri la foc cu povești despre munte. La festival prezintă meniul lor semnătură și pachete de experiențe pentru weekend în Banatul Montan.",
+      "image": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": true,
+      "featured": true,
+      "product_ids": [],
+      "contact_phone": "+40 749 999 000",
+      "contact_website": "https://pensiunealaprispa.ro",
+      "status": "published",
+      "sort_order": 6
+    },
+    {
+      "id": "ex-8",
+      "tenant_id": "prispa",
+      "slug": "afumatoarea-taranului",
+      "name": "Afumătoarea Țăranului",
+      "category": "Carne & Afumături",
+      "town": "Săcele",
+      "county": "Brașov",
+      "region": "Brașov și împrejurimi",
+      "short_description": "Cârnați, slănină și pastramă afumate la rece, după rețete mocănești.",
+      "description": "Familia Bucur duce mai departe tradiția mocanilor din Săcele: carne de la animale crescute liber, condimentată cu usturoi, cimbru și boia, apoi afumată la rece cu lemn de fag. Cârnații de casă, slănina și pastrama de oaie se maturează săptămâni întregi în afumătoare.",
+      "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": true,
+      "featured": false,
+      "product_ids": [
+        "pr-11"
+      ],
+      "contact_phone": "+40 740 121 212",
+      "contact_website": "",
+      "status": "published",
+      "sort_order": 7
+    },
+    {
+      "id": "ex-9",
+      "tenant_id": "prispa",
+      "slug": "moara-de-pe-timis",
+      "name": "Moara de pe Timiș",
+      "category": "Panificație",
+      "town": "Teregova",
+      "county": "Caraș-Severin",
+      "region": "Banatul Montan",
+      "short_description": "Făinuri măcinate pe piatră și mălai din porumb de casă.",
+      "description": "Moara de pe Timiș macină pe pietre de moară grâu și porumb din culturile locale, fără aditivi. Făina integrală și mălaiul de casă ajung în bucătăriile din tot Banatul. La festival, morarii demonstrează procesul de măcinare și pregătesc mămăligă la ceaun.",
+      "image": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": true,
+      "featured": false,
+      "product_ids": [
+        "pr-12"
+      ],
+      "contact_phone": "+40 741 232 323",
+      "contact_website": "",
+      "status": "published",
+      "sort_order": 8
+    },
+    {
+      "id": "ex-10",
+      "tenant_id": "prispa",
+      "slug": "razboiul-de-tesut",
+      "name": "Războiul de Țesut",
+      "category": "Ceramică & Meșteșuguri",
+      "town": "Săpânța",
+      "county": "Maramureș",
+      "region": "Maramureș",
+      "short_description": "Covoare, ștergare și ii țesute manual la război, cu motive vechi.",
+      "description": "În atelierul din Săpânța, meșterele țes la război de lemn covoare, ștergare și ii din lână și in vopsite natural. Fiecare motiv are o poveste și un rost, transmis din generație în generație. La festival aduc un război funcțional, la care oricine poate încerca câteva bătături.",
+      "image": "https://images.unsplash.com/photo-1528795259021-d8c86e14354c?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1528795259021-d8c86e14354c?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": false,
+      "featured": false,
+      "product_ids": [],
+      "contact_phone": "+40 742 343 434",
+      "contact_website": "",
+      "status": "published",
+      "sort_order": 9
+    },
+    {
+      "id": "ex-11",
+      "tenant_id": "prispa",
+      "slug": "livada-cu-povesti",
+      "name": "Livada cu Povești",
+      "category": "Dulcețuri & Siropuri",
+      "town": "Zărnești",
+      "county": "Brașov",
+      "region": "Brașov și împrejurimi",
+      "short_description": "Sucuri presate la rece și cidru din meri bătrâni de sub Piatra Craiului.",
+      "description": "Din livezile de meri bătrâni de la poalele Pietrei Craiului, Livada cu Povești presează la rece sucuri de mere și pere și fermentează cidru natural. Fructele sunt culese manual, iar sucul nu este filtrat, păstrând gustul întreg al fructului.",
+      "image": "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "certified": true,
+      "featured": false,
+      "product_ids": [],
+      "contact_phone": "",
+      "contact_website": "https://livadacupovesti.ro",
+      "status": "published",
+      "sort_order": 10
+    },
+    {
+      "id": "ex-12",
+      "tenant_id": "prispa",
+      "slug": "casa-cu-cerdac",
+      "name": "Casa cu Cerdac",
+      "category": "Turism & Ospitalitate",
+      "town": "Sadova",
+      "county": "Suceava",
+      "region": "Bucovina",
+      "short_description": "Turism rural și bucătărie bucovineană, în inima satului tradițional.",
+      "description": "Casa cu Cerdac este o gospodărie bucovineană transformată în experiență turistică: mese lungi cu preparate locale, ateliere de încondeiat ouă și povești despre viața satului. La festival aduce gustul Bucovinei și invitația de a descoperi satele Sucevei.",
+      "image": "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "certified": false,
+      "featured": false,
+      "product_ids": [],
+      "contact_phone": "+40 743 454 545",
+      "contact_website": "",
+      "status": "draft",
+      "sort_order": 11
+    }
+  ],
+  "products": [
+    {
+      "id": "pr-1",
+      "tenant_id": "prispa",
+      "slug": "cascaval-afumat-de-tarcu",
+      "name": "Cașcaval afumat de Țarcu",
+      "producer": "Stâna din Poiana",
+      "exhibitor_id": "ex-1",
+      "region": "Banatul Montan",
+      "category": "Lactate",
+      "short_description": "Cașcaval maturat trei luni, afumat natural cu lemn de fag.",
+      "story": "Povestea acestui cașcaval începe primăvara, când oile urcă spre pășunile Munților Țarcu. Laptele adunat dimineața se încheagă în aceeași zi, iar roțile de cașcaval coboară apoi în beciul de piatră al stânei, unde maturează minimum trei luni. Afumarea finală, doar cu lemn de fag, îi dă coaja aurie și aroma inconfundabilă. Este brânza pe care familia Munteanu o face de patru generații.",
+      "image": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "45 lei / kg",
+      "featured": true,
+      "status": "published",
+      "sort_order": 0
+    },
+    {
+      "id": "pr-2",
+      "tenant_id": "prispa",
+      "slug": "branza-framantata",
+      "name": "Brânză frământată de oaie",
+      "producer": "Stâna din Poiana",
+      "exhibitor_id": "ex-1",
+      "region": "Banatul Montan",
+      "category": "Lactate",
+      "short_description": "Brânză de burduf frământată manual, sărată în putină.",
+      "story": "Brânza frământată se face din caș de oaie lăsat la scurs, apoi frământat manual cu sare și maturat în putină de brad. Este intens, ușor picant și perfect alături de mămăligă caldă și o ceapă roșie. O rețetă simplă, dar care cere mână de meșter și răbdare.",
+      "image": "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "38 lei / kg",
+      "featured": false,
+      "status": "published",
+      "sort_order": 1
+    },
+    {
+      "id": "pr-3",
+      "tenant_id": "prispa",
+      "slug": "paine-cu-maia",
+      "name": "Pâine cu maia pe vatră",
+      "producer": "Brutăria cu Prispă",
+      "exhibitor_id": "ex-2",
+      "region": "Banatul Montan",
+      "category": "Panificație",
+      "short_description": "Pâine cu coajă groasă, dospită 24 de ore, coaptă pe vatră.",
+      "story": "O pâine simplă din trei ingrediente: făină de la moara de pe Timiș, apă de izvor și maia crescută în casă de peste zece ani. Aluatul dospește lent, o zi întreagă, apoi se coace pe vatra de cărămidă la foc de lemne. Coaja crocantă și miezul aromat sunt răsplata răbdării.",
+      "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "18 lei / bucată",
+      "featured": true,
+      "status": "published",
+      "sort_order": 2
+    },
+    {
+      "id": "pr-4",
+      "tenant_id": "prispa",
+      "slug": "cozonac-cu-nuca",
+      "name": "Cozonac cu nucă",
+      "producer": "Brutăria cu Prispă",
+      "exhibitor_id": "ex-2",
+      "region": "Banatul Montan",
+      "category": "Panificație",
+      "short_description": "Cozonac pufos cu umplutură bogată de nucă, copt pe vatră.",
+      "story": "Cozonacul de la Brutăria cu Prispă respectă rețeta bunicii: aluat frământat mult, cu unt și gălbenușuri, și o umplutură generoasă de nucă măcinată. Se coace încet, până când casa se umple de mireasmă. Un cozonac de sărbătoare, în orice zi a anului.",
+      "image": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "42 lei / bucată",
+      "featured": false,
+      "status": "published",
+      "sort_order": 3
+    },
+    {
+      "id": "pr-5",
+      "tenant_id": "prispa",
+      "slug": "miere-poliflora-de-munte",
+      "name": "Miere polifloră de munte",
+      "producer": "Prisaca de la Munte",
+      "exhibitor_id": "ex-3",
+      "region": "Banatul Montan",
+      "category": "Miere",
+      "short_description": "Miere densă din zeci de flori de pe pajiștile Muntelui Mic.",
+      "story": "Vara, stupii urcă pe pajiștile Muntelui Mic, unde albinele culeg din zeci de plante de munte. Rezultatul este o miere poliflora densă, cu o aromă complexă și o culoare chihlimbarie. Se cristalizează fin, semn că este naturală și nepasteurizată.",
+      "image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "35 lei / borcan",
+      "featured": true,
+      "status": "published",
+      "sort_order": 4
+    },
+    {
+      "id": "pr-6",
+      "tenant_id": "prispa",
+      "slug": "faguri-naturali",
+      "name": "Faguri naturali în miere",
+      "producer": "Prisaca de la Munte",
+      "exhibitor_id": "ex-3",
+      "region": "Banatul Montan",
+      "category": "Miere",
+      "short_description": "Fagure întreg, așa cum l-au clădit albinele.",
+      "story": "Fagurele natural este mierea în forma ei cea mai pură — clădit și căpăcit de albine, tăiat direct din ramă. Se mănâncă cu tot cu ceară și păstrează toate proprietățile mierii crude. O delicatesă rară, tot mai greu de găsit.",
+      "image": "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "48 lei / borcan",
+      "featured": false,
+      "status": "published",
+      "sort_order": 5
+    },
+    {
+      "id": "pr-7",
+      "tenant_id": "prispa",
+      "slug": "cana-de-lut-smaltuita",
+      "name": "Cană de lut smălțuită",
+      "producer": "Atelierul de Lut",
+      "exhibitor_id": "ex-4",
+      "region": "Maramureș",
+      "category": "Ceramică",
+      "short_description": "Cană modelată la roată, pictată manual cu motive maramureșene.",
+      "story": "Fiecare cană pornește de la un bulgăre de lut și de la mâinile Anei la roată. După ardere, Vasile o smălțuiește cu culori din oxizi naturali și o pictează cu motive vechi maramureșene. Nu există două piese identice — fiecare poartă urma meșterului.",
+      "image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "55 lei / bucată",
+      "featured": true,
+      "status": "published",
+      "sort_order": 6
+    },
+    {
+      "id": "pr-8",
+      "tenant_id": "prispa",
+      "slug": "dulceata-de-afine",
+      "name": "Dulceață de afine de pădure",
+      "producer": "Dulcețuri de Bucovina",
+      "exhibitor_id": "ex-5",
+      "region": "Bucovina",
+      "category": "Dulcețuri",
+      "short_description": "Afine culese manual, fierte încet la ceaun de aramă.",
+      "story": "Afinele se culeg manual, bob cu bob, din pădurile Bucovinei, apoi se fierb încet la ceaun de aramă, fără conservanți. Rezultatul este o dulceață intensă, cu boabe întregi, care păstrează gustul sălbatic al pădurii. Perfectă lângă o clătită sau o lingură de brânză dulce.",
+      "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "28 lei / borcan",
+      "featured": true,
+      "status": "published",
+      "sort_order": 7
+    },
+    {
+      "id": "pr-9",
+      "tenant_id": "prispa",
+      "slug": "sirop-de-catina",
+      "name": "Sirop de cătină",
+      "producer": "Dulcețuri de Bucovina",
+      "exhibitor_id": "ex-5",
+      "region": "Bucovina",
+      "category": "Siropuri",
+      "short_description": "Sirop bogat în vitamina C, din cătină culesă toamna târziu.",
+      "story": "Cătina se culege toamna târziu, după primul îngheț, când boabele sunt cele mai dulci. Siropul se prepară la rece, pentru a păstra vitamina C, și se îndulcește doar cu miere. O lingură pe zi, iarna, ține răceala departe.",
+      "image": "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "32 lei / sticlă",
+      "featured": false,
+      "status": "published",
+      "sort_order": 8
+    },
+    {
+      "id": "pr-10",
+      "tenant_id": "prispa",
+      "slug": "vin-de-autor-recas",
+      "name": "Vin de autor — Fetească Regală",
+      "producer": "Podgoria Recaș Mic",
+      "exhibitor_id": "ex-6",
+      "region": "Banat",
+      "category": "Băuturi",
+      "short_description": "Vin alb sec dintr-un soi autohton, vinificat separat pe an.",
+      "story": "Fetească Regală de la Recaș Mic crește pe dealurile însorite ale Banatului. Vinificat separat în fiecare an, vinul păstrează caracterul recoltei: note florale, aciditate vie și un final mineral. O producție limitată, îmbuteliată cu grijă.",
+      "image": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "48 lei / sticlă",
+      "featured": false,
+      "status": "published",
+      "sort_order": 9
+    },
+    {
+      "id": "pr-11",
+      "tenant_id": "prispa",
+      "slug": "carnati-de-casa-afumati",
+      "name": "Cârnați de casă afumați",
+      "producer": "Afumătoarea Țăranului",
+      "exhibitor_id": "ex-8",
+      "region": "Brașov și împrejurimi",
+      "category": "Afumături",
+      "short_description": "Cârnați condimentați cu usturoi și cimbru, afumați la rece.",
+      "story": "Carnea de la animale crescute liber se condimentează cu usturoi, cimbru și boia, apoi se umple în mațe naturale și se afumă la rece cu lemn de fag. Maturarea durează săptămâni, iar rezultatul este un cârnat aromat, așa cum se făcea la iarnă în satele mocănești.",
+      "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "52 lei / kg",
+      "featured": false,
+      "status": "published",
+      "sort_order": 10
+    },
+    {
+      "id": "pr-12",
+      "tenant_id": "prispa",
+      "slug": "malai-de-casa",
+      "name": "Mălai de casă măcinat pe piatră",
+      "producer": "Moara de pe Timiș",
+      "exhibitor_id": "ex-9",
+      "region": "Banatul Montan",
+      "category": "Panificație",
+      "short_description": "Mălai din porumb local, măcinat pe pietre de moară.",
+      "story": "Porumbul din culturile locale se macină pe pietre de moară, încet, ca să nu se încălzească și să-și piardă aroma. Mălaiul rezultat este grosier și auriu, perfect pentru o mămăligă densă la ceaun, alături de brânză și smântână.",
+      "image": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+        "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "price": "12 lei / kg",
+      "featured": false,
+      "status": "published",
+      "sort_order": 11
+    }
+  ],
+  "destinations": [
+    {
+      "id": "de-1",
+      "tenant_id": "prispa",
+      "slug": "banatul-montan",
+      "name": "Banatul Montan",
+      "region": "Banatul Montan",
+      "county": "Caraș-Severin",
+      "short_description": "O lume de munte cu sate autentice, ape cristaline și oameni care trăiesc încă în ritmul naturii.",
+      "description": "Banatul Montan este România pe care mulți o caută și puțini o cunosc: creste de calcar, păduri seculare, lacuri de un albastru imposibil și sate în care timpul curge altfel. De la Poiana Mărului la Muntele Mic și Munții Țarcu, este un ținut al ciobanilor, al morilor de apă și al gospodăriilor cu prispă. Aici, turismul înseamnă drumeții pe poteci nemarcate de turmă, cine cu produse din curte și seri la foc, sub un cer plin de stele. PRISPA aduce Banatul Montan la Brașov, ca invitație de a-l descoperi pe îndelete.",
+      "cover_image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "attractions": [
+        "Lacul Poiana Mărului",
+        "Vârful Țarcu (2.190 m)",
+        "Cheile Nerei",
+        "Cascada Bigăr",
+        "Domeniul schiabil Muntele Mic"
+      ],
+      "experiences": [
+        "Drumeții ghidate pe crestele Țarcu",
+        "Vizite la stânele de munte",
+        "Tururi cu bicicleta prin sate",
+        "Seri de povești la foc de tabără"
+      ],
+      "gastronomy": [
+        "Cașcaval afumat de stână",
+        "Balmoș și mămăligă la ceaun",
+        "Miere polifloră de munte",
+        "Afinată de casă"
+      ],
+      "external_link": "https://banatulmontan.ro",
+      "featured": true,
+      "editorial": true,
+      "status": "published",
+      "sort_order": 0
+    },
+    {
+      "id": "de-2",
+      "tenant_id": "prispa",
+      "slug": "poiana-marului",
+      "name": "Poiana Mărului",
+      "region": "Banatul Montan",
+      "county": "Caraș-Severin",
+      "short_description": "Sat de munte la poalele Țarcului, cu un lac de smarald și stâne cu tradiție.",
+      "description": "Poiana Mărului este poarta de intrare în Munții Țarcu, un sat risipit pe văi, cu case de lemn și gospodării vii. Lacul de acumulare, de un verde-smarald, este locul perfect pentru o zi de liniște, iar potecile duc spre stânele de sus și spre crestele alpine. Este locul de unde vin unele dintre cele mai bune brânzeturi prezente la PRISPA.",
+      "cover_image": "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "attractions": [
+        "Lacul Poiana Mărului",
+        "Stânele din Țarcu",
+        "Valea Bistrei Mărului"
+      ],
+      "experiences": [
+        "Pescuit sportiv",
+        "Drumeții spre creastă",
+        "Vizite la stână"
+      ],
+      "gastronomy": [
+        "Brânză frământată",
+        "Cașcaval afumat",
+        "Zacuscă de munte"
+      ],
+      "external_link": null,
+      "featured": true,
+      "editorial": false,
+      "status": "published",
+      "sort_order": 1
+    },
+    {
+      "id": "de-3",
+      "tenant_id": "prispa",
+      "slug": "muntele-mic",
+      "name": "Muntele Mic",
+      "region": "Banatul Montan",
+      "county": "Caraș-Severin",
+      "short_description": "Prima stațiune montană din Banat, iarna cu schi, vara cu pajiști pline de flori.",
+      "description": "Muntele Mic este stațiunea care leagă cele două anotimpuri ale muntelui: iarna, pârtiile atrag schiorii, iar vara, pajiștile alpine devin un covor de flori și pășuni pentru stupii apicultorilor. De sus, priveliștea se deschide spre Retezat și Țarcu. Un loc pentru drumeții ușoare și aer curat.",
+      "cover_image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "attractions": [
+        "Domeniul schiabil",
+        "Pajiștile alpine",
+        "Panorama spre Retezat"
+      ],
+      "experiences": [
+        "Schi și snowboard",
+        "Drumeții ușoare",
+        "Culesul plantelor de munte"
+      ],
+      "gastronomy": [
+        "Miere de munte",
+        "Ceai de plante alpine",
+        "Brânzeturi de stână"
+      ],
+      "external_link": null,
+      "featured": false,
+      "editorial": false,
+      "status": "published",
+      "sort_order": 2
+    },
+    {
+      "id": "de-4",
+      "tenant_id": "prispa",
+      "slug": "muntii-tarcu",
+      "name": "Munții Țarcu",
+      "region": "Banatul Montan",
+      "county": "Caraș-Severin",
+      "short_description": "Creste alpine sălbatice, unde zimbrii au fost readuși în libertate.",
+      "description": "Munții Țarcu sunt printre cei mai sălbatici din Carpații românești, un ținut de pajiști înalte și liniște deplină. Aici a fost reintrodus zimbrul european, care păstorește din nou pe versanții împăduriți. Traseele lungi de creastă răsplătesc drumeții cu panorame nesfârșite și cu sentimentul unei naturi neatinse.",
+      "cover_image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "attractions": [
+        "Vârful Țarcu",
+        "Rezervația de zimbri",
+        "Pajiștile de creastă"
+      ],
+      "experiences": [
+        "Trekking de creastă",
+        "Observarea zimbrilor",
+        "Fotografie de natură"
+      ],
+      "gastronomy": [
+        "Pastramă de oaie",
+        "Brânză de burduf",
+        "Afine de pădure"
+      ],
+      "external_link": null,
+      "featured": true,
+      "editorial": false,
+      "status": "published",
+      "sort_order": 3
+    },
+    {
+      "id": "de-5",
+      "tenant_id": "prispa",
+      "slug": "armenis",
+      "name": "Armeniș",
+      "region": "Banatul Montan",
+      "county": "Caraș-Severin",
+      "short_description": "Satul de la poalele Țarcului, casă a zimbrilor și a turismului responsabil.",
+      "description": "Armeniș a devenit un model de turism responsabil, locul de unde pornesc expedițiile de observare a zimbrilor reintroduși în Țarcu. Comunitatea locală a transformat conservarea naturii într-o experiență pentru vizitatori: cazare la localnici, ghizi din sat și povești despre viața la munte.",
+      "cover_image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "attractions": [
+        "Zona zimbrilor",
+        "Valea Timișului",
+        "Cheile Armenișului"
+      ],
+      "experiences": [
+        "Safari de zimbri",
+        "Cazare la localnici",
+        "Drumeții tematice"
+      ],
+      "gastronomy": [
+        "Bucătărie de gospodărie",
+        "Afumături de casă",
+        "Pâine pe vatră"
+      ],
+      "external_link": null,
+      "featured": false,
+      "editorial": false,
+      "status": "published",
+      "sort_order": 4
+    },
+    {
+      "id": "de-6",
+      "tenant_id": "prispa",
+      "slug": "brasov-si-imprejurimi",
+      "name": "Brașov și împrejurimi",
+      "region": "Brașov și împrejurimi",
+      "county": "Brașov",
+      "short_description": "Cetatea de la poalele Tâmpei și satele de sub Piatra Craiului.",
+      "description": "Brașovul este gazda festivalului PRISPA, dar și punctul de plecare spre o lume întreagă de experiențe: cetatea medievală, satele săsești din jur, Piatra Craiului și traseele Zărneștiului. Este locul unde orașul și muntele se ating, iar tradiția mocănească trăiește încă în Săcele și Bran.",
+      "cover_image": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "attractions": [
+        "Piața Sfatului",
+        "Muntele Tâmpa",
+        "Piatra Craiului",
+        "Bran"
+      ],
+      "experiences": [
+        "Tur al cetății",
+        "Drumeții în Piatra Craiului",
+        "Sate săsești"
+      ],
+      "gastronomy": [
+        "Afumături mocănești",
+        "Sucuri presate la rece",
+        "Bulz brașovean"
+      ],
+      "external_link": null,
+      "featured": false,
+      "editorial": false,
+      "status": "published",
+      "sort_order": 5
+    },
+    {
+      "id": "de-7",
+      "tenant_id": "prispa",
+      "slug": "maramures",
+      "name": "Maramureș",
+      "region": "Maramureș",
+      "county": "Maramureș",
+      "short_description": "Țara lemnului și a bisericilor de lemn, cu porți sculptate și tradiții vii.",
+      "description": "Maramureșul este ultima Europă rurală, un ținut unde lemnul spune povești: porți sculptate, biserici cu turle ascuțite și Cimitirul Vesel de la Săpânța. Aici, meșteșugurile nu sunt muzeu, ci viață de zi cu zi. De la Maramureș vin olarii și țesătoarele prezente la PRISPA.",
+      "cover_image": "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&w=1200&q=80"
+      ],
+      "attractions": [
+        "Cimitirul Vesel",
+        "Bisericile de lemn",
+        "Mocănița de pe Vaser"
+      ],
+      "experiences": [
+        "Ateliere de olărit",
+        "Tur al satelor",
+        "Călătorie cu mocănița"
+      ],
+      "gastronomy": [
+        "Horincă",
+        "Sarmale în cuib",
+        "Brânză de oaie"
+      ],
+      "external_link": null,
+      "featured": true,
+      "editorial": false,
+      "status": "published",
+      "sort_order": 6
+    },
+    {
+      "id": "de-8",
+      "tenant_id": "prispa",
+      "slug": "bucovina",
+      "name": "Bucovina",
+      "region": "Bucovina",
+      "county": "Suceava",
+      "short_description": "Ținutul mănăstirilor pictate și al satelor cu bucătărie generoasă.",
+      "description": "Bucovina îmbină spiritualitatea mănăstirilor pictate, unicat în lume, cu ospitalitatea satelor și cu o bucătărie bogată. Dealurile line, pădurile de brad și tradiția încondeierii ouălor fac din Bucovina o destinație pentru toate anotimpurile. De aici vin dulcețurile și experiențele rurale de la festival.",
+      "cover_image": "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=1600&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80",
+        "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80"
+      ],
+      "attractions": [
+        "Mănăstirea Voroneț",
+        "Mănăstirea Sucevița",
+        "Satele Sucevei"
+      ],
+      "experiences": [
+        "Tur al mănăstirilor",
+        "Ateliere de încondeiat ouă",
+        "Turism rural"
+      ],
+      "gastronomy": [
+        "Dulcețuri de pădure",
+        "Sirop de cătină",
+        "Bucătărie bucovineană"
+      ],
+      "external_link": null,
+      "featured": false,
+      "editorial": false,
+      "status": "published",
+      "sort_order": 7
+    }
+  ],
+  "program": [
+    {
+      "id": "ev-1",
+      "tenant_id": "prispa",
+      "day": 1,
+      "date": "2025-09-12",
+      "start_time": "12:00",
+      "end_time": "12:30",
+      "title": "Deschiderea festivalului PRISPA",
+      "description": "Ceremonia de deschidere cu fanfară și un cuvânt din partea organizatorilor și partenerilor.",
+      "stage": "Scena Mare",
+      "category": "Muzică",
+      "featured": true,
+      "sort_order": 0
+    },
+    {
+      "id": "ev-2",
+      "tenant_id": "prispa",
+      "day": 1,
+      "date": "2025-09-12",
+      "start_time": "13:00",
+      "end_time": "14:30",
+      "title": "Deschiderea porților expozanților",
+      "description": "Peste 100 de producători își deschid standurile în Piața Sfatului. Degustări și primele povești.",
+      "stage": "Zona Expozanți",
+      "category": "Gastronomie",
+      "featured": false,
+      "sort_order": 1
+    },
+    {
+      "id": "ev-3",
+      "tenant_id": "prispa",
+      "day": 1,
+      "date": "2025-09-12",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "title": "Atelier: brânza de la stână la masă",
+      "description": "Demonstrație live de preparare a cașcavalului, cu degustare, alături de Stâna din Poiana.",
+      "stage": "Cortul Gastronomic",
+      "category": "Atelier",
+      "featured": true,
+      "sort_order": 2
+    },
+    {
+      "id": "ev-4",
+      "tenant_id": "prispa",
+      "day": 1,
+      "date": "2025-09-12",
+      "start_time": "16:30",
+      "end_time": "17:30",
+      "title": "Banatul Montan — o poveste de munte",
+      "description": "Prezentare editorială a destinației Banatul Montan, cu proiecții și invitați locali.",
+      "stage": "Scena Turism",
+      "category": "Turism",
+      "featured": true,
+      "sort_order": 3
+    },
+    {
+      "id": "ev-5",
+      "tenant_id": "prispa",
+      "day": 1,
+      "date": "2025-09-12",
+      "start_time": "18:00",
+      "end_time": "19:30",
+      "title": "Atelier de olărit pentru copii",
+      "description": "Cei mici modelează prima lor cană la roată, alături de meșterii de la Atelierul de Lut.",
+      "stage": "Zona Copiilor",
+      "category": "Copii",
+      "featured": false,
+      "sort_order": 4
+    },
+    {
+      "id": "ev-6",
+      "tenant_id": "prispa",
+      "day": 1,
+      "date": "2025-09-12",
+      "start_time": "20:00",
+      "end_time": "22:00",
+      "title": "Concert de deschidere — folclor reinventat",
+      "description": "O seară de muzică ce împletește sunetul tradițional cu aranjamente moderne.",
+      "stage": "Scena Mare",
+      "category": "Muzică",
+      "featured": true,
+      "sort_order": 5
+    },
+    {
+      "id": "ev-7",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "title": "Dimineață la piață — tur ghidat de degustare",
+      "description": "Un traseu ghidat printre standuri, cu opriri la producătorii certificați și povești despre produse.",
+      "stage": "Zona Expozanți",
+      "category": "Gastronomie",
+      "featured": false,
+      "sort_order": 6
+    },
+    {
+      "id": "ev-8",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "11:30",
+      "end_time": "12:30",
+      "title": "Atelier de țesut la război",
+      "description": "Demonstrație și practică la războiul de țesut, alături de meșterele din Săpânța.",
+      "stage": "Zona Meșteșuguri",
+      "category": "Meșteșuguri",
+      "featured": false,
+      "sort_order": 7
+    },
+    {
+      "id": "ev-9",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "title": "Show culinar: bucătăria satului",
+      "description": "Un chef invitat gătește live preparate tradiționale cu produse de la expozanți.",
+      "stage": "Cortul Gastronomic",
+      "category": "Gastronomie",
+      "featured": true,
+      "sort_order": 8
+    },
+    {
+      "id": "ev-10",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "14:30",
+      "end_time": "15:30",
+      "title": "Degustare de vinuri de autor",
+      "description": "Degustare ghidată cu Podgoria Recaș Mic, despre soiuri autohtone și terroir bănățean.",
+      "stage": "Cortul Gastronomic",
+      "category": "Gastronomie",
+      "featured": false,
+      "sort_order": 9
+    },
+    {
+      "id": "ev-11",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "title": "Destinațiile României — masă rotundă",
+      "description": "Reprezentanți din Maramureș, Bucovina și Banatul Montan despre turismul autentic.",
+      "stage": "Scena Turism",
+      "category": "Conferință",
+      "featured": false,
+      "sort_order": 10
+    },
+    {
+      "id": "ev-12",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "17:30",
+      "end_time": "18:30",
+      "title": "Poveștile din prisacă — atelier despre miere",
+      "description": "Cum ajunge mierea de la floare la borcan, cu Prisaca de la Munte. Degustare de sortimente.",
+      "stage": "Zona Copiilor",
+      "category": "Atelier",
+      "featured": false,
+      "sort_order": 11
+    },
+    {
+      "id": "ev-13",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "19:00",
+      "end_time": "20:00",
+      "title": "Ansamblu folcloric — dansuri din Banat",
+      "description": "Spectacol de dansuri populare bănățene, cu costume tradiționale.",
+      "stage": "Scena Mare",
+      "category": "Muzică",
+      "featured": false,
+      "sort_order": 12
+    },
+    {
+      "id": "ev-14",
+      "tenant_id": "prispa",
+      "day": 2,
+      "date": "2025-09-13",
+      "start_time": "20:30",
+      "end_time": "22:30",
+      "title": "Concertul serii — muzică de suflet",
+      "description": "Cap de afiș al ediției, o seară de muzică sub cerul Brașovului.",
+      "stage": "Scena Mare",
+      "category": "Muzică",
+      "featured": true,
+      "sort_order": 13
+    },
+    {
+      "id": "ev-15",
+      "tenant_id": "prispa",
+      "day": 3,
+      "date": "2025-09-14",
+      "start_time": "10:30",
+      "end_time": "11:30",
+      "title": "Atelier de pâine cu maia",
+      "description": "Frământat, dospit și copt — secretele pâinii cu maia, cu Brutăria cu Prispă.",
+      "stage": "Cortul Gastronomic",
+      "category": "Atelier",
+      "featured": false,
+      "sort_order": 14
+    },
+    {
+      "id": "ev-16",
+      "tenant_id": "prispa",
+      "day": 3,
+      "date": "2025-09-14",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "title": "Drumeție ghidată virtuală — Munții Țarcu",
+      "description": "O călătorie prin imagini și povești pe crestele Țarcului și în lumea zimbrilor.",
+      "stage": "Scena Turism",
+      "category": "Turism",
+      "featured": false,
+      "sort_order": 15
+    },
+    {
+      "id": "ev-17",
+      "tenant_id": "prispa",
+      "day": 3,
+      "date": "2025-09-14",
+      "start_time": "14:00",
+      "end_time": "15:30",
+      "title": "Hora satelor — dans deschis pentru toți",
+      "description": "Toți vizitatorii sunt invitați să prindă pașii horei, alături de ansamblurile invitate.",
+      "stage": "Scena Mare",
+      "category": "Muzică",
+      "featured": true,
+      "sort_order": 16
+    },
+    {
+      "id": "ev-18",
+      "tenant_id": "prispa",
+      "day": 3,
+      "date": "2025-09-14",
+      "start_time": "18:00",
+      "end_time": "19:00",
+      "title": "Închiderea festivalului",
+      "description": "Un final cald, cu mulțumiri, premierea celor mai apreciați expozanți și un cântec de rămas-bun.",
+      "stage": "Scena Mare",
+      "category": "Muzică",
+      "featured": true,
+      "sort_order": 17
+    }
+  ],
+  "partners": [
+    {
+      "id": "pa-1",
+      "tenant_id": "prispa",
+      "slug": "asociatia-prispa",
+      "name": "Asociația PRISPA",
+      "tier": "Organizator",
+      "logo": "PR",
+      "description": "Organizatorul festivalului, o asociație dedicată promovării satului românesc, a producătorilor locali și a turismului autentic.",
+      "website": "https://prispa.ro",
+      "featured_on_home": true,
+      "sort_order": 1,
+      "status": "published"
+    },
+    {
+      "id": "pa-2",
+      "tenant_id": "prispa",
+      "slug": "primaria-brasov",
+      "name": "Primăria Municipiului Brașov",
+      "tier": "Partener instituțional",
+      "logo": "BV",
+      "description": "Gazda festivalului în Piața Sfatului și partener în organizarea evenimentelor din centrul istoric.",
+      "website": "https://brasovcity.ro",
+      "featured_on_home": true,
+      "sort_order": 2,
+      "status": "published"
+    },
+    {
+      "id": "pa-3",
+      "tenant_id": "prispa",
+      "slug": "consiliul-judetean-caras-severin",
+      "name": "Consiliul Județean Caraș-Severin",
+      "tier": "Partener instituțional",
+      "logo": "CS",
+      "description": "Partener în promovarea Banatului Montan, a destinațiilor și a producătorilor din județ.",
+      "website": "https://cjcs.ro",
+      "featured_on_home": false,
+      "sort_order": 3,
+      "status": "published"
+    },
+    {
+      "id": "pa-4",
+      "tenant_id": "prispa",
+      "slug": "banca-transilvania",
+      "name": "Banca Locală",
+      "tier": "Partener principal",
+      "logo": "BL",
+      "description": "Partener principal al ediției, susținând programele dedicate micilor producători și antreprenorilor din mediul rural.",
+      "website": "https://example.com",
+      "featured_on_home": true,
+      "sort_order": 4,
+      "status": "published"
+    },
+    {
+      "id": "pa-5",
+      "tenant_id": "prispa",
+      "slug": "grup-agroalimentar",
+      "name": "Grupul Agroalimentar Montan",
+      "tier": "Partener principal",
+      "logo": "AM",
+      "description": "Susține zona gastronomică și programul de certificare a produselor montane prezente la festival.",
+      "website": "https://example.com",
+      "featured_on_home": true,
+      "sort_order": 5,
+      "status": "published"
+    },
+    {
+      "id": "pa-6",
+      "tenant_id": "prispa",
+      "slug": "apa-de-munte",
+      "name": "Apă de Munte",
+      "tier": "Sponsor",
+      "logo": "AM",
+      "description": "Sponsor oficial cu apă de izvor pentru zonele festivalului.",
+      "website": "https://example.com",
+      "featured_on_home": false,
+      "sort_order": 6,
+      "status": "published"
+    },
+    {
+      "id": "pa-7",
+      "tenant_id": "prispa",
+      "slug": "cafeaua-de-acasa",
+      "name": "Cafeaua de Acasă",
+      "tier": "Sponsor",
+      "logo": "CA",
+      "description": "Prăjitorie parteneră pentru zona de cafea de specialitate.",
+      "website": "https://example.com",
+      "featured_on_home": false,
+      "sort_order": 7,
+      "status": "published"
+    },
+    {
+      "id": "pa-8",
+      "tenant_id": "prispa",
+      "slug": "radio-brasov",
+      "name": "Radio Brașov",
+      "tier": "Partener media",
+      "logo": "RB",
+      "description": "Partener media care transmite live din Piața Sfatului.",
+      "website": "https://example.com",
+      "featured_on_home": false,
+      "sort_order": 8,
+      "status": "published"
+    },
+    {
+      "id": "pa-9",
+      "tenant_id": "prispa",
+      "slug": "revista-satul-romanesc",
+      "name": "Revista Satul Românesc",
+      "tier": "Partener media",
+      "logo": "SR",
+      "description": "Publicație parteneră dedicată tradițiilor și poveștilor din satul românesc.",
+      "website": "https://example.com",
+      "featured_on_home": false,
+      "sort_order": 9,
+      "status": "published"
+    },
+    {
+      "id": "pa-10",
+      "tenant_id": "prispa",
+      "slug": "asociatia-turism-banat",
+      "name": "Asociația de Turism Banat",
+      "tier": "Partener local",
+      "logo": "TB",
+      "description": "Partener local în promovarea destinațiilor turistice din Banatul Montan.",
+      "website": "https://example.com",
+      "featured_on_home": false,
+      "sort_order": 10,
+      "status": "published"
+    },
+    {
+      "id": "pa-11",
+      "tenant_id": "prispa",
+      "slug": "mesteri-populari-maramures",
+      "name": "Meșteri Populari Maramureș",
+      "tier": "Partener local",
+      "logo": "MM",
+      "description": "Asociație parteneră care aduce meșteșugarii maramureșeni la festival.",
+      "website": "https://example.com",
+      "featured_on_home": false,
+      "sort_order": 11,
+      "status": "published"
+    },
+    {
+      "id": "pa-12",
+      "tenant_id": "prispa",
+      "slug": "voluntarii-prispa",
+      "name": "Voluntarii PRISPA",
+      "tier": "Partener local",
+      "logo": "VP",
+      "description": "Echipa de voluntari care face festivalul posibil, an de an.",
+      "website": "https://prispa.ro",
+      "featured_on_home": false,
+      "sort_order": 12,
+      "status": "published"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "g-1",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Masă plină cu preparate tradiționale",
+      "category": "Gastronomie",
+      "span": "wide",
+      "sort_order": 0
+    },
+    {
+      "id": "g-2",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Cașcaval afumat de stână",
+      "category": "Produse",
+      "span": "normal",
+      "sort_order": 1
+    },
+    {
+      "id": "g-3",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Concert pe scena mare, seara",
+      "category": "Concerte",
+      "span": "tall",
+      "sort_order": 2
+    },
+    {
+      "id": "g-4",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Meșter olar la roată",
+      "category": "Ateliere",
+      "span": "normal",
+      "sort_order": 3
+    },
+    {
+      "id": "g-5",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Lac de munte în Banatul Montan",
+      "category": "Turism",
+      "span": "wide",
+      "sort_order": 4
+    },
+    {
+      "id": "g-6",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Pâine cu maia coaptă pe vatră",
+      "category": "Produse",
+      "span": "normal",
+      "sort_order": 5
+    },
+    {
+      "id": "g-7",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1533928298208-27ff66555d8d?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Ansamblu folcloric în costume tradiționale",
+      "category": "Tradiții",
+      "span": "tall",
+      "sort_order": 6
+    },
+    {
+      "id": "g-8",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Borcane cu miere de munte",
+      "category": "Produse",
+      "span": "normal",
+      "sort_order": 7
+    },
+    {
+      "id": "g-9",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1528795259021-d8c86e14354c?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Țesut la războiul de lemn",
+      "category": "Ateliere",
+      "span": "normal",
+      "sort_order": 8
+    },
+    {
+      "id": "g-10",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Sat de munte într-o vale verde",
+      "category": "Turism",
+      "span": "wide",
+      "sort_order": 9
+    },
+    {
+      "id": "g-11",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Preparat gătit pe loc la festival",
+      "category": "Gastronomie",
+      "span": "normal",
+      "sort_order": 10
+    },
+    {
+      "id": "g-12",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1541692641319-981cc79ee10a?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Copii la atelier creativ",
+      "category": "Ateliere",
+      "span": "normal",
+      "sort_order": 11
+    },
+    {
+      "id": "g-13",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Lumini pe scenă în timpul concertului",
+      "category": "Concerte",
+      "span": "tall",
+      "sort_order": 12
+    },
+    {
+      "id": "g-14",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Obiecte de artizanat pe stand",
+      "category": "Tradiții",
+      "span": "normal",
+      "sort_order": 13
+    },
+    {
+      "id": "g-15",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Stand de piață cu produse locale",
+      "category": "Gastronomie",
+      "span": "wide",
+      "sort_order": 14
+    },
+    {
+      "id": "g-16",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Dulcețuri de pădure în borcane",
+      "category": "Produse",
+      "span": "normal",
+      "sort_order": 15
+    },
+    {
+      "id": "g-17",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Creste montane din Munții Țarcu",
+      "category": "Turism",
+      "span": "tall",
+      "sort_order": 16
+    },
+    {
+      "id": "g-18",
+      "tenant_id": "prispa",
+      "src": "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Vizitatori în Piața Sfatului",
+      "category": "Tradiții",
+      "span": "wide",
+      "sort_order": 17
+    }
+  ],
+  "articles": [
+    {
+      "id": "ar-1",
+      "tenant_id": "prispa",
+      "slug": "de-ce-prispa",
+      "title": "De ce PRISPA: povestea din spatele festivalului",
+      "excerpt": "Prispa este locul unde satul se deschide către oaspete. Am construit un festival în jurul acestei idei simple și calde.",
+      "body": "<p>Prispa a fost dintotdeauna locul întâlnirii. Acolo se stătea la povești seara, se primeau oaspeții, se sărbătoreau bucuriile satului. Am pornit de la această imagine când am imaginat festivalul: un loc în care România autentică își deschide poarta.</p>\n<h2>O idee simplă</h2>\n<p>Am vrut să aducem la un loc oameni care fac lucruri cu mâna lor și cu inima: producători, meșteșugari, bucătari, gazde de la munte. Nu un târg oarecare, ci o prispă uriașă, unde fiecare are o poveste de spus.</p>\n<blockquote>Nu vindem doar produse. Ducem mai departe gesturi, gusturi și locuri.</blockquote>\n<h2>De la sat la Piața Sfatului</h2>\n<p>Am ales Brașovul și Piața Sfatului pentru că este un loc de întâlnire firesc, la granița dintre oraș și munte. Timp de trei zile, centrul istoric devine o hartă vie a României rurale.</p>\n<p>Te invităm să descoperi festivalul așa cum ai descoperi un sat: fără grabă, cu curiozitate și cu poftă de povești.</p>",
+      "category": "Festival",
+      "author": "Echipa PRISPA",
+      "date": "2025-07-10",
+      "reading_minutes": 5,
+      "cover_image": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1400&q=80",
+      "featured": true,
+      "status": "published",
+      "sort_order": 0
+    },
+    {
+      "id": "ar-2",
+      "tenant_id": "prispa",
+      "slug": "banatul-montan-romania-nedescoperita",
+      "title": "Banatul Montan, România pe care puțini o cunosc",
+      "excerpt": "Creste de calcar, lacuri de smarald și sate în care timpul curge altfel. O invitație către cel mai frumos ținut ascuns al țării.",
+      "body": "<p>Există un colț al României despre care se vorbește prea puțin. Banatul Montan nu are aglomerația stațiunilor cunoscute, dar are ceva mai rar: liniște și autenticitate.</p>\n<h2>Munții care ascund povești</h2>\n<p>De la Poiana Mărului la Muntele Mic și Munții Țarcu, peisajul se schimbă la fiecare curbă. Aici au fost readuși zimbrii în libertate, iar stânele funcționează ca acum o sută de ani.</p>\n<h3>Ce să nu ratezi</h3>\n<ul>\n<li>Lacul Poiana Mărului, de un verde imposibil</li>\n<li>Crestele Munților Țarcu și rezervația de zimbri</li>\n<li>Cheile Nerei și Cascada Bigăr</li>\n</ul>\n<h2>Gustul locului</h2>\n<p>Brânza afumată de stână, mierea polifloră de munte și afinata de casă sunt doar începutul. La PRISPA aducem producătorii care le fac, ca să le cunoști povestea direct de la sursă.</p>",
+      "category": "Regiuni",
+      "author": "Ana Codrea",
+      "date": "2025-07-22",
+      "reading_minutes": 7,
+      "cover_image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80",
+      "featured": true,
+      "status": "published",
+      "sort_order": 1
+    },
+    {
+      "id": "ar-3",
+      "tenant_id": "prispa",
+      "slug": "cascavalul-de-la-stana-la-masa",
+      "title": "Cașcavalul, de la stână la masă",
+      "excerpt": "Cum ajunge laptele de dimineață o roată de cașcaval maturată trei luni. Am urcat la stână să aflăm.",
+      "body": "<p>La 1.200 de metri altitudine, ziua începe înainte de răsărit. Oile sunt mulse, iar laptele cald pornește imediat spre căldarea de închegat.</p>\n<h2>Răbdarea ca ingredient</h2>\n<p>Nimic nu se grăbește la stână. Cașul se leagă, se taie, se opărește și se frământă, apoi coboară în beciul de piatră pentru maturare. Trei luni mai târziu, roata de cașcaval este afumată cu lemn de fag.</p>\n<blockquote>Nu poți grăbi timpul. Cașcavalul bun cere luni, nu zile.</blockquote>\n<p>La festival, familia Munteanu aduce nu doar cașcavalul, ci și demonstrația: vei vedea cu ochii tăi cum se leagă cașul.</p>",
+      "category": "Producători",
+      "author": "Mihai Preda",
+      "date": "2025-08-01",
+      "reading_minutes": 6,
+      "cover_image": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
+      "featured": false,
+      "status": "published",
+      "sort_order": 2
+    },
+    {
+      "id": "ar-4",
+      "tenant_id": "prispa",
+      "slug": "interviu-mester-olar",
+      "title": "Interviu: un meșter olar despre lut și răbdare",
+      "excerpt": "„Lutul te învață să nu te grăbești.” Am stat de vorbă cu Vasile de la Atelierul de Lut din Baia Mare.",
+      "body": "<p>Vasile modelează lut de peste treizeci de ani. L-am întrebat de unde vine pasiunea și cum se păstrează un meșteșug vechi într-o lume grăbită.</p>\n<h2>Cum ai început?</h2>\n<p>„De mic, în atelierul tatălui meu. Prima cană am făcut-o pe la zece ani, strâmbă și grea. O păstrez și acum, ca să nu uit de unde am plecat.”</p>\n<h2>Ce te învață lutul?</h2>\n<p>„Răbdare. Dacă te grăbești, se strică. Trebuie să-l simți, să-l lași să-ți spună ce vrea să devină.”</p>\n<h3>Despre viitor</h3>\n<p>„Mă bucur că vin tinerii la ateliere. Atâta timp cât cineva vrea să învețe, meșteșugul trăiește.”</p>",
+      "category": "Interviuri",
+      "author": "Ana Codrea",
+      "date": "2025-08-05",
+      "reading_minutes": 8,
+      "cover_image": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+      "featured": false,
+      "status": "published",
+      "sort_order": 3
+    },
+    {
+      "id": "ar-5",
+      "tenant_id": "prispa",
+      "slug": "ghid-festival-cu-copii",
+      "title": "Ghid: cum să vizitezi PRISPA cu copiii",
+      "excerpt": "Ateliere, jocuri și gustări prietenoase. Tot ce trebuie să știi pentru o zi reușită în familie.",
+      "body": "<p>PRISPA este un festival gândit pentru toate vârstele. Iată cum să-ți organizezi vizita dacă vii cu cei mici.</p>\n<h2>Zona Copiilor</h2>\n<p>În fiecare zi găsești ateliere de olărit, jocuri tradiționale și povești. Programul este afișat la intrarea în zonă.</p>\n<h3>Sfaturi practice</h3>\n<ul>\n<li>Vino dimineața, când e mai puțină aglomerație</li>\n<li>Ia apă și o pălărie pentru soare</li>\n<li>Rezervă atelierele populare din timp, la stand</li>\n</ul>\n<p>Intrarea este liberă, iar majoritatea atelierelor pentru copii sunt gratuite.</p>",
+      "category": "Ghid",
+      "author": "Echipa PRISPA",
+      "date": "2025-08-10",
+      "reading_minutes": 4,
+      "cover_image": "https://images.unsplash.com/photo-1541692641319-981cc79ee10a?auto=format&fit=crop&w=1400&q=80",
+      "featured": false,
+      "status": "published",
+      "sort_order": 4
+    },
+    {
+      "id": "ar-6",
+      "tenant_id": "prispa",
+      "slug": "mierea-de-munte-poveste",
+      "title": "Mierea de munte și albinele care urcă vara la deal",
+      "excerpt": "Apicultura pastorală înseamnă a duce stupii acolo unde înflorește muntele. O poveste despre albine și altitudine.",
+      "body": "<p>Vara, familia Pavel își încarcă stupii în remorcă și urcă spre pajiștile Muntelui Mic. Acolo, albinele culeg din zeci de plante de munte.</p>\n<h2>De ce contează altitudinea</h2>\n<p>Florile de munte dau o miere densă și complexă, diferită de cea de câmpie. Fiecare deal are propria semnătură de arome.</p>\n<blockquote>Albinele știu drumul mai bine ca noi. Noi doar le ducem mai aproape de flori.</blockquote>\n<p>La festival poți degusta mai multe sortimente și afla care ți se potrivește.</p>",
+      "category": "Producători",
+      "author": "Mihai Preda",
+      "date": "2025-08-14",
+      "reading_minutes": 5,
+      "cover_image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+      "featured": false,
+      "status": "published",
+      "sort_order": 5
+    },
+    {
+      "id": "ar-7",
+      "tenant_id": "prispa",
+      "slug": "trei-zile-la-brasov",
+      "title": "Trei zile la Brașov: festivalul și împrejurimile",
+      "excerpt": "Cum îmbini festivalul cu o escapadă în munții din jur. Un mini-ghid pentru un weekend complet.",
+      "body": "<p>PRISPA durează trei zile, dar Brașovul și împrejurimile merită mai mult. Iată o idee de program.</p>\n<h2>Vineri</h2>\n<p>Deschiderea festivalului și o seară în centrul istoric, cu concertul de deschidere în Piața Sfatului.</p>\n<h2>Sâmbătă</h2>\n<p>Dimineața la festival, după-amiaza o urcare pe Tâmpa sau o vizită la Bran.</p>\n<h2>Duminică</h2>\n<p>Hora satelor la festival și, la plecare, o oprire în satele de sub Piatra Craiului.</p>",
+      "category": "Ghid",
+      "author": "Ana Codrea",
+      "date": "2025-08-18",
+      "reading_minutes": 6,
+      "cover_image": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+      "featured": false,
+      "status": "published",
+      "sort_order": 6
+    },
+    {
+      "id": "ar-8",
+      "tenant_id": "prispa",
+      "slug": "editia-2026-ce-urmeaza",
+      "title": "Ce urmează: primele idei pentru ediția 2026",
+      "excerpt": "Mai mulți producători, o zonă turistică extinsă și noi ateliere. Îți spunem la ce ne gândim.",
+      "body": "<p>Ediția din acest an nu s-a încheiat bine și deja ne gândim la următoarea. Iată câteva direcții.</p>\n<h2>Mai mult spațiu pentru turism</h2>\n<p>Vrem să extindem zona destinațiilor, cu mai multe regiuni și experiențe interactive.</p>\n<h2>Noi ateliere</h2>\n<p>Pregătim ateliere de fierărie, de vopsit natural și de gătit la ceaun.</p>\n<p>Rămâi aproape — vom anunța totul aici, la Noutăți.</p>",
+      "category": "Festival",
+      "author": "Echipa PRISPA",
+      "date": "2025-08-25",
+      "reading_minutes": 3,
+      "cover_image": "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=1600&q=80",
+      "featured": false,
+      "status": "draft",
+      "sort_order": 7
+    }
+  ],
+  "contact_messages": [
+    {
+      "id": "cm-1",
+      "tenant_id": "prispa",
+      "name": "Ioana Petrescu",
+      "email": "ioana.p@example.com",
+      "subject": "Înscriere ca expozant",
+      "message": "Bună ziua! Suntem o mică brutărie din Sibiu și ne-ar plăcea să participăm la ediția viitoare. Cum ne putem înscrie?",
+      "date": "2025-07-28",
+      "read": false
+    },
+    {
+      "id": "cm-2",
+      "tenant_id": "prispa",
+      "name": "Andrei Munteanu",
+      "email": "andrei.m@example.com",
+      "subject": "Colaborare parteneriat media",
+      "message": "Reprezint un portal de turism și am dori să discutăm un parteneriat media pentru festival.",
+      "date": "2025-07-30",
+      "read": true
+    },
+    {
+      "id": "cm-3",
+      "tenant_id": "prispa",
+      "name": "Familia Georgescu",
+      "email": "georgescu@example.com",
+      "subject": "Program pentru copii",
+      "message": "Venim cu doi copii de 5 și 8 ani. Ce ateliere le recomandați și trebuie să rezervăm din timp?",
+      "date": "2025-08-02",
+      "read": false
+    }
+  ],
+  "newsletter": [
+    {
+      "id": "ns-1",
+      "tenant_id": "prispa",
+      "email": "maria.ionescu@example.com",
+      "date": "2025-07-15",
+      "source": "Homepage"
+    },
+    {
+      "id": "ns-2",
+      "tenant_id": "prispa",
+      "email": "vlad.dumitru@example.com",
+      "date": "2025-07-19",
+      "source": "Homepage"
+    },
+    {
+      "id": "ns-3",
+      "tenant_id": "prispa",
+      "email": "elena.stan@example.com",
+      "date": "2025-07-24",
+      "source": "Articol"
+    },
+    {
+      "id": "ns-4",
+      "tenant_id": "prispa",
+      "email": "george.pop@example.com",
+      "date": "2025-08-01",
+      "source": "Homepage"
+    },
+    {
+      "id": "ns-5",
+      "tenant_id": "prispa",
+      "email": "raluca.matei@example.com",
+      "date": "2025-08-03",
+      "source": "Contact"
+    }
+  ]
+}

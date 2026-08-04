@@ -1,0 +1,18 @@
+# --- Web framework ---
+fastapi>=0.115
+uvicorn[standard]>=0.32
+
+# --- Database / ORM ---
+sqlmodel>=0.0.22
+psycopg[binary]>=3.2          # psycopg3 (Python 3.14 friendly)
+alembic>=1.14
+
+# --- Config / validation ---
+pydantic>=2.9
+pydantic-settings>=2.6
+email-validator>=2.2
+
+# --- Auth (used from the auth phase onward) ---
+python-jose[cryptography]>=3.3
+passlib[bcrypt]>=1.7
+python-multipart>=0.0.12       # form data / file uploads

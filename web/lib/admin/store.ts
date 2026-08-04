@@ -1,0 +1,382 @@
+"use client";
+
+import * as React from "react";
+import { prispaTenant } from "@/lib/tenants/prispa";
+import type {
+  Article,
+  ContactMessage,
+  Destination,
+  Exhibitor,
+  GalleryImage,
+  NewsletterSubscriber,
+  Partner,
+  ProgramEvent,
+  Product,
+  SectionConfig,
+  Tenant,
+} from "@/lib/tenants/types";
+import {
+  apiAddSubscriber,
+  apiCreate,
+  apiDelete,
+  apiDeleteMessage,
+  apiDeleteSubscriber,
+  apiLogin,
+  apiMove,
+  apiReset,
+  apiSetMessageRead,
+  apiToggleStatus,
+  apiUpdate,
+  apiUpdateSections,
+  apiUpdateSettings,
+  clearToken,
+  fetchBundle,
+  getToken,
+} from "@/lib/admin/api";
+
+/**
+ * Admin store. The public export surface is unchanged, but auth and every
+ * mutation now hit the real FastAPI backend and persist to Postgres.
+ *
+ * Reads stay instant thanks to a local mock seed used as the initial/fallback
+ * value; each mutation applies an optimistic local update, fires the matching
+ * API call, then reconciles with server truth via `refresh()`.
+ */
+
+export interface AdminSettings {
+  name: string;
+  tagline: string;
+  shortDescription: string;
+  startDate: string;
+  endDate: string;
+  locationName: string;
+  city: string;
+  county: string;
+  email: string;
+  phone: string;
+  facebook: string;
+  instagram: string;
+  youtube: string;
+  primaryColor: string;
+  secondaryColor: string;
+  goldColor: string;
+  heroImage: string;
+  logoText: string;
+}
+
+export interface AdminData {
+  exhibitors: Exhibitor[];
+  products: Product[];
+  destinations: Destination[];
+  program: ProgramEvent[];
+  partners: Partner[];
+  gallery: GalleryImage[];
+  articles: Article[];
+  contactMessages: ContactMessage[];
+  newsletter: NewsletterSubscriber[];
+  sections: SectionConfig[];
+  settings: AdminSettings;
+}
+
+function seed(): AdminData {
+  const c = prispaTenant.content;
+  const info = prispaTenant.config.info;
+  const social = prispaTenant.config.social;
+  const contact = prispaTenant.config.contact;
+  const theme = prispaTenant.config.theme;
+  return {
+    exhibitors: structuredClone(c.exhibitors),
+    products: structuredClone(c.products),
+    destinations: structuredClone(c.destinations),
+    program: structuredClone(c.program),
+    partners: structuredClone(c.partners),
+    gallery: structuredClone(c.gallery),
+    articles: structuredClone(c.articles),
+    contactMessages: structuredClone(c.contactMessages),
+    newsletter: structuredClone(c.newsletter),
+    sections: structuredClone(prispaTenant.config.sections),
+    settings: {
+      name: info.name,
+      tagline: info.tagline,
+      shortDescription: info.shortDescription,
+      startDate: info.startDate,
+      endDate: info.endDate,
+      locationName: info.locationName,
+      city: info.city,
+      county: info.county,
+      email: contact.email,
+      phone: contact.phone,
+      facebook: social.facebook ?? "",
+      instagram: social.instagram ?? "",
+      youtube: social.youtube ?? "",
+      primaryColor: theme.primary,
+      secondaryColor: theme.secondary,
+      goldColor: theme.gold,
+      heroImage: info.heroImage,
+      logoText: info.logoText,
+    },
+  };
+}
+
+/** Map the tenant bundle (camelCase, from the API) to AdminData. */
+function bundleToAdminData(bundle: Tenant): AdminData {
+  const config = bundle.config;
+  const content = bundle.content;
+  const info = config.info;
+  return {
+    exhibitors: content.exhibitors ?? [],
+    products: content.products ?? [],
+    destinations: content.destinations ?? [],
+    program: content.program ?? [],
+    partners: content.partners ?? [],
+    gallery: content.gallery ?? [],
+    articles: content.articles ?? [],
+    contactMessages: content.contactMessages ?? [],
+    newsletter: content.newsletter ?? [],
+    sections: config.sections ?? [],
+    settings: {
+      name: info.name,
+      tagline: info.tagline,
+      shortDescription: info.shortDescription,
+      startDate: info.startDate,
+      endDate: info.endDate,
+      locationName: info.locationName,
+      city: info.city,
+      county: info.county,
+      email: config.contact.email,
+      phone: config.contact.phone,
+      facebook: config.social.facebook || "",
+      instagram: config.social.instagram || "",
+      youtube: config.social.youtube || "",
+      primaryColor: config.theme.primary,
+      secondaryColor: config.theme.secondary,
+      goldColor: config.theme.gold,
+      heroImage: info.heroImage,
+      logoText: info.logoText,
+    },
+  };
+}
+
+// --- module-level reactive store ---------------------------------------------
+let memory: AdminData = seed();
+const listeners = new Set<() => void>();
+
+function notify() {
+  listeners.forEach((l) => l());
+}
+
+/** Apply an optimistic in-place mutation to `memory` and notify subscribers. */
+function apply(mutator: (draft: AdminData) => void) {
+  mutator(memory);
+  // New top-level reference so useSyncExternalStore detects the change.
+  memory = { ...memory };
+  notify();
+}
+
+/** Fetch the server bundle and replace `memory` with server truth. */
+export async function refresh() {
+  const bundle = await fetchBundle();
+  if (bundle) {
+    memory = bundleToAdminData(bundle as Tenant);
+    notify();
+  }
+}
+
+/** Fire an admin API call, then reconcile local state with the server. */
+async function sync(call: () => Promise<unknown>) {
+  try {
+    const result = await call();
+    if (result === false || result === null) {
+      console.error("Admin API mutation failed");
+    }
+  } catch (err) {
+    console.error("Admin API mutation threw", err);
+  }
+  await refresh();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+const serverSnapshot = seed();
+
+export function useAdminData(): AdminData {
+  return React.useSyncExternalStore(
+    subscribe,
+    () => memory,
+    () => serverSnapshot
+  );
+}
+
+// --- Generic collection helpers ---------------------------------------------
+export type CollectionKey =
+  | "exhibitors"
+  | "products"
+  | "destinations"
+  | "program"
+  | "partners"
+  | "gallery"
+  | "articles";
+
+type WithId = { id: string };
+
+export function upsertItem<K extends CollectionKey>(
+  key: K,
+  item: AdminData[K][number]
+) {
+  const list = memory[key] as WithId[];
+  const exists = list.some((x) => x.id === (item as WithId).id);
+  apply((draft) => {
+    const l = draft[key] as WithId[];
+    const idx = l.findIndex((x) => x.id === (item as WithId).id);
+    if (idx >= 0) l[idx] = item as WithId;
+    else l.unshift(item as WithId);
+  });
+  void sync(() =>
+    exists
+      ? apiUpdate(key, (item as WithId).id, item)
+      : apiCreate(key, item)
+  );
+}
+
+export function deleteItem(key: CollectionKey, id: string) {
+  apply((draft) => {
+    const list = draft[key] as WithId[];
+    const idx = list.findIndex((x) => x.id === id);
+    if (idx >= 0) list.splice(idx, 1);
+  });
+  void sync(() => apiDelete(key, id));
+}
+
+export function toggleStatus(
+  key: Exclude<CollectionKey, "program" | "gallery">,
+  id: string
+) {
+  apply((draft) => {
+    const list = draft[key] as Array<WithId & { status: string }>;
+    const item = list.find((x) => x.id === id);
+    if (item) {
+      item.status = item.status === "published" ? "draft" : "published";
+    }
+  });
+  void sync(() => apiToggleStatus(key, id));
+}
+
+export function moveItem(key: CollectionKey, id: string, dir: -1 | 1) {
+  apply((draft) => {
+    const list = draft[key] as WithId[];
+    const idx = list.findIndex((x) => x.id === id);
+    const next = idx + dir;
+    if (idx < 0 || next < 0 || next >= list.length) return;
+    [list[idx], list[next]] = [list[next], list[idx]];
+  });
+  void sync(() => apiMove(key, id, dir));
+}
+
+export function updateSettings(patch: Partial<AdminSettings>) {
+  apply((draft) => {
+    draft.settings = { ...draft.settings, ...patch };
+  });
+  void sync(() => apiUpdateSettings(patch));
+}
+
+export function toggleSection(id: string) {
+  apply((draft) => {
+    const s = draft.sections.find((x) => x.id === id);
+    if (s) s.visible = !s.visible;
+  });
+  void sync(() => apiUpdateSections(memory.sections));
+}
+
+export function moveSection(id: string, dir: -1 | 1) {
+  apply((draft) => {
+    const idx = draft.sections.findIndex((x) => x.id === id);
+    const next = idx + dir;
+    if (idx < 0 || next < 0 || next >= draft.sections.length) return;
+    [draft.sections[idx], draft.sections[next]] = [
+      draft.sections[next],
+      draft.sections[idx],
+    ];
+  });
+  void sync(() => apiUpdateSections(memory.sections));
+}
+
+export function markMessageRead(id: string, read: boolean) {
+  apply((draft) => {
+    const m = draft.contactMessages.find((x) => x.id === id);
+    if (m) m.read = read;
+  });
+  void sync(() => apiSetMessageRead(id, read));
+}
+
+export function deleteMessage(id: string) {
+  apply((draft) => {
+    draft.contactMessages = draft.contactMessages.filter((x) => x.id !== id);
+  });
+  void sync(() => apiDeleteMessage(id));
+}
+
+export function addSubscriber(email: string, source = "Admin") {
+  apply((draft) => {
+    if (draft.newsletter.some((s) => s.email === email)) return;
+    draft.newsletter.unshift({
+      id: `ns-${Date.now()}`,
+      email,
+      date: new Date().toISOString().slice(0, 10),
+      source,
+    });
+  });
+  void sync(() => apiAddSubscriber(email, source || "Admin"));
+}
+
+export function deleteSubscriber(id: string) {
+  apply((draft) => {
+    draft.newsletter = draft.newsletter.filter((x) => x.id !== id);
+  });
+  void sync(() => apiDeleteSubscriber(id));
+}
+
+export function resetDemoData() {
+  void (async () => {
+    await apiReset().catch((err) =>
+      console.error("apiReset threw", err)
+    );
+    await refresh();
+  })();
+}
+
+// --- Auth (real: JWT via FastAPI) -------------------------------------------
+export const DEMO_CREDENTIALS = {
+  email: "admin@prispa.demo",
+  password: "demo1234",
+};
+
+export async function login(
+  email: string,
+  password: string
+): Promise<boolean> {
+  const ok = await apiLogin(email, password);
+  if (ok) await refresh();
+  return ok;
+}
+
+export function loginDemo(): Promise<boolean> {
+  return login(DEMO_CREDENTIALS.email, DEMO_CREDENTIALS.password);
+}
+
+export function logoutDemo() {
+  clearToken();
+  memory = seed();
+  notify();
+}
+
+export function isLoggedIn(): boolean {
+  return !!getToken();
+}
+
+/** Create a fresh id for new items (optimistic temp id; API assigns the real one). */
+export function newId(prefix: string): string {
+  return `${prefix}-${Date.now().toString(36)}`;
+}
