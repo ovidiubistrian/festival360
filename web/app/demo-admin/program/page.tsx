@@ -134,7 +134,7 @@ export default function ProgramPage() {
   return (
     <AdminShell
       title="Program"
-      description="Gestionează evenimentele din programul festivalului."
+      description="Evenimentele afișate în secțiunea Program de pe site, grupate pe zilele festivalului."
       actions={
         <Button variant="gold" size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />

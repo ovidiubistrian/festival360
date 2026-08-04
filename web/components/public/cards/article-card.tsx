@@ -22,7 +22,7 @@ export function ArticleCard({
           src={article.coverImage}
           alt={article.title}
           fill
-          sizes="(max-width: 768px) 100vw, 33vw"
+          sizes="(max-width: 640px) 84vw, (max-width: 1024px) 47vw, 33vw"
           fallbackLabel={article.title}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />

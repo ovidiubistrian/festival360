@@ -15,6 +15,24 @@ import {
 import { moveSection, toggleSection, useAdminData } from "@/lib/admin/store";
 import { toast } from "sonner";
 
+/**
+ * What each homepage section renders on the public site. Keyed by section id
+ * so the admin is explicit about the zone every switch controls.
+ */
+const SECTION_HINTS: Record<string, string> = {
+  hero: "Antetul mare din capul paginii, cu titlul, sloganul și imaginea hero.",
+  about: "Blocul „Despre festival” — prezentarea și cifrele principale.",
+  experiences: "Grila „Zone și experiențe” cu tipurile de activități.",
+  program: "Programul pe zile al evenimentelor.",
+  exhibitors: "Selecția de expozanți (producători și meșteșugari).",
+  products: "Selecția de produse locale.",
+  destinations: "Selecția de destinații turistice.",
+  partners: "Logourile partenerilor și sponsorilor evidențiați.",
+  gallery: "Galeria foto cu filtre și lightbox.",
+  news: "Ultimele articole din secțiunea Noutăți.",
+  newsletter: "Formularul de abonare la newsletter.",
+};
+
 export default function PagesPage() {
   const data = useAdminData();
 
@@ -34,7 +52,7 @@ export default function PagesPage() {
   return (
     <AdminShell
       title="Pagini și secțiuni"
-      description="Controlează ce secțiuni apar pe pagina principală a site-ului și în ce ordine. Modificările sunt o previzualizare demonstrativă."
+      description="Fiecare rând este o zonă de pe pagina principală. Comutatorul o arată sau o ascunde, iar săgețile îi schimbă ordinea pe site."
       actions={
         <Button asChild variant="outline" size="sm">
           <a href="/prispa" target="_blank" rel="noreferrer">
@@ -93,7 +111,7 @@ export default function PagesPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-foreground">{section.label}</p>
                   <p className="text-xs text-muted-foreground">
-                    ID: {section.id}
+                    {SECTION_HINTS[section.id] ?? `ID: ${section.id}`}
                   </p>
                 </div>
 

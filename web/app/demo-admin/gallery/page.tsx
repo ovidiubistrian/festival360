@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { DataToolbar } from "@/components/admin/data-toolbar";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { Field } from "@/components/admin/field";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -119,7 +120,7 @@ export default function GalleryPage() {
   return (
     <AdminShell
       title="Galerie"
-      description="Gestionează imaginile din galeria festivalului."
+      description="Imaginile din secțiunea Galerie de pe site (cu filtre pe categorii și lightbox). Ordinea de aici este ordinea afișată."
       actions={
         <Button variant="gold" size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -251,13 +252,11 @@ export default function GalleryPage() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <Field label="Adresă imagine (URL)">
-              <Input
-                value={form.src}
-                onChange={(e) => set("src", e.target.value)}
-                placeholder="https://..."
-              />
-            </Field>
+            <MediaPicker
+              label="Imagine"
+              value={form.src}
+              onChange={(url) => set("src", url)}
+            />
             <Field label="Descriere (alt)">
               <Input
                 value={form.alt}

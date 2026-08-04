@@ -158,7 +158,7 @@ export default function PartnersPage() {
   return (
     <AdminShell
       title="Parteneri"
-      description="Gestionează partenerii și sponsorii festivalului. Reordonează cu săgețile."
+      description="Partenerii grupați pe niveluri; «Evidențiat pe homepage» îi arată în secțiunea Parteneri de pe prima pagină. Reordonează cu săgețile."
       actions={
         <Button variant="gold" size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />

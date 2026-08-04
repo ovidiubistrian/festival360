@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 import app.models  # noqa: F401  (register tables on SQLModel.metadata)
 from app.api.router import api_router
@@ -38,6 +40,15 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+# Serve uploaded media files at /media (proxied by the frontend as same-origin).
+_media_path = Path(settings.MEDIA_DIR)
+_media_path.mkdir(parents=True, exist_ok=True)
+app.mount(
+    settings.MEDIA_URL_PREFIX,
+    StaticFiles(directory=str(_media_path)),
+    name="media",
+)
 
 
 @app.get("/health", tags=["meta"])

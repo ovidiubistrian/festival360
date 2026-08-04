@@ -7,6 +7,7 @@ import { DataToolbar } from "@/components/admin/data-toolbar";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Field } from "@/components/admin/field";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { Pager } from "@/components/admin/pager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -179,7 +180,7 @@ export default function NewsPage() {
   return (
     <AdminShell
       title="Noutăți"
-      description="Gestionează articolele și noutățile festivalului."
+      description="Articolele din secțiunea Noutăți de pe site și paginile lor de detaliu."
       actions={
         <Button variant="gold" size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -382,13 +383,11 @@ export default function NewsPage() {
                 }
               />
             </Field>
-            <Field label="Imagine copertă (URL)">
-              <Input
-                value={form.coverImage}
-                onChange={(e) => set("coverImage", e.target.value)}
-                placeholder="https://..."
-              />
-            </Field>
+            <MediaPicker
+              label="Imagine copertă"
+              value={form.coverImage}
+              onChange={(url) => set("coverImage", url)}
+            />
             <Field label="Rezumat" className="sm:col-span-2">
               <Textarea
                 value={form.excerpt}

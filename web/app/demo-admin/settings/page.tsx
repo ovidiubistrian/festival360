@@ -5,6 +5,7 @@ import { Save, RotateCcw } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { Field } from "@/components/admin/field";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -84,7 +85,7 @@ export default function SettingsPage() {
   return (
     <AdminShell
       title="Setări"
-      description="Configurează informațiile festivalului și identitatea vizuală. Modificările se salvează în browser (demo)."
+      description="Informațiile globale ale festivalului (nume, date, contact, social) și identitatea vizuală — culorile temei și imaginea hero din antetul site-ului."
     >
       <Tabs defaultValue="general">
         <TabsList>
@@ -281,13 +282,11 @@ export default function SettingsPage() {
                   onChange={(v) => set("goldColor", v)}
                 />
               </div>
-              <Field label="Imagine hero (URL)">
-                <Input
-                  value={form.heroImage}
-                  onChange={(e) => set("heroImage", e.target.value)}
-                  placeholder="https://..."
-                />
-              </Field>
+              <MediaPicker
+                label="Imagine hero"
+                value={form.heroImage}
+                onChange={(url) => set("heroImage", url)}
+              />
               {form.heroImage ? (
                 <div className="relative aspect-[16/7] w-full overflow-hidden rounded-xl bg-secondary">
                   <ImageWithFallback

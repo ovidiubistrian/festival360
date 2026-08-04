@@ -17,9 +17,11 @@ from app.models.content import (
     NewsletterSubscriber,
 )
 from app.models.user import AdminUser
+from app.models.media import MediaAsset
 
 __all__ = [
     "Tenant",
+    "MediaAsset",
     "Exhibitor",
     "Product",
     "Destination",

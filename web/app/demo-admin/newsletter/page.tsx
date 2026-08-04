@@ -79,7 +79,7 @@ export default function NewsletterPage() {
   return (
     <AdminShell
       title="Newsletter"
-      description="Gestionează lista de abonați la newsletter."
+      description="Abonații înscriși prin secțiunea Newsletter de pe site. Lista nu apare public — o gestionezi doar de aici."
       actions={
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportDemo}>

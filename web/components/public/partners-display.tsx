@@ -2,6 +2,7 @@ import { ExternalLink } from "lucide-react";
 import { PartnerLogo } from "@/components/shared/partner-logo";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/shared/reveal";
+import { Carousel } from "@/components/public/carousel";
 import type { Partner, PartnerTier } from "@/lib/tenants/types";
 
 const TIER_ORDER: PartnerTier[] = [
@@ -73,22 +74,19 @@ export function PartnersDisplay({ partners }: { partners: Partner[] }) {
                   </Reveal>
                 ))}
               </div>
+            ) : items.length > 4 ? (
+              <Carousel
+                ariaLabel={tier}
+                slideClassName="basis-[45%] sm:basis-[30%] lg:basis-1/5"
+              >
+                {items.map((p) => (
+                  <PartnerTile key={p.id} partner={p} />
+                ))}
+              </Carousel>
             ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {items.map((p) => (
-                  <a
-                    key={p.id}
-                    href={p.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-6 text-center transition-colors hover:border-primary/25"
-                    title={p.description}
-                  >
-                    <PartnerLogo logo={p.logo} name={p.name} />
-                    <span className="text-sm font-medium text-charcoal/80 group-hover:text-primary">
-                      {p.name}
-                    </span>
-                  </a>
+                  <PartnerTile key={p.id} partner={p} />
                 ))}
               </div>
             )}
@@ -96,5 +94,22 @@ export function PartnersDisplay({ partners }: { partners: Partner[] }) {
         );
       })}
     </div>
+  );
+}
+
+function PartnerTile({ partner: p }: { partner: Partner }) {
+  return (
+    <a
+      href={p.website}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex h-full flex-col items-center gap-3 rounded-2xl border border-border bg-card p-6 text-center transition-colors hover:border-primary/25"
+      title={p.description}
+    >
+      <PartnerLogo logo={p.logo} name={p.name} />
+      <span className="text-sm font-medium text-charcoal/80 group-hover:text-primary">
+        {p.name}
+      </span>
+    </a>
   );
 }

@@ -1830,5 +1830,357 @@
       "date": "2025-08-03",
       "source": "Contact"
     }
+  ],
+  "media": [
+    {
+      "id": "md-hero",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=2000&q=80",
+      "alt": "Hero",
+      "filename": "hero.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-heroalt",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=2000&q=80",
+      "alt": "Hero Alt",
+      "filename": "heroAlt.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-festivalcrowd",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Festival Crowd",
+      "filename": "festivalCrowd.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-aboutcollage",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1400&q=80",
+      "alt": "About Collage",
+      "filename": "aboutCollage.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-foodspread",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Food Spread",
+      "filename": "foodSpread.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-dish",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Dish",
+      "filename": "dish.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-cheese",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Cheese",
+      "filename": "cheese.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-cheeseboard",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Cheese Board",
+      "filename": "cheeseBoard.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-bread",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Bread",
+      "filename": "bread.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-breadloaves",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Bread Loaves",
+      "filename": "breadLoaves.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-honey",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Honey",
+      "filename": "honey.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-honeyjars",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Honey Jars",
+      "filename": "honeyJars.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-jam",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Jam",
+      "filename": "jam.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-preserves",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Preserves",
+      "filename": "preserves.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-wine",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Wine",
+      "filename": "wine.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-smoked",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Smoked",
+      "filename": "smoked.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-market",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Market",
+      "filename": "market.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-pottery",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Pottery",
+      "filename": "pottery.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-ceramics",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Ceramics",
+      "filename": "ceramics.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-weaving",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1528795259021-d8c86e14354c?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Weaving",
+      "filename": "weaving.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-crafts",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&w=1200&q=80",
+      "alt": "Crafts",
+      "filename": "crafts.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-mountainlake",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Mountain Lake",
+      "filename": "mountainLake.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-mountains",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Mountains",
+      "filename": "mountains.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-forest",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Forest",
+      "filename": "forest.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-valley",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1454391304352-2bf4678b1a7a?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Valley",
+      "filename": "valley.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-peaks",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Peaks",
+      "filename": "peaks.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-village",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Village",
+      "filename": "village.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-meadow",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Meadow",
+      "filename": "meadow.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-river",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=1600&q=80",
+      "alt": "River",
+      "filename": "river.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-autumn",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=1600&q=80",
+      "alt": "Autumn",
+      "filename": "autumn.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-concert",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Concert",
+      "filename": "concert.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-concertlights",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Concert Lights",
+      "filename": "concertLights.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-folk",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1533928298208-27ff66555d8d?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Folk",
+      "filename": "folk.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-children",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1541692641319-981cc79ee10a?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Children",
+      "filename": "children.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    },
+    {
+      "id": "md-workshop",
+      "tenant_id": "prispa",
+      "url": "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1400&q=80",
+      "alt": "Workshop",
+      "filename": "workshop.jpg",
+      "content_type": "image/jpeg",
+      "size": 0,
+      "is_stock": true
+    }
   ]
 }

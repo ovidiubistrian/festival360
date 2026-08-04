@@ -16,6 +16,7 @@ from app.models import (
     Destination,
     Exhibitor,
     GalleryImage,
+    MediaAsset,
     NewsletterSubscriber,
     Partner,
     ProgramEvent,
@@ -104,6 +105,8 @@ def run_seed(session: Session, *, force: bool = False) -> None:
         session.add(ContactMessage(**_parse_dates(row, ["date"])))
     for row in payload["newsletter"]:
         session.add(NewsletterSubscriber(**_parse_dates(row, ["date"])))
+    for row in payload.get("media", []):
+        session.add(MediaAsset(**row))
 
     session.commit()
 
@@ -119,6 +122,7 @@ def _wipe_tenant(session: Session, tenant_id: str) -> None:
         Article,
         ContactMessage,
         NewsletterSubscriber,
+        MediaAsset,
     ):
         rows = session.exec(
             select(model).where(model.tenant_id == tenant_id)  # type: ignore[attr-defined]

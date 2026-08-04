@@ -16,12 +16,12 @@ export function ProductCard({
       href={`/${slug}/produse/${product.slug}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(32,37,34,0.10)]"
     >
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-[3/4] overflow-hidden">
         <ImageWithFallback
           src={product.image}
           alt={product.name}
           fill
-          sizes="(max-width: 768px) 100vw, 25vw"
+          sizes="(max-width: 640px) 82vw, (max-width: 1024px) 46vw, 25vw"
           fallbackLabel={product.name}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />

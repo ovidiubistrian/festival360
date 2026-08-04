@@ -7,6 +7,7 @@ import { DataToolbar } from "@/components/admin/data-toolbar";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Field } from "@/components/admin/field";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { Pager } from "@/components/admin/pager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -172,7 +173,7 @@ export default function DestinationsPage() {
   return (
     <AdminShell
       title="Destinații"
-      description="Gestionează destinațiile turistice și poveștile editoriale."
+      description="Destinațiile turistice din secțiunea Destinații; marchează una ca «editorială» pentru blocul mare din pagină."
       actions={
         <Button variant="gold" size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -336,13 +337,11 @@ export default function DestinationsPage() {
                 onChange={(e) => set("county", e.target.value)}
               />
             </Field>
-            <Field label="Imagine copertă (URL)">
-              <Input
-                value={form.coverImage}
-                onChange={(e) => set("coverImage", e.target.value)}
-                placeholder="https://..."
-              />
-            </Field>
+            <MediaPicker
+              label="Imagine copertă"
+              value={form.coverImage}
+              onChange={(url) => set("coverImage", url)}
+            />
             <Field label="Descriere scurtă" className="sm:col-span-2">
               <Textarea
                 value={form.shortDescription}

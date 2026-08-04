@@ -32,6 +32,13 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-in-production-please-set-a-long-random-value"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12  # 12h
 
+    # --- Media library (uploaded files) ---
+    # Directory where uploads are stored (mount a volume here in production).
+    MEDIA_DIR: str = "media_uploads"
+    # Public path prefix under which media is served (proxied by the frontend).
+    MEDIA_URL_PREFIX: str = "/media"
+    MAX_UPLOAD_MB: int = 8
+
     # --- Seed / demo ---
     SEED_ON_STARTUP: bool = False
 

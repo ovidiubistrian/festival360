@@ -72,7 +72,7 @@ export default function MessagesPage() {
   return (
     <AdminShell
       title="Mesaje de contact"
-      description="Mesajele primite prin formularul de contact al site-ului."
+      description="Mesajele trimise de vizitatori prin formularul de contact al site-ului. Nu apar public — sunt vizibile doar aici."
       actions={
         <Badge variant={unreadCount > 0 ? "terracotta" : "muted"}>
           {unreadCount} necitite

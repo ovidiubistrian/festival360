@@ -16,12 +16,12 @@ export function ExhibitorCard({
       href={`/${slug}/expozanti/${exhibitor.slug}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_2px_rgba(32,37,34,0.04)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(32,37,34,0.10)]"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden">
         <ImageWithFallback
           src={exhibitor.image}
           alt={exhibitor.name}
           fill
-          sizes="(max-width: 768px) 100vw, 33vw"
+          sizes="(max-width: 640px) 82vw, (max-width: 1024px) 46vw, 33vw"
           fallbackLabel={exhibitor.name}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />

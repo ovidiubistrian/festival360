@@ -7,6 +7,7 @@ import { DataToolbar } from "@/components/admin/data-toolbar";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Field } from "@/components/admin/field";
+import { MediaPicker } from "@/components/admin/media-picker";
 import { Pager } from "@/components/admin/pager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -184,7 +185,7 @@ export default function ExhibitorsPage() {
   return (
     <AdminShell
       title="Expozanți"
-      description="Gestionează producătorii și expozanții prezenți la festival."
+      description="Producătorii și meșteșugarii afișați în secțiunea Expozanți de pe site și în paginile lor de detaliu (/prispa/expozanti)."
       actions={
         <Button variant="gold" size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -390,13 +391,11 @@ export default function ExhibitorsPage() {
                 onChange={(e) => set("region", e.target.value)}
               />
             </Field>
-            <Field label="Imagine (URL)">
-              <Input
-                value={form.image}
-                onChange={(e) => set("image", e.target.value)}
-                placeholder="https://..."
-              />
-            </Field>
+            <MediaPicker
+              label="Imagine principală"
+              value={form.image}
+              onChange={(url) => set("image", url)}
+            />
             <Field label="Descriere scurtă" className="sm:col-span-2">
               <Textarea
                 value={form.shortDescription}

@@ -10,6 +10,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { prispaTenant } from "../lib/tenants/prispa";
+import { IMG } from "../lib/tenants/prispa/images";
 
 const TENANT_ID = "prispa";
 const { config, content } = prispaTenant;
@@ -191,6 +192,18 @@ const newsletter = content.newsletter.map((n) => ({
   source: n.source,
 }));
 
+// Stock media library entries from the central image pool (external URLs).
+const media = Object.entries(IMG).map(([key, url]) => ({
+  id: `md-${key.toLowerCase()}`,
+  tenant_id: TENANT_ID,
+  url,
+  alt: key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()).trim(),
+  filename: `${key}.jpg`,
+  content_type: "image/jpeg",
+  size: 0,
+  is_stock: true,
+}));
+
 const payload = {
   tenant,
   exhibitors,
@@ -202,6 +215,7 @@ const payload = {
   articles,
   contact_messages,
   newsletter,
+  media,
 };
 
 // Silence unused helper warning if not used elsewhere.

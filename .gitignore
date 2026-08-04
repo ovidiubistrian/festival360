@@ -26,3 +26,6 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# uploaded media (runtime volume)
+api/media_uploads/
