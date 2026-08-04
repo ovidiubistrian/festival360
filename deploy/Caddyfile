@@ -1,0 +1,13 @@
+# Reverse proxy with automatic HTTPS (Let's Encrypt).
+# DOMAIN and API_DOMAIN are provided via environment (see .env.prod).
+# DNS A records for both must point at the VPS, ports 80/443 open.
+
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:3000
+}
+
+{$API_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy api:8000
+}

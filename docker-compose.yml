@@ -1,0 +1,54 @@
+# Local full-stack: builds web + api from source and runs Postgres.
+#   docker compose up --build
+# Web:  http://localhost:3000   API: http://localhost:8000/docs
+#
+# For production on a VPS use deploy/docker-compose.prod.yml (GHCR images + Caddy).
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: festival
+      POSTGRES_PASSWORD: festival
+      POSTGRES_DB: festival360
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U festival -d festival360"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://festival:festival@db:5432/festival360
+      SECRET_KEY: local-dev-secret-not-for-production
+      ENVIRONMENT: development
+      SEED_ON_STARTUP: "true"
+      CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8000:8000"
+
+  web:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    depends_on:
+      - api
+    environment:
+      # SSR uses the internal service; the browser uses the build-time public URL.
+      API_INTERNAL_URL: http://api:8000
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

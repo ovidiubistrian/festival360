@@ -68,20 +68,25 @@ setează `NEXT_PUBLIC_API_BASE_URL` (ex. în `web/.env.local`).
 - `/prispa/{despre,program,expozanti,produse,destinatii,parteneri,galerie,noutati,contact}` (+ pagini de detaliu `/[slug]`)
 - `/demo-admin/{dashboard,pages,program,exhibitors,products,destinations,partners,gallery,news,messages,newsletter,settings}`
 
-## Deploy în producție
+## Deploy în producție (Docker + GitHub Actions → VPS)
 
-Ordinea recomandată:
+CI/CD complet: fiecare push pe `main` construiește imaginile Docker (`web` + `api`),
+le publică în GitHub Container Registry (GHCR) și le deployează pe un VPS prin SSH
+cu `docker compose`, în spatele reverse-proxy-ului **Caddy** (HTTPS automat).
 
-1. **Bază de date — Neon:** creează un proiect PostgreSQL pe [neon.tech](https://neon.tech),
-   copiază connection string-ul și adaptează-l: `postgresql+psycopg://USER:PASS@HOST/DB?sslmode=require`.
-2. **Backend — Railway:** [railway.app](https://railway.app) → deploy din repo, **Root Directory = `api`**
-   (detectează `Dockerfile`). Variabile: `DATABASE_URL` (Neon), `SECRET_KEY`,
-   `ENVIRONMENT=production`, `SEED_ON_STARTUP=true`, `CORS_ORIGINS=https://<frontend>.vercel.app`.
-   La pornire rulează migrările și seed-ul. Notează URL-ul public Railway.
-3. **Frontend — Vercel:** proiectul `festival360`, **Root Directory = `web`**. Setează
-   `NEXT_PUBLIC_API_BASE_URL=https://<api-railway-url>`. Redeploy.
+```
+push main ─► CI (lint/build/smoke) ─► build & push GHCR ─► SSH VPS ─► docker compose up -d
+```
 
-Detalii pas cu pas în [`api/README.md`](api/README.md).
+Stack-ul de producție (`deploy/docker-compose.prod.yml`): `db` (Postgres + volum),
+`api`, `web`, `caddy`. Ghid complet + checklist de secrete: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+### Rulare locală în containere (identic cu producția)
+
+```bash
+docker compose up --build     # din rădăcina repo-ului
+# web: http://localhost:3000 · api: http://localhost:8000/docs
+```
 
 ## Tehnologii
 
