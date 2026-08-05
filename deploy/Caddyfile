@@ -1,13 +1,50 @@
-# Reverse proxy with automatic HTTPS (Let's Encrypt).
-# DOMAIN and API_DOMAIN are provided via environment (see .env.prod).
-# DNS A records for both must point at the VPS, ports 80/443 open.
+# Reverse proxy with automatic HTTPS.
+# - {$DOMAIN}      → marketing site + tenants at /{slug} + /demo-admin
+# - {$API_DOMAIN}  → the API
+# - any OTHER host → a tenant CUSTOM DOMAIN, served on-demand:
+#     Caddy asks the API whether it may issue a cert for that host (on_demand_tls
+#     ask), and the Next.js middleware resolves the host → tenant and serves the
+#     tenant's site at the root. No per-domain Caddy files, no reloads.
+
+{
+	email {$ACME_EMAIL}
+	on_demand_tls {
+		ask http://api:8000/api/v1/caddy/check-domain
+	}
+}
+
+(app) {
+	encode zstd gzip
+
+	# API + uploaded media go to the backend (same-origin on any host).
+	@backend path /api/* /media/*
+	handle @backend {
+		reverse_proxy api:8000
+	}
+	# Everything else → the Next.js frontend (which does host-based routing).
+	handle {
+		reverse_proxy web:3000
+	}
+
+	header {
+		X-Frame-Options "SAMEORIGIN"
+		X-Content-Type-Options "nosniff"
+	}
+}
 
 {$DOMAIN} {
-	encode zstd gzip
-	reverse_proxy web:3000
+	import app
 }
 
 {$API_DOMAIN} {
 	encode zstd gzip
 	reverse_proxy api:8000
+}
+
+# Tenant custom domains — on-demand TLS, gated by the ask endpoint above.
+https:// {
+	tls {
+		on_demand
+	}
+	import app
 }

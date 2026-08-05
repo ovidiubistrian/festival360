@@ -29,7 +29,8 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       ENVIRONMENT: production
       SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
-      CORS_ORIGINS: https://${DOMAIN}
+      CORS_ORIGINS: https://${DOMAIN},https://${API_DOMAIN}
+      PLATFORM_DOMAIN: ${DOMAIN}
     expose:
       - "8000"
 
@@ -43,6 +44,8 @@ services:
       API_INTERNAL_URL: http://api:8000
       # Client-side calls use the public API domain (baked at build too).
       NEXT_PUBLIC_API_BASE_URL: https://${API_DOMAIN}
+      # Platform apex — the middleware treats any other host as a tenant domain.
+      NEXT_PUBLIC_PLATFORM_DOMAIN: ${DOMAIN}
     expose:
       - "3000"
 
@@ -58,6 +61,7 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
       API_DOMAIN: ${API_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
