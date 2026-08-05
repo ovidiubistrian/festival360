@@ -16,6 +16,8 @@ build/
 .env
 .env.*
 !.env.example
+!*.env.example
+!.env.prod.example
 
 # ---- Python (api/) ----
 __pycache__/
