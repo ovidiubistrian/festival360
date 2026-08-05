@@ -104,32 +104,34 @@ export default function DemoAdminLoginPage() {
               </Button>
             </form>
 
-            <div className="rounded-xl border border-border bg-secondary/60 p-3 text-left">
-              <div className="mb-2 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-terracotta" />
-                <span className="text-xs font-medium text-foreground">
-                  Conturi demo
-                </span>
+            {process.env.NODE_ENV !== "production" && (
+              <div className="rounded-xl border border-border bg-secondary/60 p-3 text-left">
+                <div className="mb-2 flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-terracotta" />
+                  <span className="text-xs font-medium text-foreground">
+                    Conturi demo (doar în dezvoltare)
+                  </span>
+                </div>
+                <ul className="space-y-1 text-xs text-muted-foreground">
+                  <li>
+                    Super-admin:{" "}
+                    <span className="font-mono text-foreground">
+                      admin@prispa.demo
+                    </span>
+                  </li>
+                  <li>
+                    Admin site:{" "}
+                    <span className="font-mono text-foreground">
+                      admin@prispa.ro
+                    </span>
+                  </li>
+                  <li>
+                    Parolă:{" "}
+                    <span className="font-mono text-foreground">demo1234</span>
+                  </li>
+                </ul>
               </div>
-              <ul className="space-y-1 text-xs text-muted-foreground">
-                <li>
-                  Super-admin:{" "}
-                  <span className="font-mono text-foreground">
-                    admin@prispa.demo
-                  </span>
-                </li>
-                <li>
-                  Admin site:{" "}
-                  <span className="font-mono text-foreground">
-                    admin@prispa.ro
-                  </span>
-                </li>
-                <li>
-                  Parolă:{" "}
-                  <span className="font-mono text-foreground">demo1234</span>
-                </li>
-              </ul>
-            </div>
+            )}
           </CardContent>
         </Card>
 

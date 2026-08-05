@@ -134,7 +134,7 @@ export default async function FestivalHubLanding() {
               <Button asChild size="sm">
                 <Link href="/admin">
                   <LayoutDashboard className="h-4 w-4" />
-                  Panou admin
+                  Autentificare
                 </Link>
               </Button>
             </div>
@@ -196,7 +196,7 @@ export default async function FestivalHubLanding() {
                 >
                   <Link href="/admin">
                     <LayoutDashboard className="h-4 w-4" />
-                    Deschide panoul de administrare
+                    Autentificare
                   </Link>
                 </Button>
               </div>
@@ -557,7 +557,7 @@ export default async function FestivalHubLanding() {
                 variant="outline"
                 className="border-white/30 bg-white/5 text-warm-white hover:bg-white/15"
               >
-                <Link href="/admin">Deschide panoul admin</Link>
+                <Link href="/admin">Autentificare</Link>
               </Button>
             </div>
           </div>
@@ -574,7 +574,7 @@ export default async function FestivalHubLanding() {
             <p>© {new Date().getFullYear()} Siteora. Demo pentru prezentare.</p>
             <div className="flex gap-6">
               <Link href="/prispa" className="hover:text-primary">Festival demo</Link>
-              <Link href="/admin" className="hover:text-primary">Panou admin</Link>
+              <Link href="/admin" className="hover:text-primary">Autentificare</Link>
             </div>
           </div>
         </Container>
