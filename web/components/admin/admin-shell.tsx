@@ -23,6 +23,7 @@ import {
   LogOut,
   RotateCcw,
   CreditCard,
+  Wallet,
   Inbox,
   type LucideIcon,
 } from "lucide-react";
@@ -52,6 +53,7 @@ const NAV: NavLink[] = [
   { label: "Dashboard", href: "/demo-admin/dashboard", icon: LayoutDashboard },
   { label: "Site-uri", href: "/demo-admin/sites", icon: Building2 },
   { label: "Abonamente", href: "/demo-admin/subscriptions", icon: CreditCard },
+  { label: "Plăți", href: "/demo-admin/billing", icon: Wallet },
   { label: "Solicitări", href: "/demo-admin/leads", icon: Inbox },
   { label: "Pagini și secțiuni", href: "/demo-admin/pages", icon: LayoutTemplate },
   { label: "Program", href: "/demo-admin/program", icon: CalendarDays },

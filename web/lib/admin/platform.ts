@@ -328,3 +328,99 @@ export async function setLeadStatus(
     return false;
   }
 }
+
+// --- Stripe billing (platform-level payment configuration) ------------------
+
+export type BillingPlan = "pro" | "cultural";
+export type BillingCycle = "monthly" | "annual";
+
+/**
+ * Read whether the platform's Stripe account is configured. Returns
+ * `{ configured: false }` on any failure so the UI can render a safe default.
+ */
+export async function getStripeStatus(): Promise<{ configured: boolean }> {
+  try {
+    const res = await fetch(`${PLATFORM}/settings/stripe`, {
+      headers: authHeaders(),
+    });
+    if (!res.ok) return { configured: false };
+    const data = (await res.json()) as { configured?: unknown };
+    return { configured: data?.configured === true };
+  } catch (err) {
+    console.error("getStripeStatus failed", err);
+    return { configured: false };
+  }
+}
+
+/**
+ * Store the platform's Stripe secret + webhook signing keys. On a 400 (keys
+ * malformed) surfaces the backend `detail` as `error`.
+ */
+export async function setStripeConfig(
+  secretKey: string,
+  webhookSecret: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch(`${PLATFORM}/settings/stripe`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({ secretKey, webhookSecret }),
+    });
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: await readDetail(
+          res,
+          `Salvarea cheilor Stripe a eșuat (${res.status}).`
+        ),
+      };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error("setStripeConfig failed", err);
+    return { ok: false, error: "Eroare de rețea. Încearcă din nou." };
+  }
+}
+
+/**
+ * Start a Stripe Checkout session for a tenant's paid plan. On success returns
+ * the hosted-checkout `url` to redirect to. On 503 (Stripe not configured) sets
+ * `notConfigured: true` and surfaces the backend `detail`; other failures
+ * (400 non-payable plan, 502 Stripe error) come back as `error`.
+ */
+export async function createCheckout(
+  slug: string,
+  plan: BillingPlan,
+  cycle: BillingCycle
+): Promise<{
+  ok: boolean;
+  url?: string;
+  error?: string;
+  notConfigured?: boolean;
+}> {
+  try {
+    const res = await fetch(`${PLATFORM}/tenants/${slug}/checkout`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ plan, cycle }),
+    });
+    if (!res.ok) {
+      const error = await readDetail(
+        res,
+        `Nu s-a putut porni plata (${res.status}).`
+      );
+      if (res.status === 503) {
+        return { ok: false, notConfigured: true, error };
+      }
+      return { ok: false, error };
+    }
+    const data = (await res.json()) as { url?: unknown };
+    if (typeof data?.url !== "string" || !data.url) {
+      return { ok: false, error: "Răspuns invalid de la server (fără URL)." };
+    }
+    return { ok: true, url: data.url };
+  } catch (err) {
+    console.error("createCheckout failed", err);
+    return { ok: false, error: "Eroare de rețea. Încearcă din nou." };
+  }
+}

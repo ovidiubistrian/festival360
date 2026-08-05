@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Loader2, CreditCard, SlidersHorizontal } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Loader2,
+  CreditCard,
+  SlidersHorizontal,
+  ArrowUpCircle,
+} from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +39,10 @@ import {
 import {
   listSubscriptions,
   setTenantPlan,
+  createCheckout,
   type SubscriptionRow,
+  type BillingPlan,
+  type BillingCycle,
 } from "@/lib/admin/platform";
 import { cn, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
@@ -50,6 +59,18 @@ const PLAN_LABEL: Record<string, string> = {
   pro: "Pro",
   cultural: "Cultural",
   enterprise: "Enterprise",
+};
+
+/** Payable plans offered through Stripe Checkout. */
+const BILLING_PLANS: BillingPlan[] = ["pro", "cultural"];
+const BILLING_PLAN_LABEL: Record<BillingPlan, string> = {
+  pro: "Pro",
+  cultural: "Cultural",
+};
+const BILLING_CYCLES: BillingCycle[] = ["monthly", "annual"];
+const BILLING_CYCLE_LABEL: Record<BillingCycle, string> = {
+  monthly: "Lunar",
+  annual: "Anual",
 };
 
 const PLANS = ["starter", "pro", "cultural", "enterprise"] as const;
@@ -110,6 +131,7 @@ function periodLabel(row: SubscriptionRow): string {
 }
 
 export default function SubscriptionsPage() {
+  const router = useRouter();
   const [rows, setRows] = React.useState<SubscriptionRow[]>([]);
   const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -119,6 +141,13 @@ export default function SubscriptionsPage() {
   const [plan, setPlan] = React.useState<string>("starter");
   const [status, setStatus] = React.useState<string>("active");
   const [saving, setSaving] = React.useState(false);
+
+  // Upgrade (paid Stripe Checkout) dialog state.
+  const [upgrading, setUpgrading] = React.useState<SubscriptionRow | null>(null);
+  const [targetPlan, setTargetPlan] = React.useState<BillingPlan>("pro");
+  const [targetCycle, setTargetCycle] =
+    React.useState<BillingCycle>("monthly");
+  const [checkingOut, setCheckingOut] = React.useState(false);
 
   // Load once on first client render, without a mount effect (repo enforces
   // react-hooks/set-state-in-effect).
@@ -167,6 +196,38 @@ export default function SubscriptionsPage() {
     toast.success(`Abonamentul „${editing.tenantName}” a fost actualizat.`);
     setEditing(null);
     await refresh();
+  }
+
+  function openUpgrade(row: SubscriptionRow) {
+    setUpgrading(row);
+    setTargetPlan("pro");
+    setTargetCycle("monthly");
+  }
+
+  async function handleCheckout() {
+    if (!upgrading) return;
+    setCheckingOut(true);
+    const res = await createCheckout(
+      upgrading.tenantId,
+      targetPlan,
+      targetCycle
+    );
+    setCheckingOut(false);
+    if (res.ok && res.url) {
+      // Redirect to Stripe-hosted Checkout.
+      window.location.href = res.url;
+      return;
+    }
+    if (res.notConfigured) {
+      toast.error(res.error ?? "Plăți indisponibile: Stripe nu este configurat.", {
+        action: {
+          label: "Configurează Stripe",
+          onClick: () => router.push("/demo-admin/billing"),
+        },
+      });
+      return;
+    }
+    toast.error(res.error ?? "Nu s-a putut porni plata.");
   }
 
   return (
@@ -225,7 +286,15 @@ export default function SubscriptionsPage() {
                       {periodLabel(row)}
                     </TableCell>
                     <TableCell>
-                      <div className="flex justify-end">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="gold"
+                          size="sm"
+                          onClick={() => openUpgrade(row)}
+                        >
+                          <ArrowUpCircle className="h-4 w-4" />
+                          Upgrade
+                        </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -315,6 +384,86 @@ export default function SubscriptionsPage() {
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               {saving ? "Se salvează…" : "Salvează"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={upgrading !== null}
+        onOpenChange={(next) => {
+          if (!next) setUpgrading(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upgrade cu plată</DialogTitle>
+            <DialogDescription>
+              {upgrading
+                ? `Pornește o plată Stripe pentru „${upgrading.tenantName}”. Vei fi redirecționat către Checkout.`
+                : null}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="upgrade-plan">Plan</Label>
+              <Select
+                value={targetPlan}
+                onValueChange={(v) => setTargetPlan(v as BillingPlan)}
+              >
+                <SelectTrigger id="upgrade-plan">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {BILLING_PLANS.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {BILLING_PLAN_LABEL[p]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="upgrade-cycle">Ciclu de facturare</Label>
+              <Select
+                value={targetCycle}
+                onValueChange={(v) => setTargetCycle(v as BillingCycle)}
+              >
+                <SelectTrigger id="upgrade-cycle">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {BILLING_CYCLES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {BILLING_CYCLE_LABEL[c]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setUpgrading(null)}
+              disabled={checkingOut}
+            >
+              Renunță
+            </Button>
+            <Button
+              variant="gold"
+              onClick={() => void handleCheckout()}
+              disabled={checkingOut}
+            >
+              {checkingOut ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUpCircle className="h-4 w-4" />
+              )}
+              {checkingOut ? "Se pregătește…" : "Continuă către plată"}
             </Button>
           </DialogFooter>
         </DialogContent>
