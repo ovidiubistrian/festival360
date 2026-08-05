@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-in-production-please-set-a-long-random-value"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12  # 12h
 
+    # --- Custom domains ---
+    PLATFORM_DOMAIN: str = "festival360.ro"
+    DOMAIN_VERIFY_PREFIX: str = "_festivalhub-verify"
+
     # --- Media library (uploaded files) ---
     # Directory where uploads are stored (mount a volume here in production).
     MEDIA_DIR: str = "media_uploads"

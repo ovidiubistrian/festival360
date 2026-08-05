@@ -16,3 +16,4 @@ email-validator>=2.2
 python-jose[cryptography]>=3.3
 passlib[bcrypt]>=1.7
 python-multipart>=0.0.12       # form data / file uploads
+dnspython>=2.6

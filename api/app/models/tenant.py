@@ -24,6 +24,12 @@ class Tenant(SQLModel, table=True):
     # system). Optional keys; the frontend falls back to festival copy.
     labels: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
 
+    # --- Custom domain (Caddy on-demand TLS + DNS TXT ownership verify) ---
+    custom_domain: str | None = Field(default=None, unique=True, index=True)
+    custom_domain_active: bool = False  # true only after DNS TXT verification
+    domain_verify_token: str = ""
+    dns_verified_at: dt.datetime | None = None
+
     # --- Festival info ---
     name: str
     tagline: str = ""

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import admin, auth, content, media, platform, tenants
+from app.api.routes import admin, auth, content, domains, media, platform, tenants
 
 api_router = APIRouter()
 
@@ -11,6 +11,7 @@ def meta() -> dict:
 
 
 api_router.include_router(auth.router)
+api_router.include_router(domains.router)
 api_router.include_router(platform.router)
 api_router.include_router(tenants.router)
 api_router.include_router(content.router)
