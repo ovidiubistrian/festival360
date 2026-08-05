@@ -16,6 +16,16 @@ GHCR_OWNER="${GHCR_OWNER:-ovidiubistrian}"
 say()  { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m!  \033[0m %s\n' "$*"; }
 
+# Prompt reading from the terminal even when the script is piped (curl | bash),
+# where stdin is the pipe. Usage: ask VAR "Prompt" "default"
+ask() {
+  local __var="$1" __prompt="$2" __default="${3:-}" __reply=""
+  if [ -r /dev/tty ]; then
+    read -rp "$__prompt" __reply </dev/tty || true
+  fi
+  printf -v "$__var" '%s' "${__reply:-$__default}"
+}
+
 # --- 1. Docker + Compose plugin -------------------------------------------
 if ! command -v docker >/dev/null 2>&1; then
   say "Instalez Docker…"
@@ -38,11 +48,11 @@ if [ -f "$ENV_FILE" ]; then
   warn ".env există deja — nu-l suprascriu."
 else
   say "Configurez .env (Enter = valoarea implicită)."
-  read -rp "  Domeniu principal [siteora.ro]: " DOMAIN;      DOMAIN="${DOMAIN:-siteora.ro}"
-  read -rp "  Domeniu API [api.${DOMAIN}]: " API_DOMAIN;     API_DOMAIN="${API_DOMAIN:-api.${DOMAIN}}"
-  read -rp "  Email ACME (Let's Encrypt) [admin@${DOMAIN}]: " ACME_EMAIL; ACME_EMAIL="${ACME_EMAIL:-admin@${DOMAIN}}"
-  read -rp "  Owner GHCR (user GitHub) [${GHCR_OWNER}]: " OWNER; OWNER="${OWNER:-$GHCR_OWNER}"
-  read -rp "  Seed date demo la pornire? (true/false) [false]: " SEED; SEED="${SEED:-false}"
+  ask DOMAIN     "  Domeniu principal [siteora.ro]: " "siteora.ro"
+  ask API_DOMAIN "  Domeniu API [api.${DOMAIN}]: " "api.${DOMAIN}"
+  ask ACME_EMAIL "  Email ACME (Let's Encrypt) [admin@${DOMAIN}]: " "admin@${DOMAIN}"
+  ask OWNER      "  Owner GHCR (user GitHub) [${GHCR_OWNER}]: " "$GHCR_OWNER"
+  ask SEED       "  Seed date demo la pornire? (true/false) [false]: " "false"
 
   PG_PASS="$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-24)"
   SECRET="$(openssl rand -hex 32)"
