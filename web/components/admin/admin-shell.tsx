@@ -22,6 +22,8 @@ import {
   ExternalLink,
   LogOut,
   RotateCcw,
+  CreditCard,
+  Inbox,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -49,6 +51,8 @@ interface NavLink {
 const NAV: NavLink[] = [
   { label: "Dashboard", href: "/demo-admin/dashboard", icon: LayoutDashboard },
   { label: "Site-uri", href: "/demo-admin/sites", icon: Building2 },
+  { label: "Abonamente", href: "/demo-admin/subscriptions", icon: CreditCard },
+  { label: "Solicitări", href: "/demo-admin/leads", icon: Inbox },
   { label: "Pagini și secțiuni", href: "/demo-admin/pages", icon: LayoutTemplate },
   { label: "Program", href: "/demo-admin/program", icon: CalendarDays },
   { label: "Expozanți", href: "/demo-admin/exhibitors", icon: Store },

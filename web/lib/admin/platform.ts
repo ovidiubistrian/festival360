@@ -122,3 +122,93 @@ export async function deleteTenant(slug: string): Promise<boolean> {
     return false;
   }
 }
+
+// --- Subscriptions & leads (super-admin commercial views) -------------------
+
+export type SubscriptionRow = {
+  tenantId: string;
+  tenantName: string;
+  eventType: string;
+  plan: string;
+  status: string;
+  billingCycle: string;
+  trialEndsAt: string | null;
+  currentPeriodEnd: string | null;
+};
+
+export type Lead = {
+  id: string;
+  name: string;
+  email: string;
+  organization: string;
+  eventType: string;
+  plan: string;
+  message: string;
+  status: string;
+  createdAt: string;
+};
+
+/** List every tenant's subscription (plan + status + billing). */
+export async function listSubscriptions(): Promise<SubscriptionRow[]> {
+  try {
+    const res = await fetch(`${PLATFORM}/subscriptions`, {
+      headers: authHeaders(),
+    });
+    if (!res.ok) return [];
+    return (await res.json()) as SubscriptionRow[];
+  } catch (err) {
+    console.error("listSubscriptions failed", err);
+    return [];
+  }
+}
+
+/** Set a tenant's plan + subscription status. Returns true on success. */
+export async function setTenantPlan(
+  slug: string,
+  plan: string,
+  status: string
+): Promise<boolean> {
+  try {
+    const res = await fetch(`${PLATFORM}/tenants/${slug}/plan`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({ plan, status }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("setTenantPlan failed", err);
+    return false;
+  }
+}
+
+/** List the signup/lead requests from the marketing landing. */
+export async function listLeads(): Promise<Lead[]> {
+  try {
+    const res = await fetch(`${PLATFORM}/leads`, {
+      headers: authHeaders(),
+    });
+    if (!res.ok) return [];
+    return (await res.json()) as Lead[];
+  } catch (err) {
+    console.error("listLeads failed", err);
+    return [];
+  }
+}
+
+/** Update a lead's status (new|contacted|converted|closed). */
+export async function setLeadStatus(
+  id: string,
+  status: string
+): Promise<boolean> {
+  try {
+    const res = await fetch(`${PLATFORM}/leads/${id}`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify({ status }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("setLeadStatus failed", err);
+    return false;
+  }
+}

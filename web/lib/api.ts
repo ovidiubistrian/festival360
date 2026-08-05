@@ -122,3 +122,61 @@ export async function subscribeNewsletter(
     return false;
   }
 }
+
+// --- Platform commercial (pricing + signup) ---------------------------------
+
+/** A commercial plan/package shown on the marketing landing. */
+export type Package = {
+  id: string;
+  code: string;
+  label: string;
+  tagline: string;
+  /** Monthly price in MINOR UNITS (bani, 1/100 RON). 0 → "La cerere". */
+  priceMonthlyBani: number;
+  /** Annual price in MINOR UNITS (bani); may be null. */
+  priceAnnualBani: number | null;
+  currency: string;
+  benefits: string[];
+  seats: number | null;
+  isFeatured: boolean;
+};
+
+/** Public list of commercial packages (revalidated ~5 min). */
+export function getPackages(): Promise<Package[] | null> {
+  return apiGet<Package[]>("/platform/packages", { revalidate: 300 });
+}
+
+/**
+ * Format a minor-unit (bani) amount as an integer RON string, e.g. 24900 →
+ * "249 RON". Shows decimals only when the amount isn't a whole RON value.
+ */
+export function formatBani(bani: number, currency = "RON"): string {
+  const value = bani / 100;
+  const hasFraction = Math.round(value * 100) % 100 !== 0;
+  const amount = value.toLocaleString("ro-RO", {
+    minimumFractionDigits: hasFraction ? 2 : 0,
+    maximumFractionDigits: 2,
+  });
+  return `${amount} ${currency}`;
+}
+
+/** Submit a signup/lead from the landing page. Client-usable. */
+export async function submitSignup(input: {
+  name: string;
+  email: string;
+  organization: string;
+  eventType: string;
+  plan: string;
+  message: string;
+}): Promise<boolean> {
+  try {
+    const res = await fetch(`${API}/platform/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}

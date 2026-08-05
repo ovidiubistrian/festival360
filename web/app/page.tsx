@@ -24,6 +24,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { Reveal } from "@/components/shared/reveal";
+import { SignupForm } from "@/components/public/signup-form";
+import { getPackages, formatBani } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { IMG } from "@/lib/tenants/prispa/images";
 
 export const metadata: Metadata = {
@@ -87,7 +90,9 @@ const advantages = [
   "Pregătit pentru integrare cu Supabase sau PostgreSQL",
 ];
 
-export default function FestivalHubLanding() {
+export default async function FestivalHubLanding() {
+  const packages = (await getPackages()) ?? [];
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Nav */}
@@ -349,6 +354,148 @@ export default function FestivalHubLanding() {
                 <span className="text-sm font-medium text-charcoal">{e.label}</span>
               </div>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* Pricing / packages */}
+      {packages.length > 0 ? (
+        <section id="pachete" className="bg-warm-white py-20 sm:py-28">
+          <Container>
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-terracotta">
+                Pachete / Prețuri
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
+                Un plan pentru fiecare tip de eveniment
+              </h2>
+              <p className="mt-4 text-base text-muted-foreground">
+                Alege pachetul potrivit acum — poți trece oricând la un plan
+                superior pe măsură ce evenimentul tău crește.
+              </p>
+            </div>
+
+            <div className="mt-14 grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {packages.map((pkg, i) => {
+                const onRequest = pkg.priceMonthlyBani === 0;
+                return (
+                  <Reveal
+                    key={pkg.id}
+                    delayIndex={i % 4}
+                    className={cn(
+                      "relative flex h-full flex-col rounded-2xl border bg-card p-6",
+                      pkg.isFeatured
+                        ? "border-terracotta ring-2 ring-terracotta/25 shadow-[0_12px_28px_rgba(32,37,34,0.10)]"
+                        : "border-border"
+                    )}
+                  >
+                    {pkg.isFeatured ? (
+                      <Badge
+                        variant="terracotta"
+                        className="absolute -top-3 left-6"
+                      >
+                        Recomandat
+                      </Badge>
+                    ) : null}
+
+                    <h3 className="font-serif text-xl font-semibold text-primary">
+                      {pkg.label}
+                    </h3>
+                    <p className="mt-1.5 text-sm text-muted-foreground">
+                      {pkg.tagline}
+                    </p>
+
+                    <div className="mt-5">
+                      {onRequest ? (
+                        <p className="font-serif text-3xl font-semibold text-primary">
+                          La cerere
+                        </p>
+                      ) : (
+                        <>
+                          <p className="font-serif text-3xl font-semibold text-primary">
+                            {formatBani(pkg.priceMonthlyBani, pkg.currency)}
+                            <span className="text-base font-normal text-muted-foreground">
+                              {" "}
+                              /lună
+                            </span>
+                          </p>
+                          {pkg.priceAnnualBani ? (
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              sau {formatBani(pkg.priceAnnualBani, pkg.currency)}
+                              /an
+                            </p>
+                          ) : null}
+                        </>
+                      )}
+                    </div>
+
+                    <ul className="mt-6 flex-1 space-y-2.5">
+                      {pkg.benefits.map((b) => (
+                        <li key={b} className="flex items-start gap-2.5">
+                          <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-secondary text-primary">
+                            <Check className="h-2.5 w-2.5" />
+                          </span>
+                          <span className="text-sm text-charcoal/80">{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {pkg.seats ? (
+                      <p className="mt-5 text-xs text-muted-foreground">
+                        Include {pkg.seats}{" "}
+                        {pkg.seats === 1 ? "utilizator" : "utilizatori"}
+                      </p>
+                    ) : null}
+
+                    <Button
+                      asChild
+                      variant={pkg.isFeatured ? "gold" : "outline"}
+                      className="mt-5 w-full"
+                    >
+                      <a href="#inscriere">Alege {pkg.label}</a>
+                    </Button>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* Signup / lead */}
+      <section id="inscriere" className="bg-secondary py-20 sm:py-28">
+        <Container>
+          <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-2 lg:gap-14">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-terracotta">
+                Înscriere
+              </p>
+              <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
+                Începe cu Festival Hub
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-charcoal/75">
+                Spune-ne despre evenimentul tău și te contactăm în cel mai scurt
+                timp cu o propunere personalizată. Fără obligații.
+              </p>
+              <ul className="mt-8 space-y-3">
+                {[
+                  "Răspuns rapid din partea echipei",
+                  "Configurare adaptată tipului tău de eveniment",
+                  "Demo live și consultanță gratuită",
+                ].map((a) => (
+                  <li key={a} className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <Check className="h-3 w-3" />
+                    </span>
+                    <span className="text-sm text-charcoal/80">{a}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+              <SignupForm />
+            </div>
           </div>
         </Container>
       </section>
