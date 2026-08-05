@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
+  Building2,
   LayoutTemplate,
   CalendarDays,
   Store,
@@ -47,6 +48,7 @@ interface NavLink {
 
 const NAV: NavLink[] = [
   { label: "Dashboard", href: "/demo-admin/dashboard", icon: LayoutDashboard },
+  { label: "Site-uri", href: "/demo-admin/sites", icon: Building2 },
   { label: "Pagini și secțiuni", href: "/demo-admin/pages", icon: LayoutTemplate },
   { label: "Program", href: "/demo-admin/program", icon: CalendarDays },
   { label: "Expozanți", href: "/demo-admin/exhibitors", icon: Store },

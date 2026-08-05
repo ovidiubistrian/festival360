@@ -104,7 +104,7 @@ export default async function TenantHome({
 
       {isResort && <ConditionsWidget />}
 
-      {visible("experiences") && (
+      {visible("experiences") && config.experiences.length > 0 && (
         <ExperiencesSection
           experiences={config.experiences}
           labels={config.labels}
@@ -113,7 +113,7 @@ export default async function TenantHome({
 
       {isResort && <TrailsMap />}
 
-      {visible("program") && (
+      {visible("program") && content.program.length > 0 && (
         <section id="program" className="bg-warm-white py-16 sm:py-24">
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
@@ -142,7 +142,7 @@ export default async function TenantHome({
         </section>
       )}
 
-      {visible("exhibitors") && (
+      {visible("exhibitors") && featuredExhibitors.length > 0 && (
         <section id="expozanti" className="bg-secondary py-16 sm:py-24">
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
@@ -178,7 +178,7 @@ export default async function TenantHome({
         </section>
       )}
 
-      {visible("products") && (
+      {visible("products") && featuredProducts.length > 0 && (
         <section id="produse" className="bg-warm-white py-16 sm:py-24">
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
@@ -211,7 +211,7 @@ export default async function TenantHome({
         </section>
       )}
 
-      {visible("destinations") && (
+      {visible("destinations") && content.destinations.length > 0 && (
         <DestinationsSection
           destinations={content.destinations}
           slug={slug}
@@ -261,7 +261,7 @@ export default async function TenantHome({
         </section>
       )}
 
-      {visible("gallery") && (
+      {visible("gallery") && galleryPreview.length > 0 && (
         <section id="galerie" className="bg-warm-white py-16 sm:py-24">
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
@@ -306,7 +306,7 @@ export default async function TenantHome({
         </section>
       )}
 
-      {visible("news") && (
+      {visible("news") && latestArticles.length > 0 && (
         <section id="noutati" className="bg-secondary py-16 sm:py-24">
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
