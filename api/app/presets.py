@@ -18,6 +18,8 @@ _HERO = {
     "resort": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2000&q=80",
     "museum": "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&w=2000&q=80",
     "conference": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=2000&q=80",
+    "institution": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80",
+    "experience": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=80",
 }
 
 
@@ -139,6 +141,58 @@ PRESETS: dict[str, dict[str, Any]] = {
             "programEyebrow": "Agendă", "programTitle": "Programul zilei",
             "exhibitorsPageTitle": "Vorbitori", "productsPageTitle": "Sesiuni & workshopuri",
             "destinationsPageTitle": "Săli & locație", "programPageTitle": "Agenda completă",
+        },
+    },
+    "institution": {
+        "name": "Instituție / administrație",
+        "description": "Instituții publice și administrații: servicii, departamente, anunțuri.",
+        "tagline": "Administrație digitală, aproape de oameni",
+        "hero_badge": "Servicii • Anunțuri • Transparență",
+        "theme": {
+            "primary": "#26364A", "secondary": "#EDF1F5", "terracotta": "#8C5A3E",
+            "gold": "#A98A45", "charcoal": "#1C2530", "background": "#F6F8FB",
+        },
+        "navigation": _nav([
+            ("Despre", "/despre"), ("Servicii", "/produse"), ("Departamente", "/expozanti"),
+            ("Sedii", "/destinatii"), ("Anunțuri", "/program"),
+            ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
+        ]),
+        "labels": {
+            "heroCtaPrimary": "Vezi serviciile", "heroCtaSecondary": "Contactează-ne",
+            "aboutEyebrow": "Despre instituție", "aboutTitle": "În slujba comunității",
+            "experiencesEyebrow": "Ce oferim", "experiencesTitle": "Servicii pentru cetățeni",
+            "exhibitorsEyebrow": "Departamente", "exhibitorsTitle": "Departamentele noastre",
+            "productsEyebrow": "Servicii", "productsTitle": "Servicii publice",
+            "destinationsEyebrow": "Sedii", "destinationsTitle": "Unde ne găsești",
+            "programEyebrow": "Anunțuri & evenimente", "programTitle": "Anunțuri publice",
+            "exhibitorsPageTitle": "Departamente", "productsPageTitle": "Servicii publice",
+            "destinationsPageTitle": "Sedii & birouri", "programPageTitle": "Anunțuri & evenimente",
+        },
+    },
+    "experience": {
+        "name": "Experiență / atracție",
+        "description": "Parcuri, trasee și atracții: activități, obiective, bilete.",
+        "tagline": "Descoperă, explorează, trăiește",
+        "hero_badge": "Activități • Trasee • Atracții",
+        "theme": {
+            "primary": "#3E5B2A", "secondary": "#EEF2E4", "terracotta": "#B4623A",
+            "gold": "#C89A3E", "charcoal": "#232A1A", "background": "#F6F9EF",
+        },
+        "navigation": _nav([
+            ("Despre", "/despre"), ("Activități", "/produse"), ("Operatori", "/expozanti"),
+            ("Atracții & trasee", "/destinatii"), ("Evenimente", "/program"),
+            ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
+        ]),
+        "labels": {
+            "heroCtaPrimary": "Planifică vizita", "heroCtaSecondary": "Vezi activitățile",
+            "aboutEyebrow": "Despre", "aboutTitle": "Aventura începe aici",
+            "experiencesEyebrow": "Ce poți face", "experiencesTitle": "Experiențe de neuitat",
+            "exhibitorsEyebrow": "Operatori", "exhibitorsTitle": "Operatorii noștri",
+            "productsEyebrow": "Activități", "productsTitle": "Activități & experiențe",
+            "destinationsEyebrow": "Atracții", "destinationsTitle": "Atracții & trasee",
+            "programEyebrow": "Evenimente", "programTitle": "Ce se întâmplă",
+            "exhibitorsPageTitle": "Operatori", "productsPageTitle": "Activități & experiențe",
+            "destinationsPageTitle": "Atracții & trasee", "programPageTitle": "Evenimente",
         },
     },
 }
