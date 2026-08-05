@@ -52,3 +52,20 @@ def get_current_superuser(
             detail="Necesită drepturi de administrator de platformă.",
         )
     return user
+
+
+def require_tenant_admin(
+    slug: str,
+    user: AdminUser = Depends(get_current_user),
+    session: Session = Depends(get_session),
+) -> Tenant:
+    """Allow a super-admin to manage any tenant; a tenant admin only their own."""
+    tenant = tenant_service.get_tenant(session, slug)
+    if not tenant:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Site inexistent.")
+    if not user.is_superuser and user.tenant_id != tenant.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Nu ai acces la acest site.",
+        )
+    return tenant

@@ -14,7 +14,7 @@ from fastapi import (
 )
 from sqlmodel import Session, select
 
-from app.api.deps import get_current_user, tenant_or_404
+from app.api.deps import require_tenant_admin, tenant_or_404
 from app.core.config import settings
 from app.core.db import get_session
 from app.models import MediaAsset, Tenant
@@ -24,7 +24,7 @@ from app.schemas.media import MediaAssetOut
 router = APIRouter(
     prefix="/tenants/{slug}/admin/media",
     tags=["media"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(require_tenant_admin)],
 )
 
 ALLOWED = {

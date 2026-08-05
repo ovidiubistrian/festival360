@@ -5,7 +5,8 @@ import datetime as dt
 from sqlmodel import Session, select
 
 from app.billing.plans import Plan
-from app.models import PlanPackage, StaffAccount, Subscription
+from app.core.security import hash_password
+from app.models import AdminUser, PlanPackage, StaffAccount, Subscription
 
 # Standard public packages. Prices in MINOR UNITS (bani). annual = 10 months.
 _PACKAGES = [
@@ -101,6 +102,23 @@ def run_billing_seed(session: Session, *, force: bool = False) -> None:
                 last_name="PRISPA",
                 email="organizator@prispa.ro",
                 role="owner",
+            )
+        )
+
+    # A demo TENANT-ADMIN login (scoped to prispa) — to test role-based login
+    # alongside the platform super-admin.
+    if not session.exec(
+        select(AdminUser).where(AdminUser.email == "admin@prispa.ro")
+    ).first():
+        session.add(
+            AdminUser(
+                id="admin-prispa",
+                email="admin@prispa.ro",
+                hashed_password=hash_password("demo1234"),
+                full_name="Admin PRISPA",
+                tenant_id="prispa",
+                is_superuser=False,
+                is_active=True,
             )
         )
     session.commit()

@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlmodel import Session
 
-from app.api.deps import get_current_user, tenant_or_404
+from app.api.deps import get_current_user, require_tenant_admin, tenant_or_404
 from app.core.db import get_session
 from app.models import (
     AdminUser,
@@ -49,7 +49,7 @@ from app.schemas.write import (
 router = APIRouter(
     prefix="/tenants/{slug}/admin",
     tags=["admin"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(require_tenant_admin)],
 )
 
 
