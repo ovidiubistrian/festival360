@@ -123,6 +123,122 @@ export async function deleteTenant(slug: string): Promise<boolean> {
   }
 }
 
+// --- Custom domains (per-tenant) --------------------------------------------
+
+export type DomainStatus = {
+  domain: string | null;
+  active: boolean;
+  verifyToken: string;
+  verifyRecordName: string;
+  verifyRecordValue: string;
+  dnsTargetHint: string;
+};
+
+/**
+ * Read a tenant's current custom-domain status. Returns null on any failure
+ * (network / non-ok) so callers can render an empty state.
+ */
+export async function getDomain(slug: string): Promise<DomainStatus | null> {
+  try {
+    const res = await fetch(`${PLATFORM}/tenants/${slug}/domain`, {
+      headers: authHeaders(),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as DomainStatus;
+  } catch (err) {
+    console.error("getDomain failed", err);
+    return null;
+  }
+}
+
+/**
+ * Read the backend's JSON `detail` from a non-ok response, falling back to a
+ * status-coded generic message.
+ */
+async function readDetail(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await res.json()) as { detail?: unknown };
+    if (typeof data?.detail === "string" && data.detail.trim()) {
+      return data.detail;
+    }
+  } catch {
+    // non-JSON body — keep the generic message
+  }
+  return fallback;
+}
+
+/**
+ * Set (or replace) a tenant's custom domain. On failure surfaces the backend
+ * `detail` as `error` — covers 402 (plan gate), 400 (invalid) and 409 (taken).
+ */
+export async function setDomain(
+  slug: string,
+  domain: string
+): Promise<{ ok: boolean; status?: DomainStatus; error?: string }> {
+  try {
+    const res = await fetch(`${PLATFORM}/tenants/${slug}/domain`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({ domain }),
+    });
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: await readDetail(
+          res,
+          `Setarea domeniului a eșuat (${res.status}).`
+        ),
+      };
+    }
+    return { ok: true, status: (await res.json()) as DomainStatus };
+  } catch (err) {
+    console.error("setDomain failed", err);
+    return { ok: false, error: "Eroare de rețea. Încearcă din nou." };
+  }
+}
+
+/**
+ * Trigger DNS verification of a tenant's domain. On 422 surfaces the backend
+ * `detail` (which TXT record is still missing) as `error`.
+ */
+export async function verifyDomain(
+  slug: string
+): Promise<{ ok: boolean; status?: DomainStatus; error?: string }> {
+  try {
+    const res = await fetch(`${PLATFORM}/tenants/${slug}/domain/verify`, {
+      method: "POST",
+      headers: authHeaders(),
+    });
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: await readDetail(
+          res,
+          `Verificarea a eșuat (${res.status}).`
+        ),
+      };
+    }
+    return { ok: true, status: (await res.json()) as DomainStatus };
+  } catch (err) {
+    console.error("verifyDomain failed", err);
+    return { ok: false, error: "Eroare de rețea. Încearcă din nou." };
+  }
+}
+
+/** Remove a tenant's custom domain. Returns true on success (204). */
+export async function removeDomain(slug: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${PLATFORM}/tenants/${slug}/domain`, {
+      method: "DELETE",
+      headers: authHeaders(),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("removeDomain failed", err);
+    return false;
+  }
+}
+
 // --- Subscriptions & leads (super-admin commercial views) -------------------
 
 export type SubscriptionRow = {

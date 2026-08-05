@@ -7,8 +7,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  API_IMAGE: ghcr.io/${{ github.repository_owner }}/festival360-api
-  WEB_IMAGE: ghcr.io/${{ github.repository_owner }}/festival360-web
+  API_IMAGE: ghcr.io/${{ github.repository_owner }}/siteora-api
+  WEB_IMAGE: ghcr.io/${{ github.repository_owner }}/siteora-web
 
 jobs:
   build-and-push:

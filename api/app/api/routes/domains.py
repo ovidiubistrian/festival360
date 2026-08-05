@@ -128,7 +128,7 @@ def _status(tenant: Tenant) -> DomainStatusOut:
             f"{settings.DOMAIN_VERIFY_PREFIX}.{d}" if d else ""
         ),
         verify_record_value=(
-            f"festivalhub-verify={tenant.domain_verify_token}"
+            f"siteora-verify={tenant.domain_verify_token}"
             if tenant.domain_verify_token
             else ""
         ),
@@ -206,7 +206,7 @@ def verify_domain(slug: str, session: Session = Depends(get_session)):
     _require_domain_feature(session, tenant)
 
     record = f"{settings.DOMAIN_VERIFY_PREFIX}.{tenant.custom_domain}"
-    expected = f"festivalhub-verify={tenant.domain_verify_token}"
+    expected = f"siteora-verify={tenant.domain_verify_token}"
     try:
         answers = dns.resolver.resolve(record, "TXT", lifetime=5.0)
         values = set()

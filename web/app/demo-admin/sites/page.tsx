@@ -11,9 +11,11 @@ import {
   ArrowRight,
   Check,
   Sparkles,
+  Globe,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
+import { DomainManager } from "@/components/admin/domain-manager";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -72,6 +74,17 @@ export default function SitesPage() {
   const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [highlightSlug, setHighlightSlug] = React.useState<string | null>(null);
+
+  // Custom-domain dialog. `domainTarget` stays set through the close animation
+  // while `domainOpen` drives visibility.
+  const [domainTarget, setDomainTarget] =
+    React.useState<TenantSummary | null>(null);
+  const [domainOpen, setDomainOpen] = React.useState(false);
+
+  function openDomain(tenant: TenantSummary) {
+    setDomainTarget(tenant);
+    setDomainOpen(true);
+  }
 
   // Wizard state.
   const [wizardOpen, setWizardOpen] = React.useState(false);
@@ -439,6 +452,14 @@ export default function SitesPage() {
                         Vezi site-ul
                       </a>
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openDomain(tenant)}
+                    >
+                      <Globe className="h-4 w-4" />
+                      Domeniu
+                    </Button>
                     {protectedSite ? null : (
                       <ConfirmDelete
                         itemLabel={`site-ul „${tenant.name}” (/${tenant.slug}) și tot conținutul lui`}
@@ -468,6 +489,13 @@ export default function SitesPage() {
           {tenants.length} site-uri în platformă.
         </p>
       ) : null}
+
+      <DomainManager
+        slug={domainTarget?.slug ?? ""}
+        tenantName={domainTarget?.name ?? ""}
+        open={domainOpen}
+        onOpenChange={setDomainOpen}
+      />
     </AdminShell>
   );
 }

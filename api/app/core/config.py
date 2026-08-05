@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     )
 
     # --- App ---
-    PROJECT_NAME: str = "Festival Hub API"
+    PROJECT_NAME: str = "Siteora API"
     API_V1_PREFIX: str = "/api/v1"
     ENVIRONMENT: str = "development"  # development | production
 
@@ -33,8 +33,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12  # 12h
 
     # --- Custom domains ---
-    PLATFORM_DOMAIN: str = "festival360.ro"
-    DOMAIN_VERIFY_PREFIX: str = "_festivalhub-verify"
+    PLATFORM_DOMAIN: str = "siteora.ro"
+    DOMAIN_VERIFY_PREFIX: str = "_siteora-verify"
 
     # --- Media library (uploaded files) ---
     # Directory where uploads are stored (mount a volume here in production).
