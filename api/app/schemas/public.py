@@ -86,6 +86,7 @@ class ProductOut(CamelModel):
     gallery: list[str]
     price: str | None
     featured: bool
+    season: str
     status: str
 
     @classmethod

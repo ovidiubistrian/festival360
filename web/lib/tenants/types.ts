@@ -160,6 +160,8 @@ export interface Product {
   gallery: string[];
   price?: string;
   featured: boolean;
+  /** "all" | "winter" | "summer" — seasonal filtering for resorts. */
+  season?: string;
   status: PublishStatus;
 }
 

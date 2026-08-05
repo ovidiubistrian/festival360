@@ -7,6 +7,8 @@ import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
 import { HomeHero } from "@/components/public/sections/home-hero";
 import { AboutSection } from "@/components/public/sections/about-section";
+import { ConditionsWidget } from "@/components/public/sections/conditions-widget";
+import { TrailsMap } from "@/components/public/sections/trails-map";
 import { ExperiencesSection } from "@/components/public/sections/experiences-section";
 import { DestinationsSection } from "@/components/public/sections/destinations-section";
 import { NewsletterSection } from "@/components/public/sections/newsletter-section";
@@ -30,6 +32,7 @@ export default async function TenantHome({
   if (!t) notFound();
 
   const { config, content, slug } = t;
+  const isResort = config.eventType === "resort";
   const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
   const visible = (id: string) =>
     config.sections.find((s) => s.id === id)?.visible ?? true;
@@ -99,12 +102,16 @@ export default async function TenantHome({
         />
       )}
 
+      {isResort && <ConditionsWidget />}
+
       {visible("experiences") && (
         <ExperiencesSection
           experiences={config.experiences}
           labels={config.labels}
         />
       )}
+
+      {isResort && <TrailsMap />}
 
       {visible("program") && (
         <section id="program" className="bg-warm-white py-16 sm:py-24">

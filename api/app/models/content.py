@@ -54,6 +54,8 @@ class Product(SQLModel, table=True):
     gallery: list[str] = Field(default_factory=list, sa_column=Column(JSON))
     price: str | None = None
     featured: bool = False
+    # "all" | "winter" | "summer" — for seasonal verticals (resorts).
+    season: str = "all"
     status: str = "published"
     sort_order: int = 0
     created_at: dt.datetime = Field(default_factory=utcnow)

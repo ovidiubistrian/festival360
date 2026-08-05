@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { PageHero } from "@/components/public/page-hero";
 import { ProductCard } from "@/components/public/cards/product-card";
 import { ExhibitorCard } from "@/components/public/cards/exhibitor-card";
+import { BookingInquiry } from "@/components/public/booking-inquiry";
 
 export async function generateMetadata({
   params,
@@ -49,7 +50,8 @@ export default async function ExhibitorDetailPage({
   const t = await getTenantBundle(tenant);
   if (!t) notFound();
 
-  const { content, slug } = t;
+  const { config, content, slug } = t;
+  const isResort = config.eventType === "resort";
   const exhibitor = content.exhibitors.find((e) => e.slug === exhibitorSlug);
   if (!exhibitor) notFound();
 
@@ -175,6 +177,15 @@ export default async function ExhibitorDetailPage({
                   </>
                 )}
               </div>
+
+              {isResort && (
+                <div className="mt-6">
+                  <BookingInquiry
+                    accommodationName={exhibitor.name}
+                    slug={slug}
+                  />
+                </div>
+              )}
             </aside>
           </div>
 

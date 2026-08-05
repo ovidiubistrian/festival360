@@ -27,9 +27,15 @@ export function ProductExplorer({
     [published]
   );
 
+  const hasSeasons = React.useMemo(
+    () => published.some((p) => p.season && p.season !== "all"),
+    [published]
+  );
+
   const [query, setQuery] = React.useState("");
   const [category, setCategory] = React.useState("all");
   const [region, setRegion] = React.useState("all");
+  const [season, setSeason] = React.useState("all");
 
   const results = published.filter((p) => {
     const q = query.trim().toLowerCase();
@@ -40,7 +46,10 @@ export function ProductExplorer({
       p.shortDescription.toLowerCase().includes(q);
     const matchesCat = category === "all" || p.category === category;
     const matchesReg = region === "all" || p.region === region;
-    return matchesQuery && matchesCat && matchesReg;
+    const productSeason = p.season ?? "all";
+    const matchesSeason =
+      season === "all" || productSeason === "all" || productSeason === season;
+    return matchesQuery && matchesCat && matchesReg && matchesSeason;
   });
 
   return (
@@ -70,6 +79,30 @@ export function ProductExplorer({
             options={regions}
           />
         </div>
+        {hasSeasons && (
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Sezon
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Chip active={season === "all"} onClick={() => setSeason("all")}>
+                Toate
+              </Chip>
+              <Chip
+                active={season === "winter"}
+                onClick={() => setSeason("winter")}
+              >
+                Iarnă
+              </Chip>
+              <Chip
+                active={season === "summer"}
+                onClick={() => setSeason("summer")}
+              >
+                Vară
+              </Chip>
+            </div>
+          </div>
+        )}
       </div>
 
       <p className="mb-5 flex items-center gap-2 text-sm text-muted-foreground">

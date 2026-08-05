@@ -425,6 +425,7 @@ EXHIBITORS: list[dict[str, Any]] = [
 PRODUCTS: list[dict[str, Any]] = [
     {
         "id": "pm-pr-1",
+        "season": "winter",
         "tenant_id": TENANT_ID,
         "slug": "schi-la-muntele-mic",
         "name": "Schi la Muntele Mic",
@@ -448,6 +449,7 @@ PRODUCTS: list[dict[str, Any]] = [
     },
     {
         "id": "pm-pr-2",
+        "season": "summer",
         "tenant_id": TENANT_ID,
         "slug": "drumetie-varful-tarcu",
         "name": "Drumeție pe Vârful Țarcu",
@@ -471,6 +473,7 @@ PRODUCTS: list[dict[str, Any]] = [
     },
     {
         "id": "pm-pr-3",
+        "season": "summer",
         "tenant_id": TENANT_ID,
         "slug": "pescuit-lacul-poiana-marului",
         "name": "Pescuit la Lacul Poiana Mărului",
@@ -494,6 +497,7 @@ PRODUCTS: list[dict[str, Any]] = [
     },
     {
         "id": "pm-pr-4",
+        "season": "summer",
         "tenant_id": TENANT_ID,
         "slug": "tur-cu-barca-pe-lac",
         "name": "Tur cu barca pe lac",
@@ -516,6 +520,7 @@ PRODUCTS: list[dict[str, Any]] = [
     },
     {
         "id": "pm-pr-5",
+        "season": "summer",
         "tenant_id": TENANT_ID,
         "slug": "calarie-pe-poteci-de-munte",
         "name": "Călărie pe poteci de munte",
@@ -538,6 +543,7 @@ PRODUCTS: list[dict[str, Any]] = [
     },
     {
         "id": "pm-pr-6",
+        "season": "all",
         "tenant_id": TENANT_ID,
         "slug": "seara-la-foc-de-tabara",
         "name": "Seară la foc de tabără",
@@ -560,6 +566,7 @@ PRODUCTS: list[dict[str, Any]] = [
     },
     {
         "id": "pm-pr-7",
+        "season": "summer",
         "tenant_id": TENANT_ID,
         "slug": "vizita-la-stana",
         "name": "Vizită la stână",
@@ -582,6 +589,7 @@ PRODUCTS: list[dict[str, Any]] = [
     },
     {
         "id": "pm-pr-8",
+        "season": "winter",
         "tenant_id": TENANT_ID,
         "slug": "inchiriere-echipament",
         "name": "Închiriere echipament",

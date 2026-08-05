@@ -69,6 +69,7 @@ class ProductIn(CamelModel):
     gallery: list[str] = []
     price: str | None = None
     featured: bool = False
+    season: str = "all"
     status: str = "published"
 
     def to_kwargs(self, tenant_id: str) -> dict[str, Any]:
