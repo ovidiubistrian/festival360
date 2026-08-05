@@ -16,22 +16,20 @@ import {
   Sparkles,
   UtensilsCrossed,
   Mountain,
-  Music,
-  Tent,
+  Landmark,
+  Users,
 } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { Reveal } from "@/components/shared/reveal";
-import { prispaTenant } from "@/lib/tenants/prispa";
-import { formatDateRange } from "@/lib/utils";
 import { IMG } from "@/lib/tenants/prispa/images";
 
 export const metadata: Metadata = {
-  title: "Festival Hub — Festivalul tău, o experiență digitală completă",
+  title: "Festival Hub — Evenimentul tău, o experiență digitală completă",
   description:
-    "Platforma multi-tenant care transformă festivalurile, târgurile și evenimentele culturale, gastronomice și turistice într-un site modern și un panou de administrare complet.",
+    "Platforma multi-tenant care transformă festivaluri, stațiuni turistice, muzee și conferințe într-un site modern și un panou de administrare complet — cu terminologie și temă potrivite fiecărui tip.",
 };
 
 const modules = [
@@ -43,28 +41,53 @@ const modules = [
   { icon: Handshake, title: "Parteneri și sponsori", desc: "Organizează partenerii pe niveluri și categorii." },
   { icon: ImageIcon, title: "Galerie", desc: "Grid editorial cu filtre și lightbox." },
   { icon: Newspaper, title: "Noutăți", desc: "Publică articole, povești și interviuri." },
-  { icon: Palette, title: "Identitate vizuală", desc: "Culori, logo și imagini, adaptate fiecărui festival." },
+  { icon: Palette, title: "Identitate vizuală", desc: "Culori, logo și imagini, adaptate fiecărui eveniment." },
 ];
 
 const eventTypes = [
-  { icon: UtensilsCrossed, label: "Festivaluri gastronomice" },
-  { icon: Tent, label: "Târguri și piețe" },
-  { icon: Mountain, label: "Turism și tradiții" },
-  { icon: Music, label: "Evenimente culturale" },
+  { icon: UtensilsCrossed, label: "Festivaluri & târguri" },
+  { icon: Mountain, label: "Stațiuni & turism" },
+  { icon: Landmark, label: "Muzee & cultură" },
+  { icon: Users, label: "Conferințe & evenimente" },
+];
+
+const demos = [
+  {
+    slug: "prispa",
+    name: "PRISPA",
+    type: "Festival",
+    tagline: "Festival de tradiții și gastronomie · Brașov",
+    color: "#183C32",
+    image: IMG.hero,
+  },
+  {
+    slug: "poiana-marului",
+    name: "Poiana Mărului",
+    type: "Stațiune",
+    tagline: "Zonă turistică de munte · Caraș-Severin",
+    color: "#17414B",
+    image: IMG.mountainLake,
+  },
+  {
+    slug: "muzeul-satului-banatean",
+    name: "Muzeul Satului Bănățean",
+    type: "Muzeu",
+    tagline: "Muzeu în aer liber · Timișoara",
+    color: "#3A2E2A",
+    image: IMG.village,
+  },
 ];
 
 const advantages = [
   "Un site public modern, rapid și responsive",
   "Panou de administrare complet, fără cod",
-  "Arhitectură multi-tenant — mai multe festivaluri, o platformă",
-  "Identitate vizuală proprie pentru fiecare eveniment",
+  "Arhitectură multi-tenant — mai multe evenimente, o platformă",
+  "Terminologie și temă potrivite fiecărui tip (festival, stațiune, muzeu…)",
   "Optimizat pentru SEO și partajare pe social media",
   "Pregătit pentru integrare cu Supabase sau PostgreSQL",
 ];
 
 export default function FestivalHubLanding() {
-  const info = prispaTenant.config.info;
-
   return (
     <div className="flex min-h-screen flex-col">
       {/* Nav */}
@@ -114,14 +137,15 @@ export default function FestivalHubLanding() {
             </Reveal>
             <Reveal delayIndex={1}>
               <h1 className="mt-6 font-serif text-4xl font-semibold leading-tight text-warm-white sm:text-6xl">
-                Festivalul tău. O experiență digitală completă.
+                Evenimentul tău. O experiență digitală completă.
               </h1>
             </Reveal>
             <Reveal delayIndex={2}>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/85">
-                Festival Hub le oferă organizatorilor un site public spectaculos
-                și un panou de administrare complet — pentru festivaluri,
-                târguri și evenimente gastronomice, culturale și turistice.
+                Festival Hub oferă un site public spectaculos și un panou de
+                administrare complet — pentru festivaluri, stațiuni turistice,
+                muzee și conferințe. Alegi tipul, iar terminologia, tema și
+                structura se potrivesc automat.
               </p>
             </Reveal>
             <Reveal delayIndex={3}>
@@ -210,7 +234,7 @@ export default function FestivalHubLanding() {
               Module disponibile
             </p>
             <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
-              Un modul pentru fiecare parte a festivalului
+              Un modul pentru fiecare parte a evenimentului tău
             </h2>
           </div>
           <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -235,47 +259,69 @@ export default function FestivalHubLanding() {
         </Container>
       </section>
 
-      {/* Active festival preview: PRISPA */}
+      {/* Live demos — one engine, many verticals */}
       <section className="bg-warm-white py-20 sm:py-28">
         <Container>
-          <Reveal className="grid overflow-hidden rounded-3xl border border-border bg-card lg:grid-cols-2">
-            <div className="relative min-h-[300px]">
-              <ImageWithFallback
-                src={info.heroImage}
-                alt={info.name}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                fallbackLabel={info.name}
-                className="object-cover"
-              />
-            </div>
-            <div className="flex flex-col justify-center p-8 sm:p-12">
-              <Badge variant="success" className="w-fit">
-                <span className="mr-1 h-2 w-2 rounded-full bg-emerald-500" />
-                Festival activ
-              </Badge>
-              <h2 className="mt-5 font-serif text-3xl font-semibold text-primary sm:text-4xl">
-                {info.name}
-              </h2>
-              <p className="mt-2 text-sm font-medium text-terracotta">
-                {formatDateRange(info.startDate, info.endDate)} · {info.locationName}, {info.city}
-              </p>
-              <p className="mt-4 text-base leading-relaxed text-charcoal/75">
-                {info.shortDescription}
-              </p>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <Button asChild>
-                  <Link href="/prispa">
-                    Vezi festivalul demo
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline">
-                  <Link href="/demo-admin">Deschide panoul admin</Link>
-                </Button>
-              </div>
-            </div>
-          </Reveal>
+          <div className="mx-auto max-w-2xl text-center">
+            <Badge variant="success" className="mx-auto w-fit">
+              <span className="mr-1 h-2 w-2 rounded-full bg-emerald-500" />
+              3 site-uri demo live
+            </Badge>
+            <h2 className="mt-4 font-serif text-3xl font-semibold text-primary sm:text-4xl">
+              Un motor, mai multe tipuri de evenimente
+            </h2>
+            <p className="mt-4 text-base text-muted-foreground">
+              Aceleași unelte, adaptate fiecărui domeniu — de la festival la
+              stațiune sau muzeu. Explorează-le pe toate trei.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {demos.map((d, i) => (
+              <Reveal key={d.slug} delayIndex={i}>
+                <Link
+                  href={`/${d.slug}`}
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(32,37,34,0.10)]"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <ImageWithFallback
+                      src={d.image}
+                      alt={d.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      fallbackLabel={d.name}
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <span
+                      className="absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-semibold text-warm-white"
+                      style={{ backgroundColor: d.color }}
+                    >
+                      {d.type}
+                    </span>
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="font-serif text-xl font-semibold text-primary">
+                      {d.name}
+                    </h3>
+                    <p className="mt-1 flex-1 text-sm text-muted-foreground">
+                      {d.tagline}
+                    </p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-terracotta">
+                      Vezi site-ul demo
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Button asChild variant="outline">
+              <Link href="/demo-admin/sites">
+                Creează un site nou din panou
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         </Container>
       </section>
 
@@ -312,15 +358,15 @@ export default function FestivalHubLanding() {
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-semibold text-warm-white sm:text-4xl">
-              Gata să-ți duci festivalul online?
+              Gata să-ți duci evenimentul online?
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-base text-cream/85">
-              Explorează demo-ul PRISPA și panoul de administrare. Totul este
-              funcțional, cu date demonstrative.
+              Explorează cele trei demo-uri live și panoul de administrare.
+              Totul este funcțional, cu date demonstrative.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="lg" variant="gold">
-                <Link href="/prispa">Vezi festivalul demo</Link>
+                <Link href="/prispa">Vezi un demo</Link>
               </Button>
               <Button
                 asChild
