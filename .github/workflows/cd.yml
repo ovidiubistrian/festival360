@@ -87,6 +87,11 @@ jobs:
           envs: GHCR_USER,GHCR_PAT
           script: |
             set -e
+            export PATH="$PATH:/usr/local/bin:/usr/bin:/bin"
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "Docker nu este instalat pe VPS. Rulează întâi deploy/bootstrap-vps.sh." >&2
+              exit 1
+            fi
             cd ~/siteora
             if [ -n "$GHCR_PAT" ]; then
               echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
