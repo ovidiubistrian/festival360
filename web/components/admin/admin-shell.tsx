@@ -93,7 +93,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           className="flex items-center gap-2"
         >
           <span className="font-serif text-lg font-semibold text-warm-white">
-            Festival Hub
+            Siteora
           </span>
           <Badge variant="gold">PRISPA</Badge>
         </Link>

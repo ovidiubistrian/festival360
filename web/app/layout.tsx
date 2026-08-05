@@ -16,17 +16,18 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://festival360.vercel.app"),
+  metadataBase: new URL("https://siteora.ro"),
   title: {
-    default: "Festival Hub — Platforma digitală pentru festivaluri",
-    template: "%s · Festival Hub",
+    default:
+      "Siteora — Construiește digital orice destinație, eveniment sau instituție",
+    template: "%s · Siteora",
   },
   description:
-    "Festival Hub este platforma multi-tenant care transformă festivalurile, târgurile și evenimentele culturale într-o experiență digitală completă.",
+    "Un singur loc pentru site, conținut, program, parteneri, produse, bilete și promovare — pentru evenimente, destinații turistice, muzee, instituții și atracții.",
   openGraph: {
     type: "website",
     locale: "ro_RO",
-    siteName: "Festival Hub",
+    siteName: "Siteora",
   },
 };
 

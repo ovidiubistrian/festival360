@@ -140,7 +140,7 @@ export function SiteFooter({
               Confidențialitate
             </Link>
             <Link href="/" className="hover:text-warm-white">
-              Festival Hub
+              Siteora
             </Link>
           </div>
         </div>

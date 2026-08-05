@@ -41,7 +41,7 @@ export default function DemoAdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-secondary p-6">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <Badge variant="gold">Festival Hub · PRISPA</Badge>
+          <Badge variant="gold">Siteora · PRISPA</Badge>
         </div>
 
         <Card>
@@ -119,7 +119,7 @@ export default function DemoAdminLoginPage() {
             href="/"
             className="text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
           >
-            Festival Hub
+            Siteora
           </Link>
           <span className="text-border">·</span>
           <a

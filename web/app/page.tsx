@@ -17,7 +17,8 @@ import {
   UtensilsCrossed,
   Mountain,
   Landmark,
-  Users,
+  Building2,
+  Compass,
 } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
@@ -30,9 +31,9 @@ import { cn } from "@/lib/utils";
 import { IMG } from "@/lib/tenants/prispa/images";
 
 export const metadata: Metadata = {
-  title: "Festival Hub — Evenimentul tău, o experiență digitală completă",
+  title: "Siteora — Construiește digital orice destinație, eveniment sau instituție",
   description:
-    "Platforma multi-tenant care transformă festivaluri, stațiuni turistice, muzee și conferințe într-un site modern și un panou de administrare complet — cu terminologie și temă potrivite fiecărui tip.",
+    "Un singur loc pentru site, conținut, program, parteneri, produse, bilete și promovare. Alegi o verticală — Events, Destinations, Culture, Institutions sau Experiences — și totul se adaptează automat.",
 };
 
 const modules = [
@@ -47,11 +48,32 @@ const modules = [
   { icon: Palette, title: "Identitate vizuală", desc: "Culori, logo și imagini, adaptate fiecărui eveniment." },
 ];
 
-const eventTypes = [
-  { icon: UtensilsCrossed, label: "Festivaluri & târguri" },
-  { icon: Mountain, label: "Stațiuni & turism" },
-  { icon: Landmark, label: "Muzee & cultură" },
-  { icon: Users, label: "Conferințe & evenimente" },
+const verticals = [
+  {
+    icon: CalendarDays,
+    name: "Siteora Events",
+    desc: "festivaluri, competiții și evenimente",
+  },
+  {
+    icon: Mountain,
+    name: "Siteora Destinations",
+    desc: "stațiuni și destinații turistice",
+  },
+  {
+    icon: Landmark,
+    name: "Siteora Culture",
+    desc: "muzee, obiective și centre culturale",
+  },
+  {
+    icon: Building2,
+    name: "Siteora Institutions",
+    desc: "instituții și administrații",
+  },
+  {
+    icon: Compass,
+    name: "Siteora Experiences",
+    desc: "parcuri, trasee și atracții",
+  },
 ];
 
 const demos = [
@@ -103,7 +125,7 @@ export default async function FestivalHubLanding() {
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Sparkles className="h-4 w-4" />
               </span>
-              Festival Hub
+              Siteora
             </Link>
             <div className="flex items-center gap-2">
               <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
@@ -142,15 +164,20 @@ export default async function FestivalHubLanding() {
             </Reveal>
             <Reveal delayIndex={1}>
               <h1 className="mt-6 font-serif text-4xl font-semibold leading-tight text-warm-white sm:text-6xl">
-                Evenimentul tău. O experiență digitală completă.
+                Construiește digital orice destinație, eveniment sau
+                instituție.
               </h1>
             </Reveal>
             <Reveal delayIndex={2}>
+              <p className="mt-4 text-sm italic text-cream/70">
+                Build your destination, event or institution digitally.
+              </p>
+            </Reveal>
+            <Reveal delayIndex={2}>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/85">
-                Festival Hub oferă un site public spectaculos și un panou de
-                administrare complet — pentru festivaluri, stațiuni turistice,
-                muzee și conferințe. Alegi tipul, iar terminologia, tema și
-                structura se potrivesc automat.
+                Un singur loc pentru site, conținut, program, parteneri,
+                produse, bilete și promovare. Alegi o verticală, iar
+                terminologia, tema și structura se adaptează automat.
               </p>
             </Reveal>
             <Reveal delayIndex={3}>
@@ -187,12 +214,13 @@ export default async function FestivalHubLanding() {
                 Pentru organizatori
               </p>
               <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
-                Tot ce îți trebuie pentru a-ți duce festivalul online
+                Tot ce îți trebuie pentru a-ți duce proiectul online
               </h2>
               <p className="mt-5 text-base leading-relaxed text-charcoal/75">
-                O singură platformă gestionează prezența digitală a evenimentului
-                tău: de la pagina de prezentare, la program, expozanți, produse,
-                destinații și parteneri. Fără dezvoltatori, fără bătăi de cap.
+                O singură platformă gestionează prezența digitală a
+                evenimentului, destinației sau instituției tale: de la pagina de
+                prezentare, la program, expozanți, produse, destinații și
+                parteneri. Fără dezvoltatori, fără bătăi de cap.
               </p>
               <ul className="mt-8 space-y-3">
                 {advantages.map((a) => (
@@ -224,7 +252,7 @@ export default async function FestivalHubLanding() {
               <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-6">
                 <Palette className="h-6 w-6 text-gold" />
                 <p className="font-serif text-lg font-semibold text-primary">Brand propriu</p>
-                <p className="text-sm text-muted-foreground">Culori și identitate per festival</p>
+                <p className="text-sm text-muted-foreground">Culori și identitate per proiect</p>
               </div>
             </Reveal>
           </div>
@@ -330,29 +358,37 @@ export default async function FestivalHubLanding() {
         </Container>
       </section>
 
-      {/* Event types */}
+      {/* Verticals */}
       <section className="bg-secondary py-20 sm:py-24">
         <Container>
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-3xl font-semibold text-primary sm:text-4xl">
-              Pentru orice tip de eveniment
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-terracotta">
+              Verticale Siteora
+            </p>
+            <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
+              O platformă, cinci verticale
             </h2>
             <p className="mt-4 text-base text-muted-foreground">
-              Festival Hub se adaptează oricărui eveniment care aduce oameni,
-              produse și locuri împreună.
+              Alegi verticala potrivită, iar Siteora se adaptează automat
+              proiectului tău — de la terminologie la structură și temă.
             </p>
           </div>
-          <div className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 lg:grid-cols-4">
-            {eventTypes.map((e) => (
-              <div
-                key={e.label}
-                className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card p-8 text-center"
+          <div className="mx-auto mt-12 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {verticals.map((v) => (
+              <Reveal
+                key={v.name}
+                className="flex flex-col items-start gap-3 rounded-2xl border border-border bg-card p-6"
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary">
-                  <e.icon className="h-6 w-6" />
+                  <v.icon className="h-6 w-6" />
                 </span>
-                <span className="text-sm font-medium text-charcoal">{e.label}</span>
-              </div>
+                <h3 className="font-serif text-lg font-semibold text-primary">
+                  {v.name}
+                </h3>
+                <p className="text-sm leading-relaxed text-charcoal/70">
+                  {v.desc}
+                </p>
+              </Reveal>
             ))}
           </div>
         </Container>
@@ -471,7 +507,7 @@ export default async function FestivalHubLanding() {
                 Înscriere
               </p>
               <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
-                Începe cu Festival Hub
+                Începe cu Siteora
               </h2>
               <p className="mt-4 text-base leading-relaxed text-charcoal/75">
                 Spune-ne despre evenimentul tău și te contactăm în cel mai scurt
@@ -505,7 +541,7 @@ export default async function FestivalHubLanding() {
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-serif text-3xl font-semibold text-warm-white sm:text-4xl">
-              Gata să-ți duci evenimentul online?
+              Gata să-ți construiești site-ul?
             </h2>
             <p className="mx-auto mt-4 max-w-lg text-base text-cream/85">
               Explorează cele trei demo-uri live și panoul de administrare.
@@ -533,9 +569,9 @@ export default async function FestivalHubLanding() {
           <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground sm:flex-row">
             <p className="flex items-center gap-2 font-serif text-lg font-semibold text-primary">
               <Sparkles className="h-4 w-4" />
-              Festival Hub
+              Siteora
             </p>
-            <p>© {new Date().getFullYear()} Festival Hub. Demo pentru prezentare.</p>
+            <p>© {new Date().getFullYear()} Siteora. Demo pentru prezentare.</p>
             <div className="flex gap-6">
               <Link href="/prispa" className="hover:text-primary">Festival demo</Link>
               <Link href="/demo-admin" className="hover:text-primary">Panou admin</Link>
