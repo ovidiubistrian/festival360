@@ -4,10 +4,18 @@ import datetime as dt
 import re
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlmodel import Session, select
 
 from app.api.deps import get_current_superuser
+from app.billing import settings_store
+from app.billing.checkout import (
+    CheckoutError,
+    PaymentNotConfigured,
+    fulfil_event,
+    start_subscription_checkout,
+)
+from app.billing.payments import StripeGateway
 from app.core.db import get_session
 from app.models import (
     AdminUser,
@@ -293,3 +301,73 @@ def set_tenant_plan(
     session.add(sub)
     session.commit()
     return {"tenant": slug, "plan": sub.plan, "status": sub.status}
+
+
+# =========================================================================
+# Stripe: platform config (encrypted), checkout, webhook
+# =========================================================================
+class StripeConfigIn(CamelModel):
+    secret_key: str
+    webhook_secret: str
+
+
+@router.get("/settings/stripe", dependencies=[Depends(get_current_superuser)])
+def stripe_status(session: Session = Depends(get_session)):
+    return {"configured": settings_store.is_stripe_configured(session)}
+
+
+@router.put("/settings/stripe", dependencies=[Depends(get_current_superuser)])
+def set_stripe_config(
+    payload: StripeConfigIn, session: Session = Depends(get_session)
+):
+    if not payload.secret_key.startswith("sk_") or not payload.webhook_secret.startswith("whsec_"):
+        raise HTTPException(status_code=400, detail="Chei Stripe invalide (sk_… și whsec_…).")
+    settings_store.set_setting(session, settings_store.STRIPE_SECRET_KEY, payload.secret_key)
+    settings_store.set_setting(session, settings_store.STRIPE_WEBHOOK_SECRET, payload.webhook_secret)
+    return {"configured": True}
+
+
+class CheckoutIn(CamelModel):
+    plan: str
+    cycle: str = "monthly"
+
+
+@router.post("/tenants/{slug}/checkout", dependencies=[Depends(get_current_superuser)])
+def create_checkout(
+    slug: str, payload: CheckoutIn, session: Session = Depends(get_session)
+):
+    tenant = session.get(Tenant, slug)
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Site inexistent.")
+    if payload.plan not in {"pro", "cultural"}:
+        raise HTTPException(status_code=400, detail="Doar planurile cu preț pot fi plătite online.")
+    import stripe
+
+    try:
+        url = start_subscription_checkout(session, tenant, payload.plan, payload.cycle)
+    except PaymentNotConfigured:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Plățile nu sunt configurate încă (lipsesc cheile Stripe).",
+        )
+    except CheckoutError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except stripe.StripeError as e:
+        raise HTTPException(status_code=502, detail=f"Eroare Stripe: {e.user_message or 'checkout eșuat'}")
+    return {"url": url}
+
+
+@router.post("/stripe/webhook", include_in_schema=False)
+async def stripe_webhook(request: Request, session: Session = Depends(get_session)):
+    cfg = settings_store.stripe_config(session)
+    if not cfg:
+        return {"received": False}  # not configured — ignore
+    gateway = StripeGateway(cfg[0], cfg[1])
+    payload = await request.body()
+    sig = request.headers.get("stripe-signature", "")
+    event = gateway.verify_webhook(payload, sig)
+    if event is None:
+        raise HTTPException(status_code=400, detail="Semnătură invalidă.")
+    if event.get("type"):
+        fulfil_event(session, event)
+    return {"received": True}
