@@ -6,15 +6,18 @@ import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { DestinationCard } from "@/components/public/cards/destination-card";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/shared/reveal";
-import type { Destination } from "@/lib/tenants/types";
+import type { Destination, TenantLabels } from "@/lib/tenants/types";
 
 export function DestinationsSection({
   destinations,
   slug,
+  labels,
 }: {
   destinations: Destination[];
   slug: string;
+  labels?: TenantLabels;
 }) {
+  const L = (k: string, fb: string) => labels?.[k] ?? fb;
   const editorial = destinations.find((d) => d.editorial);
   const others = destinations
     .filter((d) => d.featured && !d.editorial)
@@ -25,9 +28,12 @@ export function DestinationsSection({
       <Container>
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <SectionHeading
-            eyebrow="Destinații turistice"
-            title="România care merită descoperită"
-            description="Festivalul este și o poartă către unele dintre cele mai frumoase locuri ale țării."
+            eyebrow={L("destinationsEyebrow", "Destinații turistice")}
+            title={L("destinationsTitle", "România care merită descoperită")}
+            description={L(
+              "destinationsDescription",
+              "Festivalul este și o poartă către unele dintre cele mai frumoase locuri ale țării."
+            )}
           />
           <Button asChild variant="outline">
             <Link href={`/${slug}/destinatii`}>

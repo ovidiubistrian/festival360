@@ -44,13 +44,17 @@ export default async function DestinationsPage({
   );
   const editorial = published.find((d) => d.editorial);
   const rest = published.filter((d) => d.id !== editorial?.id);
+  const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
 
   return (
     <>
       <PageHero
         eyebrow="Turism și natură"
-        title="Destinații turistice"
-        description="Descoperă regiunile din spatele produselor: sate de poveste, peisaje de munte și experiențe autentice."
+        title={L("destinationsPageTitle", "Destinații turistice")}
+        description={L(
+          "destinationsPageDescription",
+          "Descoperă regiunile din spatele produselor: sate de poveste, peisaje de munte și experiențe autentice."
+        )}
         image={config.info.heroImage}
         crumbs={[{ label: "Acasă", href: `/${slug}` }, { label: "Destinații" }]}
       />

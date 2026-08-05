@@ -5,9 +5,21 @@ import { Container } from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/shared/reveal";
 import { formatDateRange } from "@/lib/utils";
-import type { FestivalInfo } from "@/lib/tenants/types";
+import type { FestivalInfo, TenantLabels } from "@/lib/tenants/types";
 
-export function HomeHero({ info, slug }: { info: FestivalInfo; slug: string }) {
+export function HomeHero({
+  info,
+  slug,
+  labels,
+  eventType,
+}: {
+  info: FestivalInfo;
+  slug: string;
+  labels?: TenantLabels;
+  eventType?: string;
+}) {
+  const L = (k: string, fb: string) => labels?.[k] ?? fb;
+  const isResort = eventType === "resort";
   return (
     <section className="relative flex min-h-[92vh] items-center overflow-hidden">
       <ImageWithFallback
@@ -25,11 +37,13 @@ export function HomeHero({ info, slug }: { info: FestivalInfo; slug: string }) {
 
       <Container className="relative z-10 pb-16 pt-28">
         <div className="max-w-2xl">
-          <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-warm-white backdrop-blur">
-              {info.heroBadge}
-            </span>
-          </Reveal>
+          {!isResort && (
+            <Reveal>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-warm-white backdrop-blur">
+                {info.heroBadge}
+              </span>
+            </Reveal>
+          )}
           <Reveal delayIndex={1}>
             <h1 className="mt-6 font-serif text-4xl font-semibold leading-[1.05] text-warm-white sm:text-6xl lg:text-7xl">
               {info.tagline}
@@ -44,7 +58,7 @@ export function HomeHero({ info, slug }: { info: FestivalInfo; slug: string }) {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button asChild size="lg" variant="gold">
                 <Link href={`/${slug}/despre`}>
-                  Descoperă festivalul
+                  {L("heroCtaPrimary", "Descoperă festivalul")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -56,17 +70,19 @@ export function HomeHero({ info, slug }: { info: FestivalInfo; slug: string }) {
               >
                 <Link href={`/${slug}/program`}>
                   <CalendarDays className="h-4 w-4" />
-                  Vezi programul
+                  {L("heroCtaSecondary", "Vezi programul")}
                 </Link>
               </Button>
             </div>
           </Reveal>
           <Reveal delayIndex={4}>
             <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-warm-white/90">
-              <span className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-gold" />
-                {formatDateRange(info.startDate, info.endDate)}
-              </span>
+              {!isResort && (
+                <span className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-gold" />
+                  {formatDateRange(info.startDate, info.endDate)}
+                </span>
+              )}
               <span className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-gold" />
                 {info.locationName}, {info.city}

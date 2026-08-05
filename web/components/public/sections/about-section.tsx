@@ -3,25 +3,28 @@ import { Container } from "@/components/shared/container";
 import { Reveal } from "@/components/shared/reveal";
 import { Icon } from "@/components/shared/icon";
 import { IMG } from "@/lib/tenants/prispa/images";
-import type { Stat } from "@/lib/tenants/types";
+import type { Stat, TenantLabels } from "@/lib/tenants/types";
 
 export function AboutSection({
   description,
   stats,
+  labels,
 }: {
   description: string;
   stats: Stat[];
+  labels?: TenantLabels;
 }) {
+  const L = (k: string, fb: string) => labels?.[k] ?? fb;
   return (
     <section id="despre" className="bg-warm-white py-20 sm:py-28">
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-terracotta">
-              Despre festival
+              {L("aboutEyebrow", "Despre festival")}
             </p>
             <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
-              Un sat întreg, adus în inima Brașovului
+              {L("aboutTitle", "Un sat întreg, adus în inima Brașovului")}
             </h2>
             <p className="mt-5 text-base leading-relaxed text-charcoal/75">
               {description}

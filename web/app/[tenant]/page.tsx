@@ -30,6 +30,7 @@ export default async function TenantHome({
   if (!t) notFound();
 
   const { config, content, slug } = t;
+  const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
   const visible = (id: string) =>
     config.sections.find((s) => s.id === id)?.visible ?? true;
 
@@ -81,17 +82,28 @@ export default async function TenantHome({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {visible("hero") && <HomeHero info={config.info} slug={slug} />}
+      {visible("hero") && (
+        <HomeHero
+          info={config.info}
+          slug={slug}
+          labels={config.labels}
+          eventType={config.eventType}
+        />
+      )}
 
       {visible("about") && (
         <AboutSection
           description={config.info.longDescription}
           stats={config.stats}
+          labels={config.labels}
         />
       )}
 
       {visible("experiences") && (
-        <ExperiencesSection experiences={config.experiences} />
+        <ExperiencesSection
+          experiences={config.experiences}
+          labels={config.labels}
+        />
       )}
 
       {visible("program") && (
@@ -99,12 +111,15 @@ export default async function TenantHome({
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
               <SectionHeading
-                eyebrow="Program"
-                title="Trei zile, zeci de momente"
-                description={`${formatDateRange(
-                  config.info.startDate,
-                  config.info.endDate
-                )} · ${config.info.locationName}, ${config.info.city}`}
+                eyebrow={L("programEyebrow", "Program")}
+                title={L("programTitle", "Trei zile, zeci de momente")}
+                description={L(
+                  "programDescription",
+                  `${formatDateRange(
+                    config.info.startDate,
+                    config.info.endDate
+                  )} · ${config.info.locationName}, ${config.info.city}`
+                )}
               />
               <Button asChild variant="outline">
                 <Link href={`/${slug}/program`}>
@@ -125,9 +140,15 @@ export default async function TenantHome({
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
               <SectionHeading
-                eyebrow="Expozanți și producători"
-                title="Oameni cu poveste, produse cu suflet"
-                description="Peste 100 de producători și meșteșugari din toată țara, aleși pe sprânceană."
+                eyebrow={L("exhibitorsEyebrow", "Expozanți și producători")}
+                title={L(
+                  "exhibitorsTitle",
+                  "Oameni cu poveste, produse cu suflet"
+                )}
+                description={L(
+                  "exhibitorsDescription",
+                  "Peste 100 de producători și meșteșugari din toată țara, aleși pe sprânceană."
+                )}
               />
               <Button asChild variant="outline">
                 <Link href={`/${slug}/expozanti`}>
@@ -155,9 +176,12 @@ export default async function TenantHome({
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
               <SectionHeading
-                eyebrow="Produse locale"
-                title="Gusturi cu origine cunoscută"
-                description="Fiecare produs are un producător, un loc și o poveste. Descoperă-le."
+                eyebrow={L("productsEyebrow", "Produse locale")}
+                title={L("productsTitle", "Gusturi cu origine cunoscută")}
+                description={L(
+                  "productsDescription",
+                  "Fiecare produs are un producător, un loc și o poveste. Descoperă-le."
+                )}
               />
               <Button asChild variant="outline">
                 <Link href={`/${slug}/produse`}>
@@ -181,7 +205,11 @@ export default async function TenantHome({
       )}
 
       {visible("destinations") && (
-        <DestinationsSection destinations={content.destinations} slug={slug} />
+        <DestinationsSection
+          destinations={content.destinations}
+          slug={slug}
+          labels={config.labels}
+        />
       )}
 
       {visible("partners") && homePartners.length > 0 && (
@@ -189,9 +217,12 @@ export default async function TenantHome({
           <Container>
             <SectionHeading
               align="center"
-              eyebrow="Parteneri și sponsori"
-              title="Alături de noi"
-              description="Festivalul PRISPA este posibil datorită partenerilor care cred în satul românesc."
+              eyebrow={L("partnersEyebrow", "Parteneri și sponsori")}
+              title={L("partnersTitle", "Alături de noi")}
+              description={L(
+                "partnersDescription",
+                "Festivalul PRISPA este posibil datorită partenerilor care cred în satul românesc."
+              )}
             />
             <Carousel
               ariaLabel="Parteneri și sponsori"
@@ -228,9 +259,12 @@ export default async function TenantHome({
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
               <SectionHeading
-                eyebrow="Galerie"
-                title="Festivalul, în imagini"
-                description="Momente din edițiile trecute: gastronomie, tradiții, concerte și natură."
+                eyebrow={L("galleryEyebrow", "Galerie")}
+                title={L("galleryTitle", "Festivalul, în imagini")}
+                description={L(
+                  "galleryDescription",
+                  "Momente din edițiile trecute: gastronomie, tradiții, concerte și natură."
+                )}
               />
               <Button asChild variant="outline">
                 <Link href={`/${slug}/galerie`}>
@@ -270,9 +304,12 @@ export default async function TenantHome({
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
               <SectionHeading
-                eyebrow="Noutăți și povești"
-                title="De citit înainte de festival"
-                description="Poveștile producătorilor, ghiduri și interviuri din lumea PRISPA."
+                eyebrow={L("newsEyebrow", "Noutăți și povești")}
+                title={L("newsTitle", "De citit înainte de festival")}
+                description={L(
+                  "newsDescription",
+                  "Poveștile producătorilor, ghiduri și interviuri din lumea PRISPA."
+                )}
               />
               <Button asChild variant="outline">
                 <Link href={`/${slug}/noutati`}>

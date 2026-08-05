@@ -86,7 +86,14 @@ export interface SectionConfig {
   visible: boolean;
 }
 
+/** Per-tenant display copy overriding festival defaults (terminology system). */
+export type TenantLabels = Record<string, string>;
+
 export interface TenantConfig {
+  /** "festival" | "resort" | ... — the vertical preset. */
+  eventType?: string;
+  /** Optional label overrides; the UI falls back to festival copy. */
+  labels?: TenantLabels;
   info: FestivalInfo;
   theme: TenantTheme;
   navigation: NavItem[];

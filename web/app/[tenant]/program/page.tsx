@@ -45,16 +45,20 @@ export default async function ProgramPage({
   const categories = Array.from(
     new Set(content.program.map((e) => e.category))
   ) as ProgramCategory[];
+  const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
 
   return (
     <>
       <PageHero
         eyebrow="Trei zile de festival"
-        title="Programul festivalului"
-        description={`${formatDateRange(
-          config.info.startDate,
-          config.info.endDate
-        )} · ${config.info.locationName}, ${config.info.city}`}
+        title={L("programPageTitle", "Programul festivalului")}
+        description={L(
+          "programPageDescription",
+          `${formatDateRange(
+            config.info.startDate,
+            config.info.endDate
+          )} · ${config.info.locationName}, ${config.info.city}`
+        )}
         image={config.info.heroImage}
         crumbs={[{ label: "Acasă", href: `/${slug}` }, { label: "Program" }]}
       />

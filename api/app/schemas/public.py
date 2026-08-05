@@ -294,6 +294,8 @@ class ContactInfoOut(CamelModel):
 
 
 class TenantConfigOut(CamelModel):
+    event_type: str
+    labels: dict[str, Any]
     info: FestivalInfoOut
     theme: ThemeOut
     navigation: list[dict[str, Any]]
@@ -306,6 +308,8 @@ class TenantConfigOut(CamelModel):
     @classmethod
     def from_model(cls, t: Tenant) -> "TenantConfigOut":
         return cls(
+            event_type=t.event_type,
+            labels=t.labels or {},
             info=FestivalInfoOut(
                 name=t.name,
                 slug=t.slug,

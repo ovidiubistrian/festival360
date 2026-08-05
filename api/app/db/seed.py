@@ -9,6 +9,7 @@ from sqlmodel import Session, select
 
 from app.core.db import engine
 from app.core.security import hash_password
+from app.db.seed_poiana import run_poiana_seed
 from app.models import (
     AdminUser,
     Article,
@@ -67,8 +68,12 @@ def load_seed_payload() -> dict[str, Any]:
 
 
 def run_seed(session: Session, *, force: bool = False) -> None:
-    """Insert the PRISPA demo data. If force, wipe existing tenant data first."""
+    """Insert the demo data (both tenants). If force, wipe first."""
     ensure_demo_admin(session)
+
+    # Seed the second demo tenant (resort) — idempotent, independent of prispa's
+    # early-return below, so it also seeds on a normal (non-force) startup.
+    run_poiana_seed(session, force=force)
 
     payload = load_seed_payload()
     tenant_row = _parse_dates(payload["tenant"], ["start_date", "end_date"])

@@ -38,13 +38,17 @@ export default async function ExhibitorsPage({
   if (!t) notFound();
 
   const { config, content, slug } = t;
+  const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
 
   return (
     <>
       <PageHero
         eyebrow="Oameni cu poveste"
-        title="Expozanți și producători"
-        description="Peste 100 de producători și meșteșugari aleși pe sprânceană — brânzeturi, miere, ceramică, afumături și multe altele."
+        title={L("exhibitorsPageTitle", "Expozanți și producători")}
+        description={L(
+          "exhibitorsPageDescription",
+          "Peste 100 de producători și meșteșugari aleși pe sprânceană — brânzeturi, miere, ceramică, afumături și multe altele."
+        )}
         image={config.info.heroImage}
         crumbs={[{ label: "Acasă", href: `/${slug}` }, { label: "Expozanți" }]}
       />

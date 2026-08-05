@@ -17,6 +17,13 @@ class Tenant(SQLModel, table=True):
     id: str = Field(primary_key=True)
     slug: str = Field(unique=True, index=True)
 
+    # --- Vertical / preset ---
+    # "festival" | "resort" | ... — drives default modules & terminology.
+    event_type: str = "festival"
+    # Per-tenant display labels overriding the festival defaults (terminology
+    # system). Optional keys; the frontend falls back to festival copy.
+    labels: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+
     # --- Festival info ---
     name: str
     tagline: str = ""

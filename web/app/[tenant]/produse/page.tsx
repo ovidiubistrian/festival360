@@ -38,13 +38,17 @@ export default async function ProductsPage({
   if (!t) notFound();
 
   const { config, content, slug } = t;
+  const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
 
   return (
     <>
       <PageHero
         eyebrow="Gusturi cu origine"
-        title="Produse locale"
-        description="Brânzeturi, miere, dulcețuri, siropuri, ceramică și afumături — fiecare cu producătorul și povestea sa."
+        title={L("productsPageTitle", "Produse locale")}
+        description={L(
+          "productsPageDescription",
+          "Brânzeturi, miere, dulcețuri, siropuri, ceramică și afumături — fiecare cu producătorul și povestea sa."
+        )}
         image={config.info.heroImage}
         crumbs={[{ label: "Acasă", href: `/${slug}` }, { label: "Produse" }]}
       />
