@@ -10,9 +10,11 @@ FROM node:20-slim AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Public API base URL is baked into the client bundle at build time.
+# NEXT_PUBLIC_* are inlined at build time (including in middleware).
 ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+ARG NEXT_PUBLIC_PLATFORM_DOMAIN=siteora.ro
+ENV NEXT_PUBLIC_PLATFORM_DOMAIN=${NEXT_PUBLIC_PLATFORM_DOMAIN}
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

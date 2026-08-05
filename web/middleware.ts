@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from "next/server";
  */
 
 const PLATFORM_DOMAIN = (
-  process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "festival360.ro"
+  process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "siteora.ro"
 ).toLowerCase();
 
 const API_BASE =
