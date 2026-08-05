@@ -72,6 +72,11 @@ def run_seed(session: Session, *, force: bool = False) -> None:
     """Insert the demo data (both tenants). If force, wipe first."""
     ensure_demo_admin(session)
 
+    # On force, clear tenant-scoped billing rows first so the per-tenant wipes
+    # below don't hit the subscription→tenant foreign key.
+    if force:
+        _wipe_all_billing(session)
+
     # Seed the second demo tenant (resort) — idempotent, independent of prispa's
     # early-return below, so it also seeds on a normal (non-force) startup.
     run_poiana_seed(session, force=force)
@@ -84,11 +89,19 @@ def run_seed(session: Session, *, force: bool = False) -> None:
     tenant_id = tenant_row["id"]
 
     existing = session.get(Tenant, tenant_id)
-    if existing and not force:
-        return
     if existing and force:
         _wipe_tenant(session, tenant_id)
 
+    if force or not existing:
+        _insert_prispa(session, payload, tenant_row)
+
+    # Billing runs last, once every tenant exists (packages + demo subs + staff).
+    from app.db.seed_billing import run_billing_seed
+
+    run_billing_seed(session, force=force)
+
+
+def _insert_prispa(session: Session, payload: dict[str, Any], tenant_row: dict[str, Any]) -> None:
     # Insert parents before children so foreign keys resolve (no ORM
     # relationships are declared, so we order the flushes explicitly).
     session.add(Tenant(**tenant_row))
@@ -117,6 +130,15 @@ def run_seed(session: Session, *, force: bool = False) -> None:
     for row in payload.get("media", []):
         session.add(MediaAsset(**row))
 
+    session.commit()
+
+
+def _wipe_all_billing(session: Session) -> None:
+    from app.models import FeatureFlag, PaymentOrder, StaffAccount, Subscription
+
+    for model in (PaymentOrder, FeatureFlag, StaffAccount, Subscription):
+        for r in session.exec(select(model)).all():
+            session.delete(r)
     session.commit()
 
 

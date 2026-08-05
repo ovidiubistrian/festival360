@@ -18,10 +18,26 @@ from app.models.content import (
 )
 from app.models.user import AdminUser
 from app.models.media import MediaAsset
+from app.models.billing import (
+    PlanPackage,
+    Subscription,
+    FeatureFlag,
+    PlatformSetting,
+    StaffAccount,
+    PaymentOrder,
+    PlatformLead,
+)
 
 __all__ = [
     "Tenant",
     "MediaAsset",
+    "PlanPackage",
+    "Subscription",
+    "FeatureFlag",
+    "PlatformSetting",
+    "StaffAccount",
+    "PaymentOrder",
+    "PlatformLead",
     "Exhibitor",
     "Product",
     "Destination",

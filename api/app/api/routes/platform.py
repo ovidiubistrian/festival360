@@ -1,13 +1,22 @@
 from __future__ import annotations
 
+import datetime as dt
 import re
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.api.deps import get_current_superuser
 from app.core.db import get_session
-from app.models import AdminUser, Tenant
+from app.models import (
+    AdminUser,
+    PlanPackage,
+    PlatformLead,
+    Subscription,
+    Tenant,
+)
+from app.models.base import new_id
 from app.presets import build_tenant_fields, list_presets, PRESETS
 from app.schemas.common import CamelModel
 
@@ -103,4 +112,184 @@ def delete_tenant(
     from app.db.seed import _wipe_tenant
 
     _wipe_tenant(session, slug)
+    # Remove the tenant's subscription too (not covered by content wipe).
+    sub = session.exec(
+        select(Subscription).where(Subscription.tenant_id == slug)
+    ).first()
+    if sub:
+        session.delete(sub)
+        session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# =========================================================================
+# Packages / pricing
+# =========================================================================
+class PackageOut(CamelModel):
+    id: str
+    code: str
+    label: str
+    tagline: str
+    price_monthly_bani: int
+    price_annual_bani: int | None
+    currency: str
+    benefits: list[str]
+    seats: int | None
+    is_featured: bool
+
+
+@router.get("/packages", response_model=list[PackageOut])
+def public_packages(session: Session = Depends(get_session)):
+    """Public pricing for the marketing site (no auth)."""
+    rows = session.exec(
+        select(PlanPackage)
+        .where(PlanPackage.tenant_id == None)  # noqa: E711
+        .where(PlanPackage.is_public == True)  # noqa: E712
+        .where(PlanPackage.active == True)  # noqa: E712
+        .order_by(PlanPackage.sort_order)
+    ).all()
+    return [PackageOut.model_validate(p) for p in rows]
+
+
+# =========================================================================
+# Signup / leads
+# =========================================================================
+class SignupIn(CamelModel):
+    name: str
+    email: str
+    organization: str = ""
+    event_type: str = ""
+    plan: str = ""
+    message: str = ""
+
+
+@router.post("/signup", status_code=201)
+def signup(payload: SignupIn, session: Session = Depends(get_session)):
+    """Public signup / sales inquiry — captured as a platform lead."""
+    lead = PlatformLead(
+        id=new_id("lead"),
+        name=payload.name,
+        email=payload.email,
+        organization=payload.organization,
+        event_type=payload.event_type,
+        plan=payload.plan,
+        message=payload.message,
+        status="new",
+    )
+    session.add(lead)
+    session.commit()
+    return {"ok": True, "id": lead.id}
+
+
+class LeadOut(CamelModel):
+    id: str
+    name: str
+    email: str
+    organization: str
+    event_type: str
+    plan: str
+    message: str
+    status: str
+    created_at: dt.datetime
+
+
+@router.get(
+    "/leads",
+    response_model=list[LeadOut],
+    dependencies=[Depends(get_current_superuser)],
+)
+def list_leads(session: Session = Depends(get_session)):
+    rows = session.exec(
+        select(PlatformLead).order_by(PlatformLead.created_at.desc())  # type: ignore[union-attr]
+    ).all()
+    return [LeadOut.model_validate(r) for r in rows]
+
+
+class LeadStatusIn(CamelModel):
+    status: str
+
+
+@router.patch("/leads/{lead_id}", dependencies=[Depends(get_current_superuser)])
+def set_lead_status(
+    lead_id: str, payload: LeadStatusIn, session: Session = Depends(get_session)
+):
+    lead = session.get(PlatformLead, lead_id)
+    if not lead:
+        raise HTTPException(status_code=404, detail="Solicitare inexistentă.")
+    lead.status = payload.status
+    session.add(lead)
+    session.commit()
+    return {"id": lead_id, "status": lead.status}
+
+
+# =========================================================================
+# Subscriptions (super-admin)
+# =========================================================================
+class SubscriptionOut(CamelModel):
+    tenant_id: str
+    tenant_name: str
+    event_type: str
+    plan: str
+    status: str
+    billing_cycle: str
+    trial_ends_at: dt.datetime | None
+    current_period_end: dt.datetime | None
+
+
+@router.get(
+    "/subscriptions",
+    response_model=list[SubscriptionOut],
+    dependencies=[Depends(get_current_superuser)],
+)
+def list_subscriptions(session: Session = Depends(get_session)):
+    tenants = {t.slug: t for t in session.exec(select(Tenant)).all()}
+    out: list[SubscriptionOut] = []
+    for t in tenants.values():
+        sub = session.exec(
+            select(Subscription).where(Subscription.tenant_id == t.id)
+        ).first()
+        out.append(
+            SubscriptionOut(
+                tenant_id=t.slug,
+                tenant_name=t.name,
+                event_type=t.event_type,
+                plan=sub.plan if sub else "—",
+                status=sub.status if sub else "none",
+                billing_cycle=sub.billing_cycle if sub else "—",
+                trial_ends_at=sub.trial_ends_at if sub else None,
+                current_period_end=sub.current_period_end if sub else None,
+            )
+        )
+    return out
+
+
+class SetPlanIn(CamelModel):
+    plan: str
+    status: str = "active"
+
+
+@router.put(
+    "/tenants/{slug}/plan", dependencies=[Depends(get_current_superuser)]
+)
+def set_tenant_plan(
+    slug: str, payload: SetPlanIn, session: Session = Depends(get_session)
+):
+    if payload.plan not in {"starter", "pro", "cultural", "enterprise"}:
+        raise HTTPException(status_code=400, detail="Plan necunoscut.")
+    tenant = session.get(Tenant, slug)
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Site inexistent.")
+    sub = session.exec(
+        select(Subscription).where(Subscription.tenant_id == slug)
+    ).first()
+    now = dt.datetime.now(dt.timezone.utc)
+    if sub is None:
+        sub = Subscription(id=f"sub-{slug}", tenant_id=slug)
+    sub.plan = payload.plan
+    sub.status = payload.status
+    if payload.status == "active":
+        sub.current_period_end = now + dt.timedelta(days=30)
+    sub.updated_at = now
+    session.add(sub)
+    session.commit()
+    return {"tenant": slug, "plan": sub.plan, "status": sub.status}
