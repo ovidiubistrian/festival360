@@ -48,7 +48,7 @@ def start_subscription_checkout(
     amount, currency = _amount_for(session, plan, cycle)
 
     order_ref = new_id("ord")
-    base = f"https://{settings.PLATFORM_DOMAIN}/demo-admin/subscriptions"
+    base = f"https://{settings.PLATFORM_DOMAIN}/admin/subscriptions"
     order = PaymentOrder(
         id=order_ref,
         order_ref=order_ref,

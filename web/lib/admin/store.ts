@@ -29,10 +29,15 @@ import {
   apiUpdate,
   apiUpdateSections,
   apiUpdateSettings,
-  clearToken,
   fetchBundle,
-  getToken,
 } from "@/lib/admin/api";
+import {
+  clearSession,
+  getCurrentTenant,
+  getToken,
+  setSession,
+  type SessionUser,
+} from "@/lib/admin/session";
 
 /**
  * Admin store. The public export surface is unchanged, but auth and every
@@ -157,6 +162,42 @@ function bundleToAdminData(bundle: Tenant): AdminData {
   };
 }
 
+/** An empty AdminData shell — used when no tenant is selected yet. */
+function emptyData(): AdminData {
+  return {
+    exhibitors: [],
+    products: [],
+    destinations: [],
+    program: [],
+    partners: [],
+    gallery: [],
+    articles: [],
+    contactMessages: [],
+    newsletter: [],
+    sections: [],
+    settings: {
+      name: "",
+      tagline: "",
+      shortDescription: "",
+      startDate: "",
+      endDate: "",
+      locationName: "",
+      city: "",
+      county: "",
+      email: "",
+      phone: "",
+      facebook: "",
+      instagram: "",
+      youtube: "",
+      primaryColor: "",
+      secondaryColor: "",
+      goldColor: "",
+      heroImage: "",
+      logoText: "",
+    },
+  };
+}
+
 // --- module-level reactive store ---------------------------------------------
 let memory: AdminData = seed();
 const listeners = new Set<() => void>();
@@ -175,6 +216,13 @@ function apply(mutator: (draft: AdminData) => void) {
 
 /** Fetch the server bundle and replace `memory` with server truth. */
 export async function refresh() {
+  // No tenant selected yet (super-admin pre-selection) — show a clean shell
+  // instead of hitting `/tenants/null/...`.
+  if (!getCurrentTenant()) {
+    memory = emptyData();
+    notify();
+    return;
+  }
   const bundle = await fetchBundle();
   if (bundle) {
     memory = bundleToAdminData(bundle as Tenant);
@@ -353,23 +401,40 @@ export const DEMO_CREDENTIALS = {
   password: "demo1234",
 };
 
+/**
+ * Authenticate, open a session and load the current tenant's data. Returns the
+ * resolved `SessionUser` (with role + tenant) so the login page can route by
+ * role — or null on failure.
+ *
+ * For a tenant-admin the session fixes the tenant (`user.tenantId`); for a
+ * super-admin with no tenant chosen yet, the current tenant stays null until
+ * the shell sets a default.
+ */
 export async function login(
   email: string,
   password: string
-): Promise<boolean> {
-  const ok = await apiLogin(email, password);
-  if (ok) await refresh();
-  return ok;
+): Promise<SessionUser | null> {
+  const result = await apiLogin(email, password);
+  if (!result) return null;
+  setSession(result.token, result.user);
+  await refresh();
+  return result.user;
 }
 
-export function loginDemo(): Promise<boolean> {
+export function loginDemo(): Promise<SessionUser | null> {
   return login(DEMO_CREDENTIALS.email, DEMO_CREDENTIALS.password);
 }
 
-export function logoutDemo() {
-  clearToken();
-  memory = seed();
+/** Clear the session and reset the store to a clean shell. */
+export function logout() {
+  clearSession();
+  memory = emptyData();
   notify();
+}
+
+/** Back-compat alias — same behaviour as `logout()`. */
+export function logoutDemo() {
+  logout();
 }
 
 export function isLoggedIn(): boolean {

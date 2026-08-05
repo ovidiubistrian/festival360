@@ -222,7 +222,7 @@ export default function SubscriptionsPage() {
       toast.error(res.error ?? "Plăți indisponibile: Stripe nu este configurat.", {
         action: {
           label: "Configurează Stripe",
-          onClick: () => router.push("/demo-admin/billing"),
+          onClick: () => router.push("/admin/billing"),
         },
       });
       return;

@@ -31,10 +31,10 @@ import { mockTraffic } from "@/lib/admin/analytics";
 import { formatDate, formatNumber } from "@/lib/utils";
 
 const SHORTCUTS = [
-  { label: "Adaugă expozant", href: "/demo-admin/exhibitors", icon: Store },
-  { label: "Adaugă produs", href: "/demo-admin/products", icon: ShoppingBasket },
-  { label: "Publică o noutate", href: "/demo-admin/news", icon: Newspaper },
-  { label: "Editează programul", href: "/demo-admin/program", icon: MapPin },
+  { label: "Adaugă expozant", href: "/admin/exhibitors", icon: Store },
+  { label: "Adaugă produs", href: "/admin/products", icon: ShoppingBasket },
+  { label: "Publică o noutate", href: "/admin/news", icon: Newspaper },
+  { label: "Editează programul", href: "/admin/program", icon: MapPin },
 ];
 
 export default function DashboardPage() {

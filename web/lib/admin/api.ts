@@ -6,6 +6,8 @@
  * uncaught — returning a boolean or parsed JSON so callers can stay simple.
  */
 
+import { getCurrentTenant, type SessionUser } from "@/lib/admin/session";
+
 const API =
   (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000") + "/api/v1";
 
@@ -45,34 +47,69 @@ export type ApiCollection =
   | "gallery"
   | "articles";
 
-const ADMIN = `${API}/tenants/prispa/admin`;
+/**
+ * Base URL for the current tenant's content-admin API. Built from
+ * `getCurrentTenant()` per call so it always follows the selected tenant.
+ * Returns null when no tenant is selected yet (super-admin, pre-selection).
+ */
+function adminBase(): string | null {
+  const slug = getCurrentTenant();
+  if (!slug) return null;
+  return `${API}/tenants/${slug}/admin`;
+}
 
+export type LoginResult = { token: string; user: SessionUser };
+
+/**
+ * Authenticate against the backend. On success returns the access token plus
+ * the resolved user (role + tenant) so the store can open a session and route
+ * by role. The caller — not this function — persists the session.
+ */
 export async function apiLogin(
   email: string,
   password: string
-): Promise<boolean> {
+): Promise<LoginResult | null> {
   try {
     const res = await fetch(`${API}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    if (!res.ok) return false;
-    const data = await res.json();
-    if (data?.accessToken) {
-      setToken(data.accessToken);
-      return true;
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      accessToken?: string;
+      user?: SessionUser;
+    };
+    if (data?.accessToken && data.user) {
+      return { token: data.accessToken, user: data.user };
     }
-    return false;
+    return null;
   } catch (err) {
     console.error("apiLogin failed", err);
-    return false;
+    return null;
+  }
+}
+
+/** Fetch the currently-authenticated user (role + tenant). */
+export async function apiMe(): Promise<SessionUser | null> {
+  try {
+    const res = await fetch(`${API}/auth/me`, {
+      headers: authHeaders(),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as SessionUser;
+  } catch (err) {
+    console.error("apiMe failed", err);
+    return null;
   }
 }
 
 export async function fetchBundle(): Promise<unknown> {
+  const slug = getCurrentTenant();
+  // No tenant selected yet (super-admin pre-selection) — nothing to fetch.
+  if (!slug) return null;
   try {
-    const res = await fetch(`${API}/tenants/prispa`, {
+    const res = await fetch(`${API}/tenants/${slug}`, {
       headers: { "Content-Type": "application/json" },
     });
     if (!res.ok) return null;
@@ -87,8 +124,13 @@ export async function apiCreate(
   collection: ApiCollection,
   item: unknown
 ): Promise<unknown> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiCreate: no tenant selected — skipping");
+    return null;
+  }
   try {
-    const res = await fetch(`${ADMIN}/${collection}`, {
+    const res = await fetch(`${base}/${collection}`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify(item),
@@ -106,8 +148,13 @@ export async function apiUpdate(
   id: string,
   item: unknown
 ): Promise<unknown> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiUpdate: no tenant selected — skipping");
+    return null;
+  }
   try {
-    const res = await fetch(`${ADMIN}/${collection}/${id}`, {
+    const res = await fetch(`${base}/${collection}/${id}`, {
       method: "PUT",
       headers: authHeaders(),
       body: JSON.stringify(item),
@@ -124,8 +171,13 @@ export async function apiDelete(
   collection: ApiCollection,
   id: string
 ): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiDelete: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/${collection}/${id}`, {
+    const res = await fetch(`${base}/${collection}/${id}`, {
       method: "DELETE",
       headers: authHeaders(),
     });
@@ -141,8 +193,13 @@ export async function apiMove(
   id: string,
   direction: -1 | 1
 ): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiMove: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/${collection}/${id}/move`, {
+    const res = await fetch(`${base}/${collection}/${id}/move`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ direction }),
@@ -158,8 +215,13 @@ export async function apiToggleStatus(
   collection: ApiCollection,
   id: string
 ): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiToggleStatus: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/${collection}/${id}/toggle-status`, {
+    const res = await fetch(`${base}/${collection}/${id}/toggle-status`, {
       method: "POST",
       headers: authHeaders(),
     });
@@ -171,8 +233,13 @@ export async function apiToggleStatus(
 }
 
 export async function apiUpdateSettings(patch: unknown): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiUpdateSettings: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/settings`, {
+    const res = await fetch(`${base}/settings`, {
       method: "PUT",
       headers: authHeaders(),
       body: JSON.stringify(patch),
@@ -185,8 +252,13 @@ export async function apiUpdateSettings(patch: unknown): Promise<boolean> {
 }
 
 export async function apiUpdateSections(sections: unknown): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiUpdateSections: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/sections`, {
+    const res = await fetch(`${base}/sections`, {
       method: "PUT",
       headers: authHeaders(),
       body: JSON.stringify({ sections }),
@@ -202,8 +274,13 @@ export async function apiSetMessageRead(
   id: string,
   read: boolean
 ): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiSetMessageRead: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/messages/${id}`, {
+    const res = await fetch(`${base}/messages/${id}`, {
       method: "PATCH",
       headers: authHeaders(),
       body: JSON.stringify({ read }),
@@ -216,8 +293,13 @@ export async function apiSetMessageRead(
 }
 
 export async function apiDeleteMessage(id: string): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiDeleteMessage: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/messages/${id}`, {
+    const res = await fetch(`${base}/messages/${id}`, {
       method: "DELETE",
       headers: authHeaders(),
     });
@@ -232,8 +314,13 @@ export async function apiAddSubscriber(
   email: string,
   source: string
 ): Promise<unknown> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiAddSubscriber: no tenant selected — skipping");
+    return null;
+  }
   try {
-    const res = await fetch(`${ADMIN}/newsletter`, {
+    const res = await fetch(`${base}/newsletter`, {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ email, source }),
@@ -247,8 +334,13 @@ export async function apiAddSubscriber(
 }
 
 export async function apiDeleteSubscriber(id: string): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiDeleteSubscriber: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/newsletter/${id}`, {
+    const res = await fetch(`${base}/newsletter/${id}`, {
       method: "DELETE",
       headers: authHeaders(),
     });
@@ -260,8 +352,13 @@ export async function apiDeleteSubscriber(id: string): Promise<boolean> {
 }
 
 export async function apiReset(): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiReset: no tenant selected — skipping");
+    return false;
+  }
   try {
-    const res = await fetch(`${ADMIN}/reset`, {
+    const res = await fetch(`${base}/reset`, {
       method: "POST",
       headers: authHeaders(),
     });

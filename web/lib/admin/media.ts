@@ -7,11 +7,20 @@
  */
 
 import { getToken } from "@/lib/admin/api";
+import { getCurrentTenant } from "@/lib/admin/session";
 
 const API =
   (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000") + "/api/v1";
 
-const ADMIN_MEDIA = `${API}/tenants/prispa/admin/media`;
+/**
+ * Media endpoint for the currently-selected tenant, built per call so it
+ * follows the tenant switcher. Returns null when no tenant is selected yet.
+ */
+function mediaBase(): string | null {
+  const slug = getCurrentTenant();
+  if (!slug) return null;
+  return `${API}/tenants/${slug}/admin/media`;
+}
 
 export type MediaAsset = {
   id: string;
@@ -25,8 +34,10 @@ export type MediaAsset = {
 
 /** List every media asset in the library (stock + uploaded). */
 export async function listMedia(): Promise<MediaAsset[]> {
+  const base = mediaBase();
+  if (!base) return [];
   try {
-    const res = await fetch(ADMIN_MEDIA, {
+    const res = await fetch(base, {
       headers: { Authorization: `Bearer ${getToken() ?? ""}` },
     });
     if (!res.ok) return [];
@@ -43,10 +54,12 @@ export async function listMedia(): Promise<MediaAsset[]> {
  * boundary. Only the Authorization header is sent.
  */
 export async function uploadMedia(file: File): Promise<MediaAsset | null> {
+  const base = mediaBase();
+  if (!base) return null;
   try {
     const body = new FormData();
     body.append("file", file);
-    const res = await fetch(ADMIN_MEDIA, {
+    const res = await fetch(base, {
       method: "POST",
       headers: { Authorization: `Bearer ${getToken() ?? ""}` },
       body,
@@ -61,8 +74,10 @@ export async function uploadMedia(file: File): Promise<MediaAsset | null> {
 
 /** Delete a media asset by id. Returns true on success (204). */
 export async function deleteMedia(id: string): Promise<boolean> {
+  const base = mediaBase();
+  if (!base) return false;
   try {
-    const res = await fetch(`${ADMIN_MEDIA}/${id}`, {
+    const res = await fetch(`${base}/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken() ?? ""}` },
     });

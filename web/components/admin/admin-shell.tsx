@@ -25,6 +25,7 @@ import {
   CreditCard,
   Wallet,
   Inbox,
+  Lock,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,9 +39,23 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
-import { isLoggedIn, logoutDemo, resetDemoData } from "@/lib/admin/store";
+import { isLoggedIn, logout, refresh, resetDemoData } from "@/lib/admin/store";
+import {
+  getCurrentTenant,
+  isSuperadmin,
+  setCurrentTenant,
+  useSession,
+} from "@/lib/admin/session";
+import { listTenants, type TenantSummary } from "@/lib/admin/platform";
 import { toast } from "sonner";
 
 interface NavLink {
@@ -49,40 +64,96 @@ interface NavLink {
   icon: LucideIcon;
 }
 
-const NAV: NavLink[] = [
-  { label: "Dashboard", href: "/demo-admin/dashboard", icon: LayoutDashboard },
-  { label: "Site-uri", href: "/demo-admin/sites", icon: Building2 },
-  { label: "Abonamente", href: "/demo-admin/subscriptions", icon: CreditCard },
-  { label: "Plăți", href: "/demo-admin/billing", icon: Wallet },
-  { label: "Solicitări", href: "/demo-admin/leads", icon: Inbox },
-  { label: "Pagini și secțiuni", href: "/demo-admin/pages", icon: LayoutTemplate },
-  { label: "Program", href: "/demo-admin/program", icon: CalendarDays },
-  { label: "Expozanți", href: "/demo-admin/exhibitors", icon: Store },
-  { label: "Produse", href: "/demo-admin/products", icon: ShoppingBasket },
-  { label: "Destinații", href: "/demo-admin/destinations", icon: MapPin },
-  { label: "Parteneri", href: "/demo-admin/partners", icon: Handshake },
-  { label: "Galerie", href: "/demo-admin/gallery", icon: ImageIcon },
-  { label: "Bibliotecă media", href: "/demo-admin/media", icon: Images },
-  { label: "Noutăți", href: "/demo-admin/news", icon: Newspaper },
-  { label: "Mesaje", href: "/demo-admin/messages", icon: Mail },
-  { label: "Newsletter", href: "/demo-admin/newsletter", icon: Send },
-  { label: "Setări", href: "/demo-admin/settings", icon: Settings },
+/** Platform tools — super-admin only. */
+const PLATFORM_NAV: NavLink[] = [
+  { label: "Site-uri", href: "/admin/sites", icon: Building2 },
+  { label: "Abonamente", href: "/admin/subscriptions", icon: CreditCard },
+  { label: "Plăți", href: "/admin/billing", icon: Wallet },
+  { label: "Solicitări", href: "/admin/leads", icon: Inbox },
 ];
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+/** Content modules — always available; operate on the current tenant. */
+const CONTENT_NAV: NavLink[] = [
+  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
+  { label: "Pagini și secțiuni", href: "/admin/pages", icon: LayoutTemplate },
+  { label: "Program", href: "/admin/program", icon: CalendarDays },
+  { label: "Expozanți", href: "/admin/exhibitors", icon: Store },
+  { label: "Produse", href: "/admin/products", icon: ShoppingBasket },
+  { label: "Destinații", href: "/admin/destinations", icon: MapPin },
+  { label: "Parteneri", href: "/admin/partners", icon: Handshake },
+  { label: "Galerie", href: "/admin/gallery", icon: ImageIcon },
+  { label: "Bibliotecă media", href: "/admin/media", icon: Images },
+  { label: "Noutăți", href: "/admin/news", icon: Newspaper },
+  { label: "Mesaje", href: "/admin/messages", icon: Mail },
+  { label: "Newsletter", href: "/admin/newsletter", icon: Send },
+  { label: "Setări", href: "/admin/settings", icon: Settings },
+];
+
+/** Route prefixes that require super-admin (platform endpoints). */
+const PLATFORM_PREFIXES = PLATFORM_NAV.map((n) => n.href);
+
+function isPlatformRoute(pathname: string): boolean {
+  return PLATFORM_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+}
+
+interface SidebarProps {
+  superadmin: boolean;
+  currentTenant: string | null;
+  tenants: TenantSummary[];
+  onTenantChange: (slug: string) => void;
+  onNavigate?: () => void;
+}
+
+function NavItem({
+  item,
+  onNavigate,
+}: {
+  item: NavLink;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
+  const active =
+    pathname === item.href || pathname.startsWith(item.href + "/");
+  const ItemIcon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      className={cn(
+        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+        active
+          ? "bg-white/10 text-warm-white"
+          : "text-cream/80 hover:bg-white/5 hover:text-warm-white"
+      )}
+      aria-current={active ? "page" : undefined}
+    >
+      <ItemIcon className="h-4 w-4 shrink-0" />
+      <span className="truncate">{item.label}</span>
+    </Link>
+  );
+}
+
+function SidebarContent({
+  superadmin,
+  currentTenant,
+  tenants,
+  onTenantChange,
+  onNavigate,
+}: SidebarProps) {
   const router = useRouter();
 
   function handleReset() {
     resetDemoData();
-    toast.success("Datele demo au fost resetate.");
+    toast.success("Datele au fost resetate.");
     onNavigate?.();
   }
 
   function handleLogout() {
-    logoutDemo();
+    logout();
     onNavigate?.();
-    router.push("/demo-admin");
+    router.push("/admin");
   }
 
   return (
@@ -90,51 +161,74 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       {/* Brand */}
       <div className="px-5 py-6">
         <Link
-          href="/demo-admin/dashboard"
+          href="/admin/dashboard"
           onClick={onNavigate}
           className="flex items-center gap-2"
         >
           <span className="font-serif text-lg font-semibold text-warm-white">
             Siteora
           </span>
-          <Badge variant="gold">PRISPA</Badge>
+          {superadmin ? (
+            <Badge variant="gold">Platformă</Badge>
+          ) : currentTenant ? (
+            <Badge variant="gold">{currentTenant.toUpperCase()}</Badge>
+          ) : null}
         </Link>
         <p className="mt-3 text-[11px] leading-snug text-cream/70">
-          Mediu demonstrativ — datele sunt salvate doar în browser
-          (localStorage).
+          {superadmin
+            ? "Administrare platformă — gestionezi toate site-urile."
+            : "Panou de administrare — gestionezi conținutul site-ului tău."}
         </p>
       </div>
 
+      {/* Super-admin tenant switcher */}
+      {superadmin ? (
+        <div className="px-3 pb-3">
+          <label className="mb-1.5 block px-1 text-[11px] font-medium uppercase tracking-wide text-cream/60">
+            Site activ
+          </label>
+          <Select
+            value={currentTenant ?? ""}
+            onValueChange={onTenantChange}
+          >
+            <SelectTrigger className="border-white/15 bg-white/10 text-warm-white">
+              <SelectValue placeholder="Alege un site…" />
+            </SelectTrigger>
+            <SelectContent>
+              {tenants.map((t) => (
+                <SelectItem key={t.slug} value={t.slug}>
+                  {t.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
+
       {/* Nav */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
-        {NAV.map((item) => {
-          const active =
-            pathname === item.href || pathname.startsWith(item.href + "/");
-          const ItemIcon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={cn(
-                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                active
-                  ? "bg-white/10 text-warm-white"
-                  : "text-cream/80 hover:bg-white/5 hover:text-warm-white"
-              )}
-              aria-current={active ? "page" : undefined}
-            >
-              <ItemIcon className="h-4 w-4 shrink-0" />
-              <span className="truncate">{item.label}</span>
-            </Link>
-          );
-        })}
+        {superadmin ? (
+          <>
+            <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-cream/50">
+              Platformă
+            </p>
+            {PLATFORM_NAV.map((item) => (
+              <NavItem key={item.href} item={item} onNavigate={onNavigate} />
+            ))}
+            <p className="px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wide text-cream/50">
+              Conținut site
+            </p>
+          </>
+        ) : null}
+        {CONTENT_NAV.map((item) => (
+          <NavItem key={item.href} item={item} onNavigate={onNavigate} />
+        ))}
       </nav>
 
       {/* Footer actions */}
       <div className="space-y-2 border-t border-white/10 px-3 py-4">
         <ConfirmDelete
-          itemLabel="toate datele demo (revenire la conținutul inițial)"
+          itemLabel="datele site-ului activ (revenire la conținutul inițial)"
           onConfirm={handleReset}
           trigger={
             <button
@@ -142,7 +236,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cream/80 transition-colors hover:bg-white/5 hover:text-warm-white"
             >
               <RotateCcw className="h-4 w-4 shrink-0" />
-              Resetează datele demo
+              Resetează datele
             </button>
           }
         />
@@ -168,15 +262,35 @@ function AuthPrompt() {
             Autentificare necesară
           </h1>
           <p className="text-sm text-muted-foreground">
-            Nu ești conectat la panoul demonstrativ. Aceasta este o
-            demonstrație — nu există autentificare reală sau securitate.
+            Nu ești conectat. Autentifică-te pentru a accesa panoul de
+            administrare.
           </p>
           <Button asChild variant="gold" className="w-full">
-            <Link href="/demo-admin">Mergi la autentificare</Link>
+            <Link href="/admin">Mergi la autentificare</Link>
           </Button>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function RestrictedNotice() {
+  return (
+    <Card>
+      <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
+        <Lock className="h-8 w-8 text-muted-foreground" />
+        <h2 className="font-serif text-lg font-semibold text-primary">
+          Acces restricționat
+        </h2>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          Această secțiune este disponibilă doar administratorilor de
+          platformă.
+        </p>
+        <Button asChild variant="gold" size="sm">
+          <Link href="/admin/dashboard">Mergi la dashboard</Link>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -194,6 +308,13 @@ export function AdminShell({
   children,
 }: AdminShellProps) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
+  const [tenants, setTenants] = React.useState<TenantSummary[]>([]);
+  const [tenantsStarted, setTenantsStarted] = React.useState(false);
+  const pathname = usePathname();
+
+  // Subscribe so tenant-switcher / role changes re-render the shell.
+  const session = useSession();
+
   // Client-mount flag without a mount effect (avoids hydration mismatch and the
   // set-state-in-effect anti-pattern). Server snapshot is false, client is true.
   const mounted = React.useSyncExternalStore(
@@ -201,7 +322,33 @@ export function AdminShell({
     () => true,
     () => false
   );
+
   const authed = mounted && isLoggedIn();
+  const superadmin = mounted && isSuperadmin();
+  const currentTenant = mounted ? getCurrentTenant() : null;
+  const userEmail = session.user?.email ?? "";
+
+  // Load the tenant list once, for super-admins, on first client render —
+  // without a mount effect that sets state (repo enforces
+  // react-hooks/set-state-in-effect). On first load with no tenant selected,
+  // default to the first tenant so the content modules have something to show.
+  if (mounted && authed && superadmin && !tenantsStarted) {
+    setTenantsStarted(true);
+    void (async () => {
+      const items = await listTenants();
+      setTenants(items);
+      if (!getCurrentTenant() && items.length > 0) {
+        setCurrentTenant(items[0].slug);
+        await refresh();
+      }
+    })();
+  }
+
+  function handleTenantChange(slug: string) {
+    if (slug === getCurrentTenant()) return;
+    setCurrentTenant(slug);
+    void refresh();
+  }
 
   if (!mounted) {
     // Avoid hydration mismatch: render nothing meaningful until client mount.
@@ -221,11 +368,22 @@ export function AdminShell({
     );
   }
 
+  const restricted = isPlatformRoute(pathname) && !superadmin;
+  const avatarInitials = (userEmail.slice(0, 2) || "SO").toUpperCase();
+  const sidebar = (
+    <SidebarContent
+      superadmin={superadmin}
+      currentTenant={currentTenant}
+      tenants={tenants}
+      onTenantChange={handleTenantChange}
+    />
+  );
+
   return (
     <div className="min-h-screen bg-secondary">
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 lg:block">
-        <SidebarContent />
+        {sidebar}
       </aside>
 
       <div className="lg:pl-64">
@@ -246,7 +404,13 @@ export function AdminShell({
               </SheetTrigger>
               <SheetContent side="left" className="w-72 p-0">
                 <SheetTitle className="sr-only">Meniu administrare</SheetTitle>
-                <SidebarContent onNavigate={() => setSheetOpen(false)} />
+                <SidebarContent
+                  superadmin={superadmin}
+                  currentTenant={currentTenant}
+                  tenants={tenants}
+                  onTenantChange={handleTenantChange}
+                  onNavigate={() => setSheetOpen(false)}
+                />
               </SheetContent>
             </Sheet>
 
@@ -257,24 +421,37 @@ export function AdminShell({
             </div>
 
             <div className="flex items-center gap-2 sm:gap-3">
-              <Badge variant="success" className="hidden sm:inline-flex">
-                <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
-                Site publicat
-              </Badge>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="hidden sm:inline-flex"
-              >
-                <a href="/prispa" target="_blank" rel="noreferrer">
-                  <ExternalLink className="h-4 w-4" />
-                  Vezi site-ul
-                </a>
-              </Button>
-              {actions}
+              {currentTenant ? (
+                <>
+                  <Badge variant="success" className="hidden sm:inline-flex">
+                    <span className="mr-1 inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                    Site publicat
+                  </Badge>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="hidden sm:inline-flex"
+                  >
+                    <a
+                      href={`/${currentTenant}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      Vezi site-ul
+                    </a>
+                  </Button>
+                </>
+              ) : null}
+              {restricted ? null : actions}
+              {userEmail ? (
+                <span className="hidden max-w-[14rem] truncate text-sm text-muted-foreground md:inline">
+                  {userEmail}
+                </span>
+              ) : null}
               <Avatar>
-                <AvatarFallback>AP</AvatarFallback>
+                <AvatarFallback>{avatarInitials}</AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -288,7 +465,7 @@ export function AdminShell({
                 {description}
               </p>
             ) : null}
-            {children}
+            {restricted ? <RestrictedNotice /> : children}
           </div>
         </main>
       </div>

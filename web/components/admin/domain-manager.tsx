@@ -270,7 +270,7 @@ export function DomainManager({
                   Fă upgrade planului pentru a conecta un domeniu propriu.
                 </p>
                 <Button asChild variant="outline" size="sm">
-                  <Link href="/demo-admin/subscriptions">
+                  <Link href="/admin/subscriptions">
                     Vezi planurile
                     <ArrowUpRight className="h-4 w-4" />
                   </Link>

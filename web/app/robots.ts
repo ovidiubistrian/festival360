@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/demo-admin",
+      disallow: "/admin",
     },
     sitemap: "https://festival360.vercel.app/sitemap.xml",
   };

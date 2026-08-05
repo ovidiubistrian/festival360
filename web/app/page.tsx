@@ -132,7 +132,7 @@ export default async function FestivalHubLanding() {
                 <Link href="/prispa">Festival demo</Link>
               </Button>
               <Button asChild size="sm">
-                <Link href="/demo-admin">
+                <Link href="/admin">
                   <LayoutDashboard className="h-4 w-4" />
                   Panou admin
                 </Link>
@@ -194,7 +194,7 @@ export default async function FestivalHubLanding() {
                   variant="outline"
                   className="border-white/30 bg-white/5 text-warm-white hover:bg-white/15"
                 >
-                  <Link href="/demo-admin">
+                  <Link href="/admin">
                     <LayoutDashboard className="h-4 w-4" />
                     Deschide panoul de administrare
                   </Link>
@@ -349,7 +349,7 @@ export default async function FestivalHubLanding() {
           </div>
           <div className="mt-10 text-center">
             <Button asChild variant="outline">
-              <Link href="/demo-admin/sites">
+              <Link href="/admin/sites">
                 Creează un site nou din panou
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -557,7 +557,7 @@ export default async function FestivalHubLanding() {
                 variant="outline"
                 className="border-white/30 bg-white/5 text-warm-white hover:bg-white/15"
               >
-                <Link href="/demo-admin">Deschide panoul admin</Link>
+                <Link href="/admin">Deschide panoul admin</Link>
               </Button>
             </div>
           </div>
@@ -574,7 +574,7 @@ export default async function FestivalHubLanding() {
             <p>© {new Date().getFullYear()} Siteora. Demo pentru prezentare.</p>
             <div className="flex gap-6">
               <Link href="/prispa" className="hover:text-primary">Festival demo</Link>
-              <Link href="/demo-admin" className="hover:text-primary">Panou admin</Link>
+              <Link href="/admin" className="hover:text-primary">Panou admin</Link>
             </div>
           </div>
         </Container>
