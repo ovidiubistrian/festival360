@@ -1,0 +1,734 @@
+"use client";
+
+import * as React from "react";
+import Link from "next/link";
+import {
+  SlidersHorizontal,
+  Loader2,
+  Save,
+  Upload,
+  ImageIcon,
+  Plus,
+  Trash2,
+  ArrowRight,
+  Info,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Icon } from "@/components/shared/icon";
+import { apiUpdateSettings } from "@/lib/admin/api";
+import { refresh, useAdminData } from "@/lib/admin/store";
+import { uploadMedia } from "@/lib/admin/media";
+import type { Experience, SectionConfig } from "@/lib/tenants/types";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
+/**
+ * Per-section configuration entry point shown on `/admin/pages`. Each homepage
+ * zone gets a "Configurează" button that opens the right editor:
+ *  - hero / about / experiences → inline editors that save via the settings API.
+ *  - content-backed zones (program, expozanți, …) → a short dialog that links to
+ *    the module that manages that content.
+ *
+ * All dialogs prefill from the live admin store using a render-phase guard
+ * (never a setState-in-effect) to respect the repo's strict hooks lint.
+ */
+
+const INLINE_EDITORS = new Set(["hero", "about", "experiences"]);
+
+/** Content-backed zones → the admin module that manages their content. */
+const MODULE_LINKS: Record<
+  string,
+  { href: string; cta: string; explanation: string }
+> = {
+  program: {
+    href: "/admin/program",
+    cta: "Gestionează programul",
+    explanation:
+      "Această secțiune afișează programul pe zile. Evenimentele se adaugă și se editează din modulul Program.",
+  },
+  exhibitors: {
+    href: "/admin/exhibitors",
+    cta: "Gestionează expozanții",
+    explanation:
+      "Această secțiune afișează selecția de expozanți. Producătorii și meșteșugarii se administrează din modulul Expozanți.",
+  },
+  accommodations: {
+    href: "/admin/accommodations",
+    cta: "Gestionează cazările",
+    explanation:
+      "Această secțiune afișează cazările disponibile. Ele se administrează din modulul Cazări.",
+  },
+  products: {
+    href: "/admin/products",
+    cta: "Gestionează produsele",
+    explanation:
+      "Această secțiune afișează selecția de produse locale. Ele se administrează din modulul Produse.",
+  },
+  destinations: {
+    href: "/admin/destinations",
+    cta: "Gestionează destinațiile",
+    explanation:
+      "Această secțiune afișează destinațiile turistice. Ele se administrează din modulul Destinații.",
+  },
+  partners: {
+    href: "/admin/partners",
+    cta: "Gestionează partenerii",
+    explanation:
+      "Această secțiune afișează logourile partenerilor și sponsorilor. Ei se administrează din modulul Parteneri.",
+  },
+  gallery: {
+    href: "/admin/gallery",
+    cta: "Gestionează galeria",
+    explanation:
+      "Această secțiune afișează galeria foto. Imaginile se administrează din modulul Galerie.",
+  },
+  news: {
+    href: "/admin/news",
+    cta: "Gestionează noutățile",
+    explanation:
+      "Această secțiune afișează ultimele articole. Ele se administrează din modulul Noutăți.",
+  },
+  newsletter: {
+    href: "/admin/newsletter",
+    cta: "Gestionează abonații",
+    explanation:
+      "Această secțiune afișează formularul de abonare la newsletter. Abonații se administrează din modulul Newsletter.",
+  },
+};
+
+/** Reusable image field: upload (uploadMedia) + paste-URL + live preview. */
+function ImageField({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const [uploading, setUploading] = React.useState(false);
+
+  async function handleUpload(file: File | undefined) {
+    if (!file) return;
+    setUploading(true);
+    const asset = await uploadMedia(file);
+    setUploading(false);
+    if (!asset) {
+      toast.error("Încărcarea imaginii a eșuat.");
+      return;
+    }
+    onChange(asset.url);
+    toast.success("Imagine încărcată.");
+  }
+
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      {value.trim() ? (
+        <div className="overflow-hidden rounded-xl border border-border bg-secondary">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={value}
+            alt="Previzualizare"
+            loading="lazy"
+            className="h-40 w-full object-cover"
+          />
+        </div>
+      ) : null}
+      <div className="flex flex-wrap items-center gap-3">
+        <label
+          className={cn(
+            "inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary",
+            uploading && "pointer-events-none opacity-70"
+          )}
+        >
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
+          {uploading ? "Se încarcă…" : "Încarcă imagine"}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            disabled={uploading}
+            onChange={(e) => {
+              void handleUpload(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      </div>
+      <div className="flex items-center gap-2">
+        <ImageIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <Input
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://... sau /media/..."
+        />
+      </div>
+    </div>
+  );
+}
+
+/** Footer with a spinner-aware "Salvează" button, shared by inline editors. */
+function SaveFooter({
+  saving,
+  onCancel,
+  onSave,
+}: {
+  saving: boolean;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <DialogFooter>
+      <Button variant="ghost" onClick={onCancel} disabled={saving}>
+        Anulează
+      </Button>
+      <Button variant="gold" onClick={onSave} disabled={saving}>
+        {saving ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Save className="h-4 w-4" />
+        )}
+        {saving ? "Se salvează…" : "Salvează"}
+      </Button>
+    </DialogFooter>
+  );
+}
+
+/** PUT the patch, refresh the store, toast, and close on success. */
+async function persist(
+  patch: Record<string, unknown>,
+  onSuccess: () => void
+): Promise<boolean> {
+  const ok = await apiUpdateSettings(patch);
+  if (!ok) {
+    toast.error("Salvarea a eșuat. Încearcă din nou.");
+    return false;
+  }
+  await refresh();
+  toast.success("Modificările au fost salvate.");
+  onSuccess();
+  return true;
+}
+
+// ---------------------------------------------------------------- Hero editor
+
+interface HeroForm {
+  heroBadge: string;
+  tagline: string;
+  shortDescription: string;
+  heroImage: string;
+}
+
+function HeroEditor({ onClose }: { onClose: () => void }) {
+  const data = useAdminData();
+  const [form, setForm] = React.useState<HeroForm>(() => ({
+    heroBadge: data.settings.heroBadge,
+    tagline: data.settings.tagline,
+    shortDescription: data.settings.shortDescription,
+    heroImage: data.settings.heroImage,
+  }));
+  const [saving, setSaving] = React.useState(false);
+
+  function set<K extends keyof HeroForm>(key: K, value: HeroForm[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    await persist(
+      {
+        heroBadge: form.heroBadge.trim(),
+        tagline: form.tagline.trim(),
+        shortDescription: form.shortDescription.trim(),
+        heroImage: form.heroImage.trim(),
+      },
+      onClose
+    );
+    setSaving(false);
+  }
+
+  return (
+    <>
+      <div className="space-y-5 py-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="hero-badge">Etichetă (badge)</Label>
+          <Input
+            id="hero-badge"
+            value={form.heroBadge}
+            onChange={(e) => set("heroBadge", e.target.value)}
+            placeholder="Tradiții • Gastronomie • Turism"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="hero-tagline">Titlu principal (H1)</Label>
+          <Textarea
+            id="hero-tagline"
+            value={form.tagline}
+            onChange={(e) => set("tagline", e.target.value)}
+            className="min-h-[70px]"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="hero-subtitle">Subtitlu</Label>
+          <Textarea
+            id="hero-subtitle"
+            value={form.shortDescription}
+            onChange={(e) => set("shortDescription", e.target.value)}
+          />
+        </div>
+        <ImageField
+          id="hero-image"
+          label="Imagine hero"
+          value={form.heroImage}
+          onChange={(url) => set("heroImage", url)}
+        />
+      </div>
+      <SaveFooter
+        saving={saving}
+        onCancel={onClose}
+        onSave={() => void handleSave()}
+      />
+    </>
+  );
+}
+
+// --------------------------------------------------------------- About editor
+
+interface StatRow {
+  value: string;
+  label: string;
+  icon: string;
+}
+
+function AboutEditor({ onClose }: { onClose: () => void }) {
+  const data = useAdminData();
+  const [longDescription, setLongDescription] = React.useState(
+    () => data.settings.longDescription
+  );
+  const [stats, setStats] = React.useState<StatRow[]>(() =>
+    data.stats.map((s) => ({
+      value: s.value,
+      label: s.label,
+      icon: s.icon ?? "",
+    }))
+  );
+  const [saving, setSaving] = React.useState(false);
+
+  function updateStat(index: number, patch: Partial<StatRow>) {
+    setStats((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, ...patch } : s))
+    );
+  }
+  function addStat() {
+    setStats((prev) => [...prev, { value: "", label: "", icon: "" }]);
+  }
+  function removeStat(index: number) {
+    setStats((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    await persist(
+      {
+        longDescription: longDescription.trim(),
+        stats: stats
+          .filter((s) => s.value.trim() || s.label.trim())
+          .map((s) => ({
+            value: s.value.trim(),
+            label: s.label.trim(),
+            icon: s.icon.trim(),
+          })),
+      },
+      onClose
+    );
+    setSaving(false);
+  }
+
+  return (
+    <>
+      <div className="space-y-5 py-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="about-text">Text „Despre”</Label>
+          <Textarea
+            id="about-text"
+            value={longDescription}
+            onChange={(e) => setLongDescription(e.target.value)}
+            className="min-h-[120px]"
+          />
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label>Cifre principale</Label>
+            <Button variant="outline" size="sm" onClick={addStat}>
+              <Plus className="h-4 w-4" />
+              Adaugă
+            </Button>
+          </div>
+          {stats.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
+              Nicio cifră adăugată încă.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.map((s, i) => (
+                <li
+                  key={i}
+                  className="flex flex-wrap items-end gap-2 rounded-xl border border-border p-3 sm:flex-nowrap"
+                >
+                  <div className="w-full space-y-1 sm:w-28">
+                    <Label
+                      htmlFor={`stat-value-${i}`}
+                      className="text-xs text-muted-foreground"
+                    >
+                      Valoare
+                    </Label>
+                    <Input
+                      id={`stat-value-${i}`}
+                      value={s.value}
+                      onChange={(e) => updateStat(i, { value: e.target.value })}
+                      placeholder="100+"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <Label
+                      htmlFor={`stat-label-${i}`}
+                      className="text-xs text-muted-foreground"
+                    >
+                      Etichetă
+                    </Label>
+                    <Input
+                      id={`stat-label-${i}`}
+                      value={s.label}
+                      onChange={(e) => updateStat(i, { label: e.target.value })}
+                      placeholder="Expozanți"
+                    />
+                  </div>
+                  <div className="w-full space-y-1 sm:w-36">
+                    <Label
+                      htmlFor={`stat-icon-${i}`}
+                      className="text-xs text-muted-foreground"
+                    >
+                      Icon (lucide)
+                    </Label>
+                    <Input
+                      id={`stat-icon-${i}`}
+                      value={s.icon}
+                      onChange={(e) => updateStat(i, { icon: e.target.value })}
+                      placeholder="Store"
+                    />
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => removeStat(i)}
+                    aria-label="Șterge cifra"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+      <SaveFooter
+        saving={saving}
+        onCancel={onClose}
+        onSave={() => void handleSave()}
+      />
+    </>
+  );
+}
+
+// --------------------------------------------------------- Experiences editor
+
+function ExperiencesEditor({ onClose }: { onClose: () => void }) {
+  const data = useAdminData();
+  const [items, setItems] = React.useState<Experience[]>(() =>
+    data.experiences.map((e) => ({ ...e }))
+  );
+  const [saving, setSaving] = React.useState(false);
+
+  function updateItem(index: number, patch: Partial<Experience>) {
+    setItems((prev) =>
+      prev.map((it, i) => (i === index ? { ...it, ...patch } : it))
+    );
+  }
+  function addItem() {
+    setItems((prev) => [
+      ...prev,
+      {
+        id: `exp-${Date.now().toString(36)}`,
+        title: "",
+        description: "",
+        icon: "",
+        image: "",
+      },
+    ]);
+  }
+  function removeItem(index: number) {
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  }
+  function move(index: number, dir: -1 | 1) {
+    setItems((prev) => {
+      const next = index + dir;
+      if (next < 0 || next >= prev.length) return prev;
+      const copy = [...prev];
+      [copy[index], copy[next]] = [copy[next], copy[index]];
+      return copy;
+    });
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    await persist(
+      {
+        experiences: items
+          .filter((it) => it.title.trim() || it.description.trim())
+          .map((it) => ({
+            title: it.title.trim(),
+            description: it.description.trim(),
+            icon: it.icon.trim(),
+            image: it.image.trim(),
+          })),
+      },
+      onClose
+    );
+    setSaving(false);
+  }
+
+  return (
+    <>
+      <div className="space-y-4 py-2">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Fiecare card afișează un titlu, o descriere, un icon și o imagine.
+          </p>
+          <Button variant="outline" size="sm" onClick={addItem}>
+            <Plus className="h-4 w-4" />
+            Adaugă
+          </Button>
+        </div>
+
+        {items.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground">
+            Nicio experiență adăugată încă.
+          </p>
+        ) : (
+          <ul className="space-y-4">
+            {items.map((it, i) => (
+              <li
+                key={it.id}
+                className="space-y-3 rounded-xl border border-border p-4"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2 text-sm font-medium text-foreground">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary text-primary [&_svg]:size-4">
+                      <Icon name={it.icon} />
+                    </span>
+                    Experiența {i + 1}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      disabled={i === 0}
+                      onClick={() => move(i, -1)}
+                      aria-label="Mută mai sus"
+                    >
+                      <ArrowRight className="h-4 w-4 -rotate-90" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      disabled={i === items.length - 1}
+                      onClick={() => move(i, 1)}
+                      aria-label="Mută mai jos"
+                    >
+                      <ArrowRight className="h-4 w-4 rotate-90" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => removeItem(i)}
+                      aria-label="Șterge experiența"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`exp-title-${i}`}>Titlu</Label>
+                    <Input
+                      id={`exp-title-${i}`}
+                      value={it.title}
+                      onChange={(e) => updateItem(i, { title: e.target.value })}
+                      placeholder="Gastronomie locală"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`exp-icon-${i}`}>Icon (lucide)</Label>
+                    <Input
+                      id={`exp-icon-${i}`}
+                      value={it.icon}
+                      onChange={(e) => updateItem(i, { icon: e.target.value })}
+                      placeholder="UtensilsCrossed"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`exp-desc-${i}`}>Descriere</Label>
+                  <Textarea
+                    id={`exp-desc-${i}`}
+                    value={it.description}
+                    onChange={(e) =>
+                      updateItem(i, { description: e.target.value })
+                    }
+                  />
+                </div>
+                <ImageField
+                  id={`exp-image-${i}`}
+                  label="Imagine"
+                  value={it.image}
+                  onChange={(url) => updateItem(i, { image: url })}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <SaveFooter
+        saving={saving}
+        onCancel={onClose}
+        onSave={() => void handleSave()}
+      />
+    </>
+  );
+}
+
+// -------------------------------------------------- Content-backed / generic
+
+function ContentBackedBody({
+  sectionId,
+  onClose,
+}: {
+  sectionId: string;
+  onClose: () => void;
+}) {
+  const data = useAdminData();
+  // On a resort the "exhibitors" homepage zone shows real accommodations, so
+  // point its manager button at the Cazări module instead of Expozanți.
+  const resolvedId =
+    sectionId === "exhibitors" && data.eventType === "resort"
+      ? "accommodations"
+      : sectionId;
+  const link = MODULE_LINKS[resolvedId];
+  return (
+    <>
+      <p className="flex items-start gap-2 py-2 text-sm text-muted-foreground">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        {link
+          ? link.explanation
+          : "Această secțiune afișează conținut din modulele tale."}
+      </p>
+      <DialogFooter>
+        <Button variant="ghost" onClick={onClose}>
+          Închide
+        </Button>
+        {link ? (
+          <Button asChild variant="gold" onClick={onClose}>
+            <Link href={link.href}>
+              {link.cta}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        ) : null}
+      </DialogFooter>
+    </>
+  );
+}
+
+// ------------------------------------------------------------------- Wrapper
+
+/**
+ * "Configurează" button + its dialog for a single homepage section. Keeps its
+ * own open state; the dialog remounts its editor each time it opens so the form
+ * always reflects the latest store snapshot (no setState-in-effect needed).
+ */
+export function SectionConfigButton({ section }: { section: SectionConfig }) {
+  const [open, setOpen] = React.useState(false);
+  const close = React.useCallback(() => setOpen(false), []);
+  const inline = INLINE_EDITORS.has(section.id);
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen(true)}
+        aria-label={`Configurează secțiunea ${section.label}`}
+      >
+        <SlidersHorizontal className="h-4 w-4" />
+        Configurează
+      </Button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent
+          className={cn(
+            "max-h-[85vh] overflow-y-auto",
+            inline ? "max-w-2xl" : "max-w-lg"
+          )}
+        >
+          <DialogHeader>
+            <DialogTitle>Configurează: {section.label}</DialogTitle>
+            <DialogDescription>
+              {inline
+                ? "Setează conținutul afișat în această zonă a paginii principale."
+                : "Detalii despre această zonă și unde se administrează conținutul ei."}
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Remount the editor per-open via the `open` key so it re-reads the
+              store snapshot on each open — a render-phase prefill, not an effect. */}
+          {open ? (
+            section.id === "hero" ? (
+              <HeroEditor key="hero" onClose={close} />
+            ) : section.id === "about" ? (
+              <AboutEditor key="about" onClose={close} />
+            ) : section.id === "experiences" ? (
+              <ExperiencesEditor key="experiences" onClose={close} />
+            ) : (
+              <ContentBackedBody sectionId={section.id} onClose={close} />
+            )
+          ) : null}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}

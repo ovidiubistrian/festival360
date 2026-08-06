@@ -14,6 +14,7 @@ import { DestinationsSection } from "@/components/public/sections/destinations-s
 import { NewsletterSection } from "@/components/public/sections/newsletter-section";
 import { ProgramSchedule } from "@/components/public/program-schedule";
 import { ExhibitorCard } from "@/components/public/cards/exhibitor-card";
+import { AccommodationCard } from "@/components/public/cards/accommodation-card";
 import { ProductCard } from "@/components/public/cards/product-card";
 import { ArticleCard } from "@/components/public/cards/article-card";
 import { Carousel } from "@/components/public/carousel";
@@ -43,6 +44,11 @@ export default async function TenantHome({
   const featuredProducts = content.products
     .filter((p) => p.featured && p.status === "published")
     .slice(0, 4);
+  // Resort "Cazare & gazde" zone shows real accommodations (featured first).
+  const featuredAccommodations = content.accommodations
+    .filter((a) => a.status === "published")
+    .sort((a, b) => Number(b.featured) - Number(a.featured))
+    .slice(0, 6);
   const homePartners = content.partners
     .filter((p) => p.featuredOnHome && p.status === "published")
     .sort((a, b) => a.order - b.order);
@@ -142,7 +148,49 @@ export default async function TenantHome({
         </section>
       )}
 
-      {visible("exhibitors") && featuredExhibitors.length > 0 && (
+      {/* Resorts render their real accommodations in this zone; other verticals
+          show exhibitors/producers. Both share the "exhibitors" section slot so
+          admin visibility/order still applies. */}
+      {visible("exhibitors") &&
+        isResort &&
+        featuredAccommodations.length > 0 && (
+          <section id="cazare" className="bg-secondary py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("exhibitorsEyebrow", "Cazare & gazde")}
+                  title={L("exhibitorsTitle", "Unde stai")}
+                  description={L(
+                    "exhibitorsDescription",
+                    "Cabane, pensiuni și case de oaspeți, alese pentru tine."
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/cazari`}>
+                    Toate cazările
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Reveal className="mt-10">
+                <Carousel
+                  ariaLabel="Cazări evidențiate"
+                  slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
+                >
+                  {featuredAccommodations.map((a) => (
+                    <AccommodationCard
+                      key={a.id}
+                      accommodation={a}
+                      slug={slug}
+                    />
+                  ))}
+                </Carousel>
+              </Reveal>
+            </Container>
+          </section>
+        )}
+
+      {visible("exhibitors") && !isResort && featuredExhibitors.length > 0 && (
         <section id="expozanti" className="bg-secondary py-16 sm:py-24">
           <Container>
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">

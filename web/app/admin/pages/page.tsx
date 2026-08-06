@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { moveSection, toggleSection, useAdminData } from "@/lib/admin/store";
+import { SectionConfigButton } from "@/components/admin/section-config-dialog";
 import { toast } from "sonner";
 
 /**
@@ -79,7 +80,7 @@ export default function PagesPage() {
             {data.sections.map((section, index) => (
               <li
                 key={section.id}
-                className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+                className="flex flex-wrap items-center gap-x-4 gap-y-3 py-3 first:pt-0 last:pb-0"
               >
                 <div className="flex flex-col">
                   <Button
@@ -115,19 +116,23 @@ export default function PagesPage() {
                   </p>
                 </div>
 
-                {section.visible ? (
-                  <Badge variant="success">Vizibilă</Badge>
-                ) : (
-                  <Badge variant="muted">Ascunsă</Badge>
-                )}
+                <div className="ml-auto flex flex-wrap items-center gap-3">
+                  <SectionConfigButton section={section} />
 
-                <Switch
-                  checked={section.visible}
-                  onCheckedChange={() =>
-                    onToggle(section.id, section.label, section.visible)
-                  }
-                  aria-label={`Comută vizibilitatea secțiunii ${section.label}`}
-                />
+                  {section.visible ? (
+                    <Badge variant="success">Vizibilă</Badge>
+                  ) : (
+                    <Badge variant="muted">Ascunsă</Badge>
+                  )}
+
+                  <Switch
+                    checked={section.visible}
+                    onCheckedChange={() =>
+                      onToggle(section.id, section.label, section.visible)
+                    }
+                    aria-label={`Comută vizibilitatea secțiunii ${section.label}`}
+                  />
+                </div>
               </li>
             ))}
           </ul>

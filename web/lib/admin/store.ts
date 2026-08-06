@@ -7,6 +7,7 @@ import type {
   Article,
   ContactMessage,
   Destination,
+  Experience,
   Exhibitor,
   GalleryImage,
   NewsletterSubscriber,
@@ -14,6 +15,7 @@ import type {
   ProgramEvent,
   Product,
   SectionConfig,
+  Stat,
   Tenant,
 } from "@/lib/tenants/types";
 import {
@@ -53,6 +55,8 @@ export interface AdminSettings {
   name: string;
   tagline: string;
   shortDescription: string;
+  longDescription: string;
+  heroBadge: string;
   startDate: string;
   endDate: string;
   locationName: string;
@@ -82,6 +86,10 @@ export interface AdminData {
   contactMessages: ContactMessage[];
   newsletter: NewsletterSubscriber[];
   sections: SectionConfig[];
+  /** Homepage "Despre" stats (about-section). */
+  stats: Stat[];
+  /** Homepage "Zone și experiențe" grid. */
+  experiences: Experience[];
   settings: AdminSettings;
   /** Vertical preset key (festival | resort | museum | …). */
   eventType?: string;
@@ -109,10 +117,14 @@ function seed(): AdminData {
     contactMessages: structuredClone(c.contactMessages),
     newsletter: structuredClone(c.newsletter),
     sections: structuredClone(prispaTenant.config.sections),
+    stats: structuredClone(prispaTenant.config.stats),
+    experiences: structuredClone(prispaTenant.config.experiences),
     settings: {
       name: info.name,
       tagline: info.tagline,
       shortDescription: info.shortDescription,
+      longDescription: info.longDescription,
+      heroBadge: info.heroBadge,
       startDate: info.startDate,
       endDate: info.endDate,
       locationName: info.locationName,
@@ -152,10 +164,14 @@ function bundleToAdminData(bundle: Tenant): AdminData {
     contactMessages: content.contactMessages ?? [],
     newsletter: content.newsletter ?? [],
     sections: config.sections ?? [],
+    stats: config.stats ?? [],
+    experiences: config.experiences ?? [],
     settings: {
       name: info.name,
       tagline: info.tagline,
       shortDescription: info.shortDescription,
+      longDescription: info.longDescription,
+      heroBadge: info.heroBadge,
       startDate: info.startDate,
       endDate: info.endDate,
       locationName: info.locationName,
@@ -192,10 +208,14 @@ function emptyData(): AdminData {
     contactMessages: [],
     newsletter: [],
     sections: [],
+    stats: [],
+    experiences: [],
     settings: {
       name: "",
       tagline: "",
       shortDescription: "",
+      longDescription: "",
+      heroBadge: "",
       startDate: "",
       endDate: "",
       locationName: "",
