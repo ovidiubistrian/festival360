@@ -33,7 +33,7 @@ export function AccommodationCard({
       href={`/${slug}/cazari/${accommodation.slug}`}
       className={cn(
         "group relative flex overflow-hidden rounded-3xl",
-        large ? "min-h-[420px]" : "min-h-[300px]"
+        large ? "aspect-[4/5]" : "aspect-[3/4]"
       )}
     >
       <ImageWithFallback

@@ -70,7 +70,7 @@ export function AccommodationGallery({
   // Single photo → no carousel chrome.
   if (images.length === 1) {
     return (
-      <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-border">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-border">
         <ImageWithFallback
           src={images[0]}
           alt={name}
@@ -99,7 +99,7 @@ export function AccommodationGallery({
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`${i + 1} din ${images.length}`}
-                className="relative aspect-[16/9] min-w-0 shrink-0 grow-0 basis-full"
+                className="relative aspect-[3/4] min-w-0 shrink-0 grow-0 basis-full"
               >
                 <ImageWithFallback
                   src={src}

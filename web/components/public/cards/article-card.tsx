@@ -17,7 +17,7 @@ export function ArticleCard({
       href={`/${slug}/noutati/${article.slug}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(32,37,34,0.10)]"
     >
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div className="relative aspect-[3/4] overflow-hidden">
         <ImageWithFallback
           src={article.coverImage}
           alt={article.title}
