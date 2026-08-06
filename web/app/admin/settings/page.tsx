@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Save, RotateCcw } from "lucide-react";
+import { Save } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { Field } from "@/components/admin/field";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import {
-  resetDemoData,
   updateSeo,
   updateSettings,
   useAdminData,
@@ -113,11 +111,6 @@ export default function SettingsPage() {
     }
     updateSettings(patch);
     toast.success(message);
-  }
-
-  function handleReset() {
-    resetDemoData();
-    toast.success("Datele demo au fost resetate.");
   }
 
   return (
@@ -515,29 +508,6 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Danger zone */}
-      <Card className="border-destructive/30">
-        <CardHeader>
-          <CardTitle className="text-destructive">Zonă sensibilă</CardTitle>
-          <CardDescription>
-            Resetează întregul conținut demonstrativ la valorile inițiale. Toate
-            modificările salvate în browser vor fi pierdute.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ConfirmDelete
-            itemLabel="toate datele demo (revenire la conținutul inițial)"
-            onConfirm={handleReset}
-            trigger={
-              <Button variant="destructive">
-                <RotateCcw className="h-4 w-4" />
-                Resetează datele demo
-              </Button>
-            }
-          />
-        </CardContent>
-      </Card>
     </AdminShell>
   );
 }
