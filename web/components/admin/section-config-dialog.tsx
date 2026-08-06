@@ -744,6 +744,19 @@ function defaultHrefFor(source: CustomSectionSource): string {
   return CUSTOM_SOURCES.find((s) => s.value === source)?.defaultHref ?? "";
 }
 
+/**
+ * Auto-suggested hrefs for the accommodations source. Camping has its own public
+ * page (`campinguri`); every other accommodation type lists under `cazari`.
+ * These are the values we may safely overwrite when the source/type changes —
+ * a user-customized href is never one of these, so it stays untouched.
+ */
+const AUTO_ACCOMMODATION_HREFS = new Set(["cazari", "campinguri"]);
+
+function suggestedHref(source: CustomSectionSource, accType: string): string {
+  if (source === "accommodations" && accType === "camping") return "campinguri";
+  return defaultHrefFor(source);
+}
+
 interface CustomForm {
   source: CustomSectionSource;
   /** Sentinel "all" or an AccommodationType value. */
@@ -802,8 +815,21 @@ function CustomSectionEditor({
       source: next,
       accType: "all",
       productCategory: "",
-      ctaHref: defaultHrefFor(next),
+      ctaHref: suggestedHref(next, "all"),
     }));
+  }
+
+  // Switching the accommodation type re-suggests the "Vezi tot" href (camping →
+  // `campinguri`, otherwise `cazari`) but never clobbers a user-customized link.
+  function changeAccType(next: string) {
+    setForm((prev) => {
+      const ctaHref =
+        prev.ctaHref.trim() === "" ||
+        AUTO_ACCOMMODATION_HREFS.has(prev.ctaHref.trim())
+          ? suggestedHref(prev.source, next)
+          : prev.ctaHref;
+      return { ...prev, accType: next, ctaHref };
+    });
   }
 
   function handleSave() {
@@ -877,10 +903,7 @@ function CustomSectionEditor({
         {form.source === "accommodations" ? (
           <div className="space-y-1.5">
             <Label htmlFor="cs-acc-type">Tip cazare</Label>
-            <Select
-              value={form.accType}
-              onValueChange={(v) => set("accType", v)}
-            >
+            <Select value={form.accType} onValueChange={changeAccType}>
               <SelectTrigger id="cs-acc-type">
                 <SelectValue />
               </SelectTrigger>
@@ -916,9 +939,14 @@ function CustomSectionEditor({
                     ?.label ?? form.accType
                 : "";
               // Deep-link straight into the create form with the type prefilled.
-              const manageHref = typedAcc
-                ? `${MODULE_LINKS.accommodations.href}?nou=${form.accType}`
-                : MODULE_LINKS[form.source].href;
+              // Camping is managed in its own module (Campinguri); other
+              // accommodation types stay in the Cazări module.
+              const manageHref =
+                form.accType === "camping"
+                  ? "/admin/campinguri?nou=camping"
+                  : typedAcc
+                    ? `${MODULE_LINKS.accommodations.href}?nou=${form.accType}`
+                    : MODULE_LINKS[form.source].href;
               const manageCta = typedAcc
                 ? `Adaugă ${typeLabel.toLowerCase()}`
                 : MODULE_LINKS[form.source].cta;

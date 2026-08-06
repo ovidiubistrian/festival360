@@ -2,6 +2,6 @@
 
 import { AccommodationsManager } from "@/components/admin/accommodations-manager";
 
-export default function AccommodationsPage() {
-  return <AccommodationsManager scope="lodging" />;
+export default function CampingsPage() {
+  return <AccommodationsManager scope="camping" />;
 }

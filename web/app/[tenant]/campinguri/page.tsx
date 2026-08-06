@@ -16,8 +16,8 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Cazări";
-  const description = `Unități de cazare recomandate în zona ${info.name}: hoteluri, pensiuni, cabane și vile.`;
+  const title = "Campinguri";
+  const description = `Locuri de camping în zona ${info.name} — corturi, rulote și camping în mijlocul naturii.`;
   return {
     title,
     description,
@@ -29,7 +29,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function AccommodationsPage({
+export default async function CampingsPage({
   params,
 }: {
   params: Promise<{ tenant: string }>;
@@ -39,11 +39,12 @@ export default async function AccommodationsPage({
   if (!t) notFound();
 
   const { config, content, slug } = t;
-  // On a resort, camping has its own "Campinguri" list, so the Cazări list shows
-  // lodging only. Other verticals keep the full list unchanged.
-  const isResort = config.eventType === "resort";
+  // Campinguri is a resort-only split of accommodations; other verticals do not
+  // expose this route.
+  if (config.eventType !== "resort") notFound();
+
   const published = (content.accommodations ?? []).filter(
-    (a) => a.status === "published" && (!isResort || a.type !== "camping")
+    (a) => a.status === "published" && a.type === "camping"
   );
   const featured = published.find((a) => a.featured);
   const rest = published.filter((a) => a.id !== featured?.id);
@@ -52,32 +53,33 @@ export default async function AccommodationsPage({
   return (
     <>
       <PageHero
-        eyebrow="Unde stai"
-        title={L("accommodationsPageTitle", "Cazări")}
+        eyebrow="În mijlocul naturii"
+        title={L("campingsPageTitle", "Campinguri")}
         description={L(
-          "accommodationsPageDescription",
-          "Hoteluri, pensiuni, cabane și vile pentru un sejur pe placul tău — alege și rezervă direct."
+          "campingsPageDescription",
+          "Locuri de camping pentru corturi și rulote — natură, liniște și aer curat, aproape de tot."
         )}
         image={config.info.heroImage}
-        crumbs={[{ label: "Acasă", href: `/${slug}` }, { label: "Cazări" }]}
+        crumbs={[
+          { label: "Acasă", href: `/${slug}` },
+          { label: "Campinguri" },
+        ]}
       />
 
       <section className="bg-warm-white py-20 sm:py-28">
         <Container>
           <SectionHeading
-            eyebrow="Locuri de cazare"
-            title="Un sejur confortabil, aproape de tot"
-            description="De la cabane liniștite la pensiuni primitoare — găsește locul potrivit pentru vizita ta."
+            eyebrow="Locuri de camping"
+            title="Dormi sub cerul liber"
+            description="De la campinguri amenajate la locuri sălbatice — găsește popasul potrivit pentru aventura ta."
           />
 
           {published.length === 0 ? (
             <div className="mt-12 rounded-3xl border border-dashed border-border bg-secondary/40 py-20 text-center">
-              <p className="text-base font-medium text-primary">
-                În curând
-              </p>
+              <p className="text-base font-medium text-primary">În curând</p>
               <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-                Lista de cazări va fi disponibilă în curând. Revino mai târziu
-                pentru recomandări.
+                Lista de campinguri va fi disponibilă în curând. Revino mai
+                târziu pentru recomandări.
               </p>
             </div>
           ) : (

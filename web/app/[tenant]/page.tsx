@@ -45,8 +45,10 @@ export default async function TenantHome({
     .filter((p) => p.featured && p.status === "published")
     .slice(0, 4);
   // Resort "Cazare & gazde" zone shows real accommodations (featured first).
+  // Camping is split into its own "Campinguri" section, so exclude it here to
+  // avoid duplication.
   const featuredAccommodations = content.accommodations
-    .filter((a) => a.status === "published")
+    .filter((a) => a.status === "published" && a.type !== "camping")
     .sort((a, b) => Number(b.featured) - Number(a.featured))
     .slice(0, 6);
   const homePartners = content.partners

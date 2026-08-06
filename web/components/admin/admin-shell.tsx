@@ -12,6 +12,7 @@ import {
   Store,
   ShoppingBasket,
   BedDouble,
+  Tent,
   MapPin,
   Handshake,
   Image as ImageIcon,
@@ -122,6 +123,13 @@ const CONTENT_MODULE_DEFS: ContentModuleDef[] = [
     icon: BedDouble,
   },
   {
+    key: "campinguri",
+    labelKey: "navCampinguri",
+    label: "Campinguri",
+    href: "/admin/campinguri",
+    icon: Tent,
+  },
+  {
     key: "program",
     labelKey: "navProgram",
     label: "Program",
@@ -209,7 +217,7 @@ const CONTENT_MODULE_DEFS: ContentModuleDef[] = [
 
 /** Full default nav (festival vertical) — the fallback before modules load. */
 const DEFAULT_CONTENT_NAV: NavLink[] = CONTENT_MODULE_DEFS.filter(
-  (d) => d.key !== "accommodations"
+  (d) => d.key !== "accommodations" && d.key !== "campinguri"
 ).map((d) => ({ label: d.label, href: d.href, icon: d.icon }));
 
 /**
