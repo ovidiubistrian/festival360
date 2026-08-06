@@ -220,6 +220,7 @@ class SettingsIn(CamelModel):
     name: str | None = None
     tagline: str | None = None
     short_description: str | None = None
+    long_description: str | None = None
     start_date: str | None = None
     end_date: str | None = None
     location_name: str | None = None
@@ -234,13 +235,19 @@ class SettingsIn(CamelModel):
     secondary_color: str | None = None
     gold_color: str | None = None
     hero_image: str | None = None
+    hero_badge: str | None = None
     logo_text: str | None = None
+    # Homepage zone content (About "cifre" + Experiences grid), edited as whole
+    # arrays from the per-section editors.
+    stats: list[dict[str, Any]] | None = None
+    experiences: list[dict[str, Any]] | None = None
 
     def to_tenant_patch(self) -> dict[str, Any]:
         m = {
             "name": "name",
             "tagline": "tagline",
             "short_description": "short_description",
+            "long_description": "long_description",
             "location_name": "location_name",
             "city": "city",
             "county": "county",
@@ -253,7 +260,10 @@ class SettingsIn(CamelModel):
             "secondary_color": "theme_secondary",
             "gold_color": "theme_gold",
             "hero_image": "hero_image",
+            "hero_badge": "hero_badge",
             "logo_text": "logo_text",
+            "stats": "stats",
+            "experiences": "experiences",
         }
         patch: dict[str, Any] = {}
         for field, col in m.items():
