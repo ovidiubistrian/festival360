@@ -79,11 +79,41 @@ export interface Experience {
   image: string;
 }
 
+/** Content collection a custom section can draw its items from. */
+export type CustomSectionSource =
+  | "accommodations"
+  | "products"
+  | "destinations"
+  | "exhibitors"
+  | "gallery"
+  | "news"
+  | "program";
+
 /** Section visibility + ordering, editable from the demo admin. */
 export interface SectionConfig {
   id: string;
   label: string;
   visible: boolean;
+  /** True for admin-created sections (built-in zones leave this undefined). */
+  custom?: boolean;
+  /** Which content collection a custom section renders. */
+  source?: CustomSectionSource;
+  /** Field on the source items to filter by, e.g. "type" or "category". */
+  filterField?: string;
+  /** Value to match; empty/undefined means no filtering. */
+  filterValue?: string;
+  /** Small overline label above the title. */
+  eyebrow?: string;
+  /** Section title (custom sections). */
+  title?: string;
+  /** Section description (custom sections). */
+  description?: string;
+  /** "Vezi tot" button label. */
+  ctaLabel?: string;
+  /** "Vezi tot" href, relative to the tenant, e.g. "cazari". */
+  ctaHref?: string;
+  /** Max items to show; defaults to 6. */
+  limit?: number;
 }
 
 /** Per-tenant display copy overriding festival defaults (terminology system). */

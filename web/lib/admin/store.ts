@@ -376,6 +376,28 @@ export function toggleSection(id: string) {
   void sync(() => apiUpdateSections(memory.sections));
 }
 
+export function addSection(section: SectionConfig) {
+  apply((draft) => {
+    draft.sections.push(section);
+  });
+  void sync(() => apiUpdateSections(memory.sections));
+}
+
+export function updateSection(id: string, patch: Partial<SectionConfig>) {
+  apply((draft) => {
+    const idx = draft.sections.findIndex((x) => x.id === id);
+    if (idx >= 0) draft.sections[idx] = { ...draft.sections[idx], ...patch };
+  });
+  void sync(() => apiUpdateSections(memory.sections));
+}
+
+export function removeSection(id: string) {
+  apply((draft) => {
+    draft.sections = draft.sections.filter((x) => x.id !== id);
+  });
+  void sync(() => apiUpdateSections(memory.sections));
+}
+
 export function moveSection(id: string, dir: -1 | 1) {
   apply((draft) => {
     const idx = draft.sections.findIndex((x) => x.id === id);

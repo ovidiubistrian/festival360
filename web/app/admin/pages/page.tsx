@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronUp, ChevronDown, Eye, ExternalLink } from "lucide-react";
+import { ChevronUp, ChevronDown, Eye, ExternalLink, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -12,8 +12,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { moveSection, toggleSection, useAdminData } from "@/lib/admin/store";
-import { SectionConfigButton } from "@/components/admin/section-config-dialog";
+import {
+  moveSection,
+  removeSection,
+  toggleSection,
+  useAdminData,
+} from "@/lib/admin/store";
+import {
+  AddSectionButton,
+  SectionConfigButton,
+} from "@/components/admin/section-config-dialog";
 import { toast } from "sonner";
 
 /**
@@ -48,6 +56,11 @@ export default function PagesPage() {
     moveSection(id, dir);
   }
 
+  function onDelete(id: string, label: string) {
+    removeSection(id);
+    toast.success(`Secțiunea „${label}” a fost ștearsă.`);
+  }
+
   const visibleCount = data.sections.filter((s) => s.visible).length;
 
   return (
@@ -55,12 +68,15 @@ export default function PagesPage() {
       title="Pagini și secțiuni"
       description="Fiecare rând este o zonă de pe pagina principală. Comutatorul o arată sau o ascunde, iar săgețile îi schimbă ordinea pe site."
       actions={
-        <Button asChild variant="outline" size="sm">
-          <a href="/prispa" target="_blank" rel="noreferrer">
-            <ExternalLink className="h-4 w-4" />
-            Previzualizează site-ul
-          </a>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <a href="/prispa" target="_blank" rel="noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              Previzualizează site-ul
+            </a>
+          </Button>
+          <AddSectionButton />
+        </div>
       }
     >
       <Card>
@@ -110,14 +126,33 @@ export default function PagesPage() {
                 </span>
 
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-foreground">{section.label}</p>
+                  <p className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+                    {section.label}
+                    {section.custom ? (
+                      <Badge variant="secondary">Personalizată</Badge>
+                    ) : null}
+                  </p>
                   <p className="text-xs text-muted-foreground">
-                    {SECTION_HINTS[section.id] ?? `ID: ${section.id}`}
+                    {section.custom
+                      ? "Secțiune personalizată cu conținut filtrat."
+                      : (SECTION_HINTS[section.id] ?? `ID: ${section.id}`)}
                   </p>
                 </div>
 
                 <div className="ml-auto flex flex-wrap items-center gap-3">
                   <SectionConfigButton section={section} />
+
+                  {section.custom ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => onDelete(section.id, section.label)}
+                      aria-label={`Șterge secțiunea ${section.label}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  ) : null}
 
                   {section.visible ? (
                     <Badge variant="success">Vizibilă</Badge>

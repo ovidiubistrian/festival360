@@ -25,11 +25,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Icon } from "@/components/shared/icon";
 import { apiUpdateSettings } from "@/lib/admin/api";
-import { refresh, useAdminData } from "@/lib/admin/store";
+import {
+  addSection,
+  refresh,
+  updateSection,
+  useAdminData,
+} from "@/lib/admin/store";
 import { uploadMedia } from "@/lib/admin/media";
-import type { Experience, SectionConfig } from "@/lib/tenants/types";
+import type {
+  CustomSectionSource,
+  Experience,
+  SectionConfig,
+} from "@/lib/tenants/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -674,6 +690,284 @@ function ContentBackedBody({
   );
 }
 
+// ------------------------------------------------ Custom section editor
+
+/** Picker sources for admin-created sections (program is intentionally omitted). */
+const CUSTOM_SOURCES: {
+  value: CustomSectionSource;
+  label: string;
+  defaultHref: string;
+}[] = [
+  { value: "accommodations", label: "Cazări", defaultHref: "cazari" },
+  { value: "products", label: "Produse", defaultHref: "produse" },
+  { value: "destinations", label: "Atracții", defaultHref: "destinatii" },
+  { value: "exhibitors", label: "Expozanți", defaultHref: "expozanti" },
+  { value: "gallery", label: "Galerie", defaultHref: "galerie" },
+  { value: "news", label: "Noutăți", defaultHref: "noutati" },
+];
+
+/** Accommodation-type filter values (sentinel "all" = no filter). */
+const ACCOMMODATION_TYPES: { value: string; label: string }[] = [
+  { value: "all", label: "Toate" },
+  { value: "camping", label: "Camping" },
+  { value: "cabana", label: "Cabană" },
+  { value: "pensiune", label: "Pensiune" },
+  { value: "hotel", label: "Hotel" },
+  { value: "apartament", label: "Apartament" },
+  { value: "vila", label: "Vilă" },
+];
+
+function defaultHrefFor(source: CustomSectionSource): string {
+  return CUSTOM_SOURCES.find((s) => s.value === source)?.defaultHref ?? "";
+}
+
+interface CustomForm {
+  source: CustomSectionSource;
+  /** Sentinel "all" or an AccommodationType value. */
+  accType: string;
+  productCategory: string;
+  title: string;
+  eyebrow: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+}
+
+function initCustomForm(section?: SectionConfig): CustomForm {
+  const source = section?.source ?? "accommodations";
+  return {
+    source,
+    accType:
+      section?.source === "accommodations"
+        ? section.filterValue || "all"
+        : "all",
+    productCategory:
+      section?.source === "products" ? section.filterValue || "" : "",
+    title: section?.title ?? section?.label ?? "",
+    eyebrow: section?.eyebrow ?? "",
+    description: section?.description ?? "",
+    ctaLabel: section?.ctaLabel ?? "",
+    ctaHref: section?.ctaHref ?? (section ? "" : defaultHrefFor(source)),
+  };
+}
+
+/**
+ * Create/edit form for an admin-created section. When `section` is provided the
+ * form is prefilled for editing; otherwise it creates a new custom section.
+ * State is seeded once via a lazy initializer (render-phase prefill — no
+ * setState-in-effect), so the parent must remount it per-open with a key.
+ */
+function CustomSectionEditor({
+  section,
+  onClose,
+}: {
+  section?: SectionConfig;
+  onClose: () => void;
+}) {
+  const [form, setForm] = React.useState<CustomForm>(() =>
+    initCustomForm(section)
+  );
+  const [saving, setSaving] = React.useState(false);
+
+  function set<K extends keyof CustomForm>(key: K, value: CustomForm[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function changeSource(next: CustomSectionSource) {
+    setForm((prev) => ({
+      ...prev,
+      source: next,
+      accType: "all",
+      productCategory: "",
+      ctaHref: defaultHrefFor(next),
+    }));
+  }
+
+  function handleSave() {
+    const title = form.title.trim();
+    if (!title) {
+      toast.error("Adaugă un titlu pentru secțiune.");
+      return;
+    }
+
+    let filterField: string | undefined;
+    let filterValue: string | undefined;
+    if (form.source === "accommodations" && form.accType !== "all") {
+      filterField = "type";
+      filterValue = form.accType;
+    } else if (form.source === "products" && form.productCategory.trim()) {
+      filterField = "category";
+      filterValue = form.productCategory.trim();
+    }
+
+    const shared = {
+      label: title,
+      title,
+      source: form.source,
+      filterField,
+      filterValue,
+      eyebrow: form.eyebrow.trim() || undefined,
+      description: form.description.trim() || undefined,
+      ctaLabel: form.ctaLabel.trim() || undefined,
+      ctaHref: form.ctaHref.trim() || undefined,
+      limit: 6,
+    };
+
+    setSaving(true);
+    if (section) {
+      updateSection(section.id, shared);
+      toast.success("Secțiunea a fost actualizată.");
+    } else {
+      const id = `custom-${crypto.randomUUID().slice(0, 8)}`;
+      addSection({ id, visible: true, custom: true, ...shared });
+      toast.success("Secțiunea a fost adăugată.");
+    }
+    setSaving(false);
+    onClose();
+  }
+
+  return (
+    <>
+      <div className="space-y-5 py-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="cs-source">Sursă</Label>
+          <Select
+            value={form.source}
+            onValueChange={(v) => changeSource(v as CustomSectionSource)}
+          >
+            <SelectTrigger id="cs-source">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CUSTOM_SOURCES.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Conținutul afișat provine din acest modul.
+          </p>
+        </div>
+
+        {form.source === "accommodations" ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="cs-acc-type">Tip cazare</Label>
+            <Select
+              value={form.accType}
+              onValueChange={(v) => set("accType", v)}
+            >
+              <SelectTrigger id="cs-acc-type">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ACCOMMODATION_TYPES.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>
+                    {t.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ) : null}
+
+        {form.source === "products" ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="cs-product-cat">Categorie (opțional)</Label>
+            <Input
+              id="cs-product-cat"
+              value={form.productCategory}
+              onChange={(e) => set("productCategory", e.target.value)}
+              placeholder="Ex: Miere"
+            />
+          </div>
+        ) : null}
+
+        <div className="space-y-1.5">
+          <Label htmlFor="cs-title">Titlu</Label>
+          <Input
+            id="cs-title"
+            value={form.title}
+            onChange={(e) => set("title", e.target.value)}
+            placeholder="Ex: Campinguri"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="cs-eyebrow">Etichetă (opțional)</Label>
+          <Input
+            id="cs-eyebrow"
+            value={form.eyebrow}
+            onChange={(e) => set("eyebrow", e.target.value)}
+            placeholder="Ex: Natură & aventură"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="cs-description">Descriere (opțional)</Label>
+          <Textarea
+            id="cs-description"
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+            placeholder="Un scurt text de introducere pentru secțiune."
+          />
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="cs-cta-label">Buton „Vezi tot” (opțional)</Label>
+            <Input
+              id="cs-cta-label"
+              value={form.ctaLabel}
+              onChange={(e) => set("ctaLabel", e.target.value)}
+              placeholder="Vezi tot"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="cs-cta-href">Link buton (opțional)</Label>
+            <Input
+              id="cs-cta-href"
+              value={form.ctaHref}
+              onChange={(e) => set("ctaHref", e.target.value)}
+              placeholder="cazari"
+            />
+          </div>
+        </div>
+      </div>
+      <SaveFooter saving={saving} onCancel={onClose} onSave={handleSave} />
+    </>
+  );
+}
+
+/** "Adaugă secțiune" button + its create dialog for a new custom section. */
+export function AddSectionButton() {
+  const [open, setOpen] = React.useState(false);
+  const close = React.useCallback(() => setOpen(false), []);
+
+  return (
+    <>
+      <Button variant="gold" size="sm" onClick={() => setOpen(true)}>
+        <Plus className="h-4 w-4" />
+        Adaugă secțiune
+      </Button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-h-[85vh] max-w-lg overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Adaugă o secțiune personalizată</DialogTitle>
+            <DialogDescription>
+              Afișează o selecție filtrată din conținutul tău pe pagina
+              principală.
+            </DialogDescription>
+          </DialogHeader>
+          {open ? <CustomSectionEditor key="create" onClose={close} /> : null}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 // ------------------------------------------------------------------- Wrapper
 
 /**
@@ -685,6 +979,7 @@ export function SectionConfigButton({ section }: { section: SectionConfig }) {
   const [open, setOpen] = React.useState(false);
   const close = React.useCallback(() => setOpen(false), []);
   const inline = INLINE_EDITORS.has(section.id);
+  const isCustom = section.custom === true;
 
   return (
     <>
@@ -706,18 +1001,26 @@ export function SectionConfigButton({ section }: { section: SectionConfig }) {
           )}
         >
           <DialogHeader>
-            <DialogTitle>Configurează: {section.label}</DialogTitle>
+            <DialogTitle>
+              {isCustom
+                ? `Editează: ${section.label}`
+                : `Configurează: ${section.label}`}
+            </DialogTitle>
             <DialogDescription>
-              {inline
-                ? "Setează conținutul afișat în această zonă a paginii principale."
-                : "Detalii despre această zonă și unde se administrează conținutul ei."}
+              {isCustom
+                ? "Editează sursa, filtrul și textele acestei secțiuni personalizate."
+                : inline
+                  ? "Setează conținutul afișat în această zonă a paginii principale."
+                  : "Detalii despre această zonă și unde se administrează conținutul ei."}
             </DialogDescription>
           </DialogHeader>
 
           {/* Remount the editor per-open via the `open` key so it re-reads the
               store snapshot on each open — a render-phase prefill, not an effect. */}
           {open ? (
-            section.id === "hero" ? (
+            isCustom ? (
+              <CustomSectionEditor key="custom" section={section} onClose={close} />
+            ) : section.id === "hero" ? (
               <HeroEditor key="hero" onClose={close} />
             ) : section.id === "about" ? (
               <AboutEditor key="about" onClose={close} />

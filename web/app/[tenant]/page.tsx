@@ -12,6 +12,7 @@ import { TrailsMap } from "@/components/public/sections/trails-map";
 import { ExperiencesSection } from "@/components/public/sections/experiences-section";
 import { DestinationsSection } from "@/components/public/sections/destinations-section";
 import { NewsletterSection } from "@/components/public/sections/newsletter-section";
+import { CustomSection } from "@/components/public/sections/custom-section";
 import { ProgramSchedule } from "@/components/public/program-schedule";
 import { ExhibitorCard } from "@/components/public/cards/exhibitor-card";
 import { AccommodationCard } from "@/components/public/cards/accommodation-card";
@@ -386,6 +387,17 @@ export default async function TenantHome({
           </Container>
         </section>
       )}
+
+      {config.sections
+        .filter((s) => s.custom && (s.visible ?? true))
+        .map((s) => (
+          <CustomSection
+            key={s.id}
+            section={s}
+            content={content}
+            slug={slug}
+          />
+        ))}
 
       {visible("newsletter") && <NewsletterSection />}
     </>
