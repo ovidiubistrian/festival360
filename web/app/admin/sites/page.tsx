@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   Loader2,
@@ -13,6 +14,7 @@ import {
   Sparkles,
   Globe,
   KeyRound,
+  SquarePen,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
@@ -39,6 +41,7 @@ import {
   type Preset,
   type TenantSummary,
 } from "@/lib/admin/platform";
+import { setCurrentTenant } from "@/lib/admin/session";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -72,6 +75,7 @@ function eventTypeLabel(eventType: string): string {
 }
 
 export default function SitesPage() {
+  const router = useRouter();
   const [tenants, setTenants] = React.useState<TenantSummary[]>([]);
   const [loaded, setLoaded] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -211,6 +215,12 @@ export default function SitesPage() {
       },
     });
     await refresh();
+  }
+
+  /** Enter a site: make it the active tenant and open its dashboard. */
+  function editSite(tenant: TenantSummary) {
+    setCurrentTenant(tenant.slug);
+    router.push("/admin/dashboard");
   }
 
   async function remove(tenant: TenantSummary) {
@@ -455,6 +465,14 @@ export default function SitesPage() {
                   </div>
 
                   <div className="flex shrink-0 items-center gap-2">
+                    <Button
+                      variant="gold"
+                      size="sm"
+                      onClick={() => editSite(tenant)}
+                    >
+                      <SquarePen className="h-4 w-4" />
+                      Editează site
+                    </Button>
                     <Button asChild variant="outline" size="sm">
                       <a
                         href={`/${tenant.slug}`}

@@ -28,7 +28,7 @@ import {
   Menu,
   ExternalLink,
   LogOut,
-  RotateCcw,
+  ArrowLeft,
   CreditCard,
   Wallet,
   Inbox,
@@ -54,22 +54,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
-import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import {
   isLoggedIn,
   logout,
   refresh,
-  resetDemoData,
   useAdminData,
 } from "@/lib/admin/store";
 import {
+  clearCurrentTenant,
   getCurrentTenant,
   isSuperadmin,
   setCurrentTenant,
   useSession,
 } from "@/lib/admin/session";
 import { listTenants, type TenantSummary } from "@/lib/admin/platform";
-import { toast } from "sonner";
 
 interface NavLink {
   label: string;
@@ -288,6 +286,7 @@ interface SidebarProps {
   currentTenant: string | null;
   tenants: TenantSummary[];
   onTenantChange: (slug: string) => void;
+  onExitTenant: () => void;
   onNavigate?: () => void;
 }
 
@@ -325,17 +324,19 @@ function SidebarContent({
   currentTenant,
   tenants,
   onTenantChange,
+  onExitTenant,
   onNavigate,
 }: SidebarProps) {
   const router = useRouter();
   const data = useAdminData();
   const contentNav = buildContentNav(data.modules, data.labels);
 
-  function handleReset() {
-    resetDemoData();
-    toast.success("Datele au fost resetate.");
-    onNavigate?.();
-  }
+  // Super-admin in platform mode: no tenant selected → platform tools only.
+  const platformMode = superadmin && !currentTenant;
+  // Super-admin editing a specific site.
+  const tenantEditMode = superadmin && !!currentTenant;
+  const activeTenantName =
+    tenants.find((t) => t.slug === currentTenant)?.name ?? currentTenant ?? "";
 
   function handleLogout() {
     logout();
@@ -348,36 +349,52 @@ function SidebarContent({
       {/* Brand */}
       <div className="px-5 py-6">
         <Link
-          href="/admin/dashboard"
+          href={platformMode ? "/admin/sites" : "/admin/dashboard"}
           onClick={onNavigate}
           className="flex items-center gap-2"
         >
           <span className="font-serif text-lg font-semibold text-warm-white">
             Siteora
           </span>
-          {superadmin ? (
-            <Badge variant="gold">Platformă</Badge>
-          ) : currentTenant ? (
-            <Badge variant="gold">{currentTenant.toUpperCase()}</Badge>
-          ) : null}
+          {superadmin ? <Badge variant="gold">Platformă</Badge> : null}
         </Link>
         <p className="mt-3 text-[11px] leading-snug text-cream/70">
-          {superadmin
+          {platformMode
             ? "Administrare platformă — gestionezi toate site-urile."
-            : "Panou de administrare — gestionezi conținutul site-ului tău."}
+            : tenantEditMode
+              ? "Editezi un site. Revino la platformă pentru administrare."
+              : "Panou de administrare — gestionezi conținutul site-ului tău."}
         </p>
       </div>
 
-      {/* Super-admin tenant switcher */}
-      {superadmin ? (
+      {/* Tenant-edit header: which site + back to platform */}
+      {tenantEditMode ? (
         <div className="px-3 pb-3">
-          <label className="mb-1.5 block px-1 text-[11px] font-medium uppercase tracking-wide text-cream/60">
-            Site activ
+          <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-3">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-cream/60">
+              Editezi
+            </p>
+            <p className="mt-0.5 truncate font-serif text-sm font-semibold text-warm-white">
+              {activeTenantName}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                onNavigate?.();
+                onExitTenant();
+              }}
+              className="mt-2 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium text-cream/80 transition-colors hover:bg-white/10 hover:text-warm-white"
+            >
+              <ArrowLeft className="h-3.5 w-3.5 shrink-0" />
+              Înapoi la platformă
+            </button>
+          </div>
+
+          {/* Compact site switcher */}
+          <label className="mb-1.5 mt-3 block px-1 text-[11px] font-medium uppercase tracking-wide text-cream/60">
+            Schimbă site-ul
           </label>
-          <Select
-            value={currentTenant ?? ""}
-            onValueChange={onTenantChange}
-          >
+          <Select value={currentTenant ?? ""} onValueChange={onTenantChange}>
             <SelectTrigger className="border-white/15 bg-white/10 text-warm-white">
               <SelectValue placeholder="Alege un site…" />
             </SelectTrigger>
@@ -394,7 +411,7 @@ function SidebarContent({
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-4">
-        {superadmin ? (
+        {platformMode ? (
           <>
             <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-cream/50">
               Platformă
@@ -402,31 +419,23 @@ function SidebarContent({
             {PLATFORM_NAV.map((item) => (
               <NavItem key={item.href} item={item} onNavigate={onNavigate} />
             ))}
-            <p className="px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wide text-cream/50">
-              Conținut site
-            </p>
           </>
-        ) : null}
-        {contentNav.map((item) => (
-          <NavItem key={item.href} item={item} onNavigate={onNavigate} />
-        ))}
+        ) : (
+          <>
+            {tenantEditMode ? (
+              <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-cream/50">
+                Conținut site
+              </p>
+            ) : null}
+            {contentNav.map((item) => (
+              <NavItem key={item.href} item={item} onNavigate={onNavigate} />
+            ))}
+          </>
+        )}
       </nav>
 
       {/* Footer actions */}
       <div className="space-y-2 border-t border-white/10 px-3 py-4">
-        <ConfirmDelete
-          itemLabel="datele site-ului activ (revenire la conținutul inițial)"
-          onConfirm={handleReset}
-          trigger={
-            <button
-              type="button"
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cream/80 transition-colors hover:bg-white/5 hover:text-warm-white"
-            >
-              <RotateCcw className="h-4 w-4 shrink-0" />
-              Resetează datele
-            </button>
-          }
-        />
         <button
           type="button"
           onClick={handleLogout}
@@ -481,6 +490,26 @@ function RestrictedNotice() {
   );
 }
 
+function NoActiveSiteNotice() {
+  return (
+    <Card>
+      <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
+        <Building2 className="h-8 w-8 text-muted-foreground" />
+        <h2 className="font-serif text-lg font-semibold text-primary">
+          Niciun site selectat
+        </h2>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          Alege un site din <span className="font-medium">Site-uri</span> pentru
+          a-l edita.
+        </p>
+        <Button asChild variant="gold" size="sm">
+          <Link href="/admin/sites">Mergi la Site-uri</Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 export interface AdminShellProps {
   title: string;
   description?: string;
@@ -498,6 +527,7 @@ export function AdminShell({
   const [tenants, setTenants] = React.useState<TenantSummary[]>([]);
   const [tenantsStarted, setTenantsStarted] = React.useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   // Subscribe so tenant-switcher / role changes re-render the shell.
   const session = useSession();
@@ -517,17 +547,13 @@ export function AdminShell({
 
   // Load the tenant list once, for super-admins, on first client render —
   // without a mount effect that sets state (repo enforces
-  // react-hooks/set-state-in-effect). On first load with no tenant selected,
-  // default to the first tenant so the content modules have something to show.
+  // react-hooks/set-state-in-effect). No tenant is auto-selected: super-admins
+  // start in platform mode and explicitly "enter" a site to edit it.
   if (mounted && authed && superadmin && !tenantsStarted) {
     setTenantsStarted(true);
     void (async () => {
       const items = await listTenants();
       setTenants(items);
-      if (!getCurrentTenant() && items.length > 0) {
-        setCurrentTenant(items[0].slug);
-        await refresh();
-      }
     })();
   }
 
@@ -535,6 +561,12 @@ export function AdminShell({
     if (slug === getCurrentTenant()) return;
     setCurrentTenant(slug);
     void refresh();
+  }
+
+  function handleExitTenant() {
+    clearCurrentTenant();
+    void refresh();
+    router.push("/admin/sites");
   }
 
   if (!mounted) {
@@ -556,6 +588,10 @@ export function AdminShell({
   }
 
   const restricted = isPlatformRoute(pathname) && !superadmin;
+  // Super-admin in platform mode (no active site) hit a tenant content route:
+  // there's no site to edit, so show a friendly prompt instead of the page.
+  const needsSite =
+    superadmin && !currentTenant && !isPlatformRoute(pathname);
   const avatarInitials = (userEmail.slice(0, 2) || "SO").toUpperCase();
   const sidebar = (
     <SidebarContent
@@ -563,6 +599,7 @@ export function AdminShell({
       currentTenant={currentTenant}
       tenants={tenants}
       onTenantChange={handleTenantChange}
+      onExitTenant={handleExitTenant}
     />
   );
 
@@ -596,6 +633,7 @@ export function AdminShell({
                   currentTenant={currentTenant}
                   tenants={tenants}
                   onTenantChange={handleTenantChange}
+                  onExitTenant={handleExitTenant}
                   onNavigate={() => setSheetOpen(false)}
                 />
               </SheetContent>
@@ -652,7 +690,13 @@ export function AdminShell({
                 {description}
               </p>
             ) : null}
-            {restricted ? <RestrictedNotice /> : children}
+            {restricted ? (
+              <RestrictedNotice />
+            ) : needsSite ? (
+              <NoActiveSiteNotice />
+            ) : (
+              children
+            )}
           </div>
         </main>
       </div>

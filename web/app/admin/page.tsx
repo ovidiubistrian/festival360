@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { login } from "@/lib/admin/store";
+import { clearCurrentTenant } from "@/lib/admin/session";
 
 export default function DemoAdminLoginPage() {
   const router = useRouter();
@@ -34,9 +35,15 @@ export default function DemoAdminLoginPage() {
       toast.error("Email sau parolă incorecte");
       return;
     }
-    // Route by role: super-admin lands on the platform site list; a tenant-admin
-    // lands on their own site's dashboard.
-    router.push(user.isSuperuser ? "/admin/sites" : "/admin/dashboard");
+    // Route by role: super-admin lands on the platform site list (in platform
+    // mode — clear any stale previously-selected tenant); a tenant-admin lands
+    // on their own site's dashboard.
+    if (user.isSuperuser) {
+      clearCurrentTenant();
+      router.push("/admin/sites");
+    } else {
+      router.push("/admin/dashboard");
+    }
   }
 
   return (

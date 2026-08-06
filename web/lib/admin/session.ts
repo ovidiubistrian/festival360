@@ -128,6 +128,15 @@ export function setCurrentTenant(slug: string) {
   notify();
 }
 
+/** Clear the selected tenant (super-admin returns to platform mode). */
+export function clearCurrentTenant() {
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem(CURRENT_TENANT_KEY);
+  }
+  snap = { ...snap, currentTenant: null };
+  notify();
+}
+
 export function clearSession() {
   if (typeof window !== "undefined") {
     window.localStorage.removeItem(TOKEN_KEY);
