@@ -123,6 +123,20 @@ export default async function AboutPage({
                   className="object-cover"
                 />
               </div>
+              {info.aboutImage2?.trim() ? (
+                <div className="absolute -bottom-6 -left-6 hidden w-48 overflow-hidden rounded-2xl border-4 border-warm-white shadow-lg sm:block">
+                  <div className="relative aspect-square">
+                    <ImageWithFallback
+                      src={info.aboutImage2}
+                      alt={info.name}
+                      fill
+                      sizes="200px"
+                      fallbackLabel={info.name}
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              ) : null}
             </Reveal>
           </div>
         </Container>
