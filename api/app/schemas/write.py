@@ -266,6 +266,7 @@ class SettingsIn(CamelModel):
     about_image: str | None = None
     about_image_2: str | None = None
     logo_text: str | None = None
+    logo_image: str | None = None
     # Homepage zone content (About "cifre" + Experiences grid), edited as whole
     # arrays from the per-section editors.
     stats: list[dict[str, Any]] | None = None
@@ -293,6 +294,7 @@ class SettingsIn(CamelModel):
             "about_image": "about_image",
             "about_image_2": "about_image_2",
             "logo_text": "logo_text",
+            "logo_image": "logo_image",
             "stats": "stats",
             "experiences": "experiences",
         }

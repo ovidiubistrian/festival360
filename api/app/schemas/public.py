@@ -321,6 +321,7 @@ class FestivalInfoOut(CamelModel):
     hero_image: str
     hero_badge: str
     logo_text: str
+    logo_image: str
     about_image: str
     about_image_2: str
 
@@ -383,6 +384,7 @@ class TenantConfigOut(CamelModel):
                 hero_image=t.hero_image,
                 hero_badge=t.hero_badge,
                 logo_text=t.logo_text,
+                logo_image=t.logo_image,
                 about_image=t.about_image,
                 about_image_2=t.about_image_2,
             ),

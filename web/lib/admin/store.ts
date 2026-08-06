@@ -75,6 +75,7 @@ export interface AdminSettings {
   aboutImage: string;
   aboutImage2: string;
   logoText: string;
+  logoImage: string;
 }
 
 export interface AdminData {
@@ -147,6 +148,7 @@ function seed(): AdminData {
       aboutImage: info.aboutImage ?? "",
       aboutImage2: info.aboutImage2 ?? "",
       logoText: info.logoText,
+      logoImage: info.logoImage ?? "",
     },
     eventType: prispaTenant.config.eventType,
     modules: prispaTenant.config.modules,
@@ -197,6 +199,7 @@ function bundleToAdminData(bundle: Tenant): AdminData {
       aboutImage: info.aboutImage ?? "",
       aboutImage2: info.aboutImage2 ?? "",
       logoText: info.logoText,
+      logoImage: info.logoImage ?? "",
     },
     eventType: config.eventType,
     modules: config.modules,
@@ -244,6 +247,7 @@ function emptyData(): AdminData {
       aboutImage: "",
       aboutImage2: "",
       logoText: "",
+      logoImage: "",
     },
   };
 }

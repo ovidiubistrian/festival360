@@ -19,12 +19,15 @@ import type { NavItem } from "@/lib/tenants/types";
 export function SiteHeader({
   slug,
   logoText,
+  logoImage,
   navigation,
   eventType = "festival",
   ctaLabel = "Vezi programul",
 }: {
   slug: string;
   logoText: string;
+  /** Optional logo image; shown instead of the text logo when set. */
+  logoImage?: string;
   navigation: NavItem[];
   /** Vertical preset — gates festival-only chrome ("FEST" tag + program CTA). */
   eventType?: string;
@@ -66,16 +69,27 @@ export function SiteHeader({
               scrolled ? "text-primary" : "text-warm-white"
             )}
           >
-            {logoText}
-            {isFestival && (
-              <span
-                className={cn(
-                  "ml-1 align-super text-[10px] font-sans font-medium tracking-widest",
-                  scrolled ? "text-terracotta" : "text-gold"
+            {logoImage?.trim() ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={logoImage}
+                alt={logoText}
+                className="h-9 w-auto object-contain sm:h-10"
+              />
+            ) : (
+              <>
+                {logoText}
+                {isFestival && (
+                  <span
+                    className={cn(
+                      "ml-1 align-super text-[10px] font-sans font-medium tracking-widest",
+                      scrolled ? "text-terracotta" : "text-gold"
+                    )}
+                  >
+                    FEST
+                  </span>
                 )}
-              >
-                FEST
-              </span>
+              </>
             )}
           </Link>
 

@@ -43,6 +43,7 @@ class Tenant(SQLModel, table=True):
     hero_image: str = ""
     hero_badge: str = ""
     logo_text: str = ""
+    logo_image: str = ""  # optional logo image; shown instead of logo_text
     # "Despre" section images (main collage + small inset); "" falls back to the
     # frontend defaults.
     about_image: str = ""

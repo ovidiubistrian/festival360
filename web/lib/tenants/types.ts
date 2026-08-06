@@ -63,6 +63,8 @@ export interface FestivalInfo {
   heroImage: string;
   heroBadge: string;
   logoText: string;
+  /** Optional logo image; shown instead of the logo text when set. */
+  logoImage?: string;
   /** "Despre" section images; empty falls back to the frontend defaults. */
   aboutImage?: string;
   aboutImage2?: string;

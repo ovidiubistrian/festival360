@@ -74,6 +74,7 @@ export default async function TenantLayout({
       <SiteHeader
         slug={t.slug}
         logoText={t.config.info.logoText}
+        logoImage={t.config.info.logoImage}
         navigation={t.config.navigation}
         eventType={t.config.eventType}
         ctaLabel={t.config.labels?.headerCta ?? "Vezi programul"}

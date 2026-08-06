@@ -55,6 +55,10 @@ function ColorField({
 
 export default function SettingsPage() {
   const data = useAdminData();
+  const isResort = data.eventType === "resort";
+  // Vertical-aware wording (resort speaks about a "stațiune", not a "festival").
+  const noun = isResort ? "stațiunii" : "festivalului";
+  const nameLabel = isResort ? "Nume stațiune" : "Nume festival";
   const [form, setForm] = React.useState<AdminSettings>(data.settings);
   // Resync the form when the stored settings reference changes (e.g. after a
   // demo reset), adjusted during render instead of in a set-state effect.
@@ -85,7 +89,7 @@ export default function SettingsPage() {
   return (
     <AdminShell
       title="Setări"
-      description="Informațiile globale ale festivalului (nume, date, contact, social) și identitatea vizuală — culorile temei și imaginea hero din antetul site-ului."
+      description={`Informațiile globale ale ${noun} (nume, contact, social) și identitatea vizuală — logo, culori și imaginea hero.`}
     >
       <Tabs defaultValue="general">
         <TabsList>
@@ -100,12 +104,13 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Informații generale</CardTitle>
               <CardDescription>
-                Numele, descrierea și datele festivalului.
+                Numele, descrierea și {isResort ? "locația" : "datele"}{" "}
+                {noun}.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nume festival">
+                <Field label={nameLabel}>
                   <Input
                     value={form.name}
                     onChange={(e) => set("name", e.target.value)}
@@ -130,20 +135,24 @@ export default function SettingsPage() {
                     rows={3}
                   />
                 </Field>
-                <Field label="Data început">
-                  <Input
-                    type="date"
-                    value={form.startDate}
-                    onChange={(e) => set("startDate", e.target.value)}
-                  />
-                </Field>
-                <Field label="Data sfârșit">
-                  <Input
-                    type="date"
-                    value={form.endDate}
-                    onChange={(e) => set("endDate", e.target.value)}
-                  />
-                </Field>
+                {!isResort && (
+                  <>
+                    <Field label="Data început">
+                      <Input
+                        type="date"
+                        value={form.startDate}
+                        onChange={(e) => set("startDate", e.target.value)}
+                      />
+                    </Field>
+                    <Field label="Data sfârșit">
+                      <Input
+                        type="date"
+                        value={form.endDate}
+                        onChange={(e) => set("endDate", e.target.value)}
+                      />
+                    </Field>
+                  </>
+                )}
                 <Field label="Locație">
                   <Input
                     value={form.locationName}
@@ -282,6 +291,30 @@ export default function SettingsPage() {
                   onChange={(v) => set("goldColor", v)}
                 />
               </div>
+              <div className="space-y-2">
+                <MediaPicker
+                  label="Logo (imagine)"
+                  value={form.logoImage}
+                  onChange={(url) => set("logoImage", url)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Opțional. Când e setat, se afișează în antet în locul textului
+                  „{form.logoText || "logo"}”. PNG cu fundal transparent, ideal.
+                </p>
+                {form.logoImage ? (
+                  <div className="inline-flex items-center rounded-xl border border-border bg-primary p-4">
+                    <ImageWithFallback
+                      src={form.logoImage}
+                      alt="Previzualizare logo"
+                      width={160}
+                      height={48}
+                      unoptimized
+                      className="h-12 w-auto object-contain"
+                      fallbackLabel="Logo"
+                    />
+                  </div>
+                ) : null}
+              </div>
               <MediaPicker
                 label="Imagine hero"
                 value={form.heroImage}
@@ -309,6 +342,7 @@ export default function SettingsPage() {
                         "primaryColor",
                         "secondaryColor",
                         "goldColor",
+                        "logoImage",
                         "heroImage",
                       ],
                       "Identitatea vizuală a fost salvată."
