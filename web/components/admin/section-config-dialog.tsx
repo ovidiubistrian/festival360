@@ -907,6 +907,26 @@ function CustomSectionEditor({
           </div>
         ) : null}
 
+        {MODULE_LINKS[form.source] ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-secondary/40 p-3">
+            <p className="text-xs text-muted-foreground">
+              Adaugi conținutul în această secțiune din modulul respectiv.
+              {form.source === "accommodations" && form.accType !== "all"
+                ? ` Marchează tipul „${
+                    ACCOMMODATION_TYPES.find((t) => t.value === form.accType)
+                      ?.label ?? form.accType
+                  }” la fiecare cazare ca să apară aici.`
+                : ""}
+            </p>
+            <Button asChild variant="outline" size="sm" onClick={onClose}>
+              <Link href={MODULE_LINKS[form.source].href}>
+                {MODULE_LINKS[form.source].cta}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        ) : null}
+
         <div className="space-y-1.5">
           <Label htmlFor="cs-title">Titlu</Label>
           <Input
