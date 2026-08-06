@@ -238,3 +238,30 @@ class Restaurant(SQLModel, table=True):
     sort_order: int = 0
     created_at: dt.datetime = Field(default_factory=utcnow)
     updated_at: dt.datetime = Field(default_factory=utcnow)
+
+
+class TenantEvent(SQLModel, table=True):
+    # Table name avoids the SQL reserved word "event".
+    __tablename__ = "tenant_event"
+
+    id: str = Field(primary_key=True)
+    tenant_id: str = Field(foreign_key="tenant.id", index=True)
+    slug: str = Field(index=True)
+    title: str
+    cover_image: str = ""
+    gallery: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    short_description: str = ""
+    description: str = ""
+    start_date: dt.date | None = None
+    end_date: dt.date | None = None
+    time_label: str = ""  # ex: "18:00–23:00"
+    location: str = ""
+    # schedule items: [{time, title, description}]
+    program: list[dict] = Field(default_factory=list, sa_column=Column(JSON))
+    ticket_url: str = ""  # external ticketing link
+    ticket_label: str = ""  # button text; UI defaults to "Cumpără bilete"
+    featured: bool = False
+    status: str = "published"
+    sort_order: int = 0
+    created_at: dt.datetime = Field(default_factory=utcnow)
+    updated_at: dt.datetime = Field(default_factory=utcnow)

@@ -13,6 +13,7 @@ from app.schemas.public import (
     ArticleOut,
     ContactMessageOut,
     DestinationOut,
+    EventOut,
     ExhibitorOut,
     GalleryImageOut,
     NewsletterSubscriberOut,
@@ -40,6 +41,7 @@ def build_bundle(session: Session, tenant: Tenant) -> TenantBundleOut:
         restaurants=[
             RestaurantOut.from_model(x) for x in svc.restaurants_for(session, tid)
         ],
+        events=[EventOut.from_model(x) for x in svc.events_for(session, tid)],
         products=[ProductOut.from_model(x) for x in svc.products_for(session, tid)],
         destinations=[
             DestinationOut.from_model(x) for x in svc.destinations_for(session, tid)

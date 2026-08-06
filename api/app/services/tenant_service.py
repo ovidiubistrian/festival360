@@ -14,6 +14,7 @@ from app.models import (
     ProgramEvent,
     Product,
     Restaurant,
+    TenantEvent,
     Tenant,
 )
 
@@ -52,6 +53,16 @@ def restaurants_for(session: Session, tenant_id: str) -> list[Restaurant]:
             select(Restaurant)
             .where(Restaurant.tenant_id == tenant_id)
             .order_by(Restaurant.sort_order)
+        ).all()
+    )
+
+
+def events_for(session: Session, tenant_id: str) -> list[TenantEvent]:
+    return list(
+        session.exec(
+            select(TenantEvent)
+            .where(TenantEvent.tenant_id == tenant_id)
+            .order_by(TenantEvent.start_date, TenantEvent.sort_order)
         ).all()
     )
 

@@ -107,6 +107,32 @@ class RestaurantIn(CamelModel):
         return d
 
 
+class EventIn(CamelModel):
+    id: str | None = None
+    slug: str
+    title: str
+    cover_image: str = ""
+    gallery: list[str] = []
+    short_description: str = ""
+    description: str = ""
+    start_date: str | None = None
+    end_date: str | None = None
+    time_label: str = ""
+    location: str = ""
+    program: list[dict[str, Any]] = []
+    ticket_url: str = ""
+    ticket_label: str = ""
+    featured: bool = False
+    status: str = "published"
+
+    def to_kwargs(self, tenant_id: str) -> dict[str, Any]:
+        d = self.model_dump(exclude={"id"})
+        d["start_date"] = _date(self.start_date)
+        d["end_date"] = _date(self.end_date)
+        d["tenant_id"] = tenant_id
+        return d
+
+
 class ProductIn(CamelModel):
     id: str | None = None
     slug: str

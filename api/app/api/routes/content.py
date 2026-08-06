@@ -12,6 +12,7 @@ from app.schemas.public import (
     AccommodationOut,
     ArticleOut,
     DestinationOut,
+    EventOut,
     ExhibitorOut,
     GalleryImageOut,
     PartnerOut,
@@ -91,6 +92,26 @@ def get_restaurant(
         if x.slug == item_slug:
             return RestaurantOut.from_model(x)
     raise _not_found("Restaurant")
+
+
+# --- Events (evenimente) ---
+@router.get("/events", response_model=list[EventOut])
+def list_events(
+    tenant: Tenant = Depends(tenant_or_404), session: Session = Depends(get_session)
+):
+    return [EventOut.from_model(x) for x in svc.events_for(session, tenant.id)]
+
+
+@router.get("/events/{item_slug}", response_model=EventOut)
+def get_event(
+    item_slug: str,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    for x in svc.events_for(session, tenant.id):
+        if x.slug == item_slug:
+            return EventOut.from_model(x)
+    raise _not_found("Eveniment")
 
 
 # --- Products ---

@@ -17,6 +17,7 @@ from app.models.content import (
     NewsletterSubscriber,
     Accommodation,
     Restaurant,
+    TenantEvent,
 )
 from app.models.analytics import PageView
 from app.models.marketing import TenantEmailSettings
@@ -53,6 +54,7 @@ __all__ = [
     "NewsletterSubscriber",
     "Accommodation",
     "Restaurant",
+    "TenantEvent",
     "PageView",
     "TenantEmailSettings",
     "AdminUser",

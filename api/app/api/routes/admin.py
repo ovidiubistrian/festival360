@@ -19,6 +19,7 @@ from app.models import (
     ProgramEvent,
     Product,
     Restaurant,
+    TenantEvent,
     Tenant,
 )
 from app.models.base import new_id, utcnow
@@ -27,6 +28,7 @@ from app.schemas.public import (
     AccommodationOut,
     ArticleOut,
     DestinationOut,
+    EventOut,
     ExhibitorOut,
     GalleryImageOut,
     PartnerOut,
@@ -39,6 +41,7 @@ from app.schemas.write import (
     AccommodationIn,
     ArticleIn,
     DestinationIn,
+    EventIn,
     ExhibitorIn,
     GalleryImageIn,
     MessageReadIn,
@@ -170,6 +173,45 @@ def update_restaurant(
     if not obj:
         raise _notfound("Restaurant")
     return RestaurantOut.from_model(
+        crud.update(session, obj, payload.to_kwargs(tenant.id))
+    )
+
+
+# =========================================================================
+# Events (evenimente)
+# =========================================================================
+@router.get("/events", response_model=list[EventOut])
+def list_events(
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    from app.services import tenant_service as svc
+
+    return [EventOut.from_model(x) for x in svc.events_for(session, tenant.id)]
+
+
+@router.post("/events", response_model=EventOut, status_code=201)
+def create_event_item(
+    payload: EventIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    return EventOut.from_model(
+        crud.create(session, TenantEvent, payload.to_kwargs(tenant.id), "ev")
+    )
+
+
+@router.put("/events/{item_id}", response_model=EventOut)
+def update_event_item(
+    item_id: str,
+    payload: EventIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    obj = crud.get_owned(session, TenantEvent, item_id, tenant.id)
+    if not obj:
+        raise _notfound("Eveniment")
+    return EventOut.from_model(
         crud.update(session, obj, payload.to_kwargs(tenant.id))
     )
 
@@ -349,6 +391,7 @@ _MODELS: dict[str, type] = {
     "exhibitors": Exhibitor,
     "accommodations": Accommodation,
     "restaurants": Restaurant,
+    "events": TenantEvent,
     "products": Product,
     "destinations": Destination,
     "program": ProgramEvent,
@@ -360,6 +403,7 @@ _STATUS_MODELS = {
     "exhibitors",
     "accommodations",
     "restaurants",
+    "events",
     "products",
     "destinations",
     "partners",

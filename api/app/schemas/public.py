@@ -16,6 +16,7 @@ from app.models import (
     ProgramEvent,
     Product,
     Restaurant,
+    TenantEvent,
     Tenant,
 )
 from app.presets import modules_for, navigation_for, reconcile_sections
@@ -123,6 +124,46 @@ class RestaurantOut(CamelModel):
     @classmethod
     def from_model(cls, m: Restaurant) -> "RestaurantOut":
         return cls.model_validate(m)
+
+
+class EventOut(CamelModel):
+    id: str
+    slug: str
+    title: str
+    cover_image: str
+    gallery: list[str]
+    short_description: str
+    description: str
+    start_date: str | None
+    end_date: str | None
+    time_label: str
+    location: str
+    program: list[dict[str, Any]]
+    ticket_url: str
+    ticket_label: str
+    featured: bool
+    status: str
+
+    @classmethod
+    def from_model(cls, m: TenantEvent) -> "EventOut":
+        return cls(
+            id=m.id,
+            slug=m.slug,
+            title=m.title,
+            cover_image=m.cover_image,
+            gallery=m.gallery,
+            short_description=m.short_description,
+            description=m.description,
+            start_date=_iso(m.start_date),
+            end_date=_iso(m.end_date),
+            time_label=m.time_label,
+            location=m.location,
+            program=m.program,
+            ticket_url=m.ticket_url,
+            ticket_label=m.ticket_label,
+            featured=m.featured,
+            status=m.status,
+        )
 
 
 class ProductOut(CamelModel):
@@ -432,6 +473,7 @@ class TenantContentOut(CamelModel):
     exhibitors: list[ExhibitorOut]
     accommodations: list[AccommodationOut]
     restaurants: list[RestaurantOut]
+    events: list[EventOut]
     products: list[ProductOut]
     destinations: list[DestinationOut]
     program: list[ProgramEventOut]

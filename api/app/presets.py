@@ -45,7 +45,11 @@ _SECTION_IDS = [
 
 # Vertical-specific extra homepage sections (inserted after "experiences").
 _EXTRA_SECTIONS: dict[str, list[tuple[str, str]]] = {
-    "resort": [("conditions", "Condiții stațiune"), ("trails", "Trasee & hartă")],
+    "resort": [
+        ("conditions", "Condiții stațiune"),
+        ("trails", "Trasee & hartă"),
+        ("events", "Evenimente"),
+    ],
 }
 
 
@@ -109,11 +113,15 @@ PRESETS: dict[str, dict[str, Any]] = {
         },
         "navigation": _nav([
             ("Despre", "/despre"), ("Cazări", "/cazari"), ("Restaurante", "/restaurante"),
-            ("Experiențe", "/produse"), ("Atracții", "/destinatii"), ("Evenimente", "/program"),
+            ("Experiențe", "/produse"), ("Atracții", "/destinatii"), ("Evenimente", "/evenimente"),
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
         "labels": {
             "headerCta": "Vezi evenimentele",
+            "navEvents": "Evenimente",
+            "eventsEyebrow": "Ce se întâmplă",
+            "eventsTitle": "Evenimente",
+            "eventsDescription": "Evenimentele din stațiune.",
             "heroCtaPrimary": "Planifică vizita", "heroCtaSecondary": "Vezi cazarea",
             "aboutEyebrow": "Despre destinație", "aboutTitle": "Muntele care te așteaptă",
             "experiencesEyebrow": "Experiențe", "experiencesTitle": "Ce poți face aici",
@@ -252,7 +260,7 @@ _MODULES: dict[str, list[str]] = {
     ],
     "resort": [
         "dashboard", "pages", "accommodations", "campinguri", "restaurants",
-        "destinations", "products", "program", "partners", "gallery", "media",
+        "destinations", "products", "events", "partners", "gallery", "media",
         "news", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "museum": [
