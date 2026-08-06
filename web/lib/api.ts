@@ -5,6 +5,7 @@ import type {
   Destination,
   Article,
 } from "@/lib/tenants/types";
+import { apiBaseUrl } from "@/lib/api-base";
 
 /**
  * API client for the FastAPI backend.
@@ -14,12 +15,7 @@ import type {
  *
  * Set NEXT_PUBLIC_API_BASE_URL to point at the API (defaults to local dev).
  */
-// On the server (SSR) prefer the internal service URL (fast, no public hop);
-// in the browser only NEXT_PUBLIC_* is available, so it falls back to that.
-export const API_BASE_URL =
-  process.env.API_INTERNAL_URL?.replace(/\/$/, "") ||
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, "") ||
-  "http://localhost:8000";
+export const API_BASE_URL = apiBaseUrl();
 
 const API = `${API_BASE_URL}/api/v1`;
 
