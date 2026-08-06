@@ -94,6 +94,9 @@ function emptyProduct(): Product {
 
 export default function ProductsPage() {
   const data = useAdminData();
+  // Resort vertical treats this module as "Experiențe / Activități" (ATV, boat
+  // trips, points of interest…) rather than physical "Produse".
+  const isResort = data.eventType === "resort";
   const [query, setQuery] = React.useState("");
   const [categoryFilter, setCategoryFilter] = React.useState<string>("all");
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
@@ -141,7 +144,10 @@ export default function ProductsPage() {
   }
 
   function openAdd() {
-    setForm(emptyProduct());
+    const draft = emptyProduct();
+    // Resort activities use a free-text "Tip"; start it empty (no festival cat).
+    if (isResort) draft.category = "" as ProductCategory;
+    setForm(draft);
     setIsEdit(false);
     setDialogOpen(true);
   }
@@ -185,8 +191,12 @@ export default function ProductsPage() {
 
   return (
     <AdminShell
-      title="Produse"
-      description="Produsele locale din secțiunea Produse de pe site și paginile lor de detaliu."
+      title={isResort ? "Experiențe & activități" : "Produse"}
+      description={
+        isResort
+          ? "Activitățile și experiențele de pe site: închiriere ATV, plimbări cu barca, locuri de interes etc."
+          : "Produsele locale din secțiunea Produse de pe site și paginile lor de detaliu."
+      }
       actions={
         <Button variant="gold" size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />
@@ -197,22 +207,29 @@ export default function ProductsPage() {
       <DataToolbar
         query={query}
         onQuery={setQuery}
-        placeholder="Caută după nume, producător..."
+        placeholder={
+          isResort ? "Caută după nume..." : "Caută după nume, producător..."
+        }
         filter={
           <>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[160px]" aria-label="Filtru categorie">
-                <SelectValue placeholder="Categorie" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Toate categoriile</SelectItem>
-                {CATEGORIES.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {c}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {!isResort && (
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger
+                  className="w-[160px]"
+                  aria-label="Filtru categorie"
+                >
+                  <SelectValue placeholder="Categorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toate categoriile</SelectItem>
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[140px]" aria-label="Filtru status">
                 <SelectValue placeholder="Status" />
@@ -236,8 +253,8 @@ export default function ProductsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nume</TableHead>
-                <TableHead>Producător</TableHead>
-                <TableHead>Categorie</TableHead>
+                {!isResort && <TableHead>Producător</TableHead>}
+                <TableHead>{isResort ? "Tip" : "Categorie"}</TableHead>
                 <TableHead>Preț</TableHead>
                 <TableHead>Evidențiat</TableHead>
                 <TableHead>Status</TableHead>
@@ -247,9 +264,11 @@ export default function ProductsPage() {
             <TableBody>
               {pageItems.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center">
+                  <TableCell colSpan={isResort ? 6 : 7} className="py-12 text-center">
                     <p className="text-sm text-muted-foreground">
-                      Niciun produs găsit pentru filtrele curente.
+                      {isResort
+                        ? "Nicio activitate găsită pentru filtrele curente."
+                        : "Niciun produs găsit pentru filtrele curente."}
                     </p>
                   </TableCell>
                 </TableRow>
@@ -259,11 +278,17 @@ export default function ProductsPage() {
                     <TableCell className="font-medium text-foreground">
                       {p.name}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {p.producer || exhibitorName(p.exhibitorId)}
-                    </TableCell>
+                    {!isResort && (
+                      <TableCell className="text-muted-foreground">
+                        {p.producer || exhibitorName(p.exhibitorId)}
+                      </TableCell>
+                    )}
                     <TableCell>
-                      <Badge variant="secondary">{p.category}</Badge>
+                      {p.category ? (
+                        <Badge variant="secondary">{p.category}</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {p.price || "—"}
@@ -329,11 +354,18 @@ export default function ProductsPage() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {isEdit ? "Editează produs" : "Adaugă produs"}
+              {isResort
+                ? isEdit
+                  ? "Editează activitatea"
+                  : "Adaugă activitate"
+                : isEdit
+                  ? "Editează produs"
+                  : "Adaugă produs"}
             </DialogTitle>
             <DialogDescription>
-              Completează detaliile produsului. Modificările se salvează în
-              browser (demo).
+              {isResort
+                ? "Completează detaliile activității sau experienței."
+                : "Completează detaliile produsului."}
             </DialogDescription>
           </DialogHeader>
 
@@ -350,50 +382,69 @@ export default function ProductsPage() {
                 onChange={(e) => set("slug", e.target.value)}
               />
             </Field>
-            <Field label="Producător">
-              <Input
-                value={form.producer}
-                onChange={(e) => set("producer", e.target.value)}
-              />
-            </Field>
-            <Field label="Expozant">
-              <Select
-                value={form.exhibitorId || "none"}
-                onValueChange={(v) =>
-                  set("exhibitorId", v === "none" ? "" : v)
-                }
+            {!isResort && (
+              <Field label="Producător">
+                <Input
+                  value={form.producer}
+                  onChange={(e) => set("producer", e.target.value)}
+                />
+              </Field>
+            )}
+            {!isResort && (
+              <Field label="Expozant">
+                <Select
+                  value={form.exhibitorId || "none"}
+                  onValueChange={(v) =>
+                    set("exhibitorId", v === "none" ? "" : v)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Alege expozant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">— Fără expozant —</SelectItem>
+                    {data.exhibitors.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            )}
+            {isResort ? (
+              <Field
+                label="Tip"
+                hint="ex: Închiriere ATV, Plimbare cu barca, Loc de interes"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Alege expozant" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">— Fără expozant —</SelectItem>
-                  {data.exhibitors.map((e) => (
-                    <SelectItem key={e.id} value={e.id}>
-                      {e.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Categorie">
-              <Select
-                value={form.category}
-                onValueChange={(v) => set("category", v as ProductCategory)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Regiune">
+                <Input
+                  value={form.category}
+                  onChange={(e) =>
+                    set("category", e.target.value as ProductCategory)
+                  }
+                  placeholder="Ex: Închiriere ATV"
+                />
+              </Field>
+            ) : (
+              <Field label="Categorie">
+                <Select
+                  value={form.category}
+                  onValueChange={(v) => set("category", v as ProductCategory)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+            )}
+            <Field label={isResort ? "Zonă / locație" : "Regiune"}>
               <Input
                 value={form.region}
                 onChange={(e) => set("region", e.target.value)}
@@ -403,7 +454,7 @@ export default function ProductsPage() {
               <Input
                 value={form.price ?? ""}
                 onChange={(e) => set("price", e.target.value)}
-                placeholder="25 lei / kg"
+                placeholder={isResort ? "de la 100 RON" : "25 lei / kg"}
               />
             </Field>
             <MediaPicker
@@ -418,7 +469,7 @@ export default function ProductsPage() {
                 rows={2}
               />
             </Field>
-            <Field label="Poveste" className="sm:col-span-2">
+            <Field label={isResort ? "Detalii" : "Poveste"} className="sm:col-span-2">
               <Textarea
                 value={form.story}
                 onChange={(e) => set("story", e.target.value)}
