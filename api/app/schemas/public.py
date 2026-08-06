@@ -18,7 +18,7 @@ from app.models import (
     Restaurant,
     Tenant,
 )
-from app.presets import modules_for, navigation_for
+from app.presets import modules_for, navigation_for, reconcile_sections
 
 
 def _iso(d: dt.date | None) -> str | None:
@@ -363,6 +363,8 @@ class TenantConfigOut(CamelModel):
     sections: list[dict[str, Any]]
     stats: list[dict[str, Any]]
     experiences: list[dict[str, Any]]
+    conditions: dict[str, Any]
+    trails: dict[str, Any]
 
     @classmethod
     def from_model(cls, t: Tenant) -> "TenantConfigOut":
@@ -411,9 +413,11 @@ class TenantConfigOut(CamelModel):
                 county=t.contact_county,
                 map_embed_query=t.contact_map_query,
             ),
-            sections=t.sections,
+            sections=reconcile_sections(t.sections, t.event_type),
             stats=t.stats,
             experiences=t.experiences,
+            conditions=t.conditions or {},
+            trails=t.trails or {},
         )
 
 

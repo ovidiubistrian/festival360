@@ -43,8 +43,40 @@ _SECTION_IDS = [
 ]
 
 
-def _sections() -> list[dict[str, Any]]:
-    return [{"id": i, "label": lbl, "visible": True} for i, lbl in _SECTION_IDS]
+# Vertical-specific extra homepage sections (inserted after "experiences").
+_EXTRA_SECTIONS: dict[str, list[tuple[str, str]]] = {
+    "resort": [("conditions", "Condiții stațiune"), ("trails", "Trasee & hartă")],
+}
+
+
+def _section_ids_for(event_type: str) -> list[tuple[str, str]]:
+    ids = list(_SECTION_IDS)
+    extra = _EXTRA_SECTIONS.get(event_type)
+    if extra:
+        idx = next((i for i, (k, _) in enumerate(ids) if k == "experiences"), 2) + 1
+        ids[idx:idx] = extra
+    return ids
+
+
+def _sections(event_type: str = "festival") -> list[dict[str, Any]]:
+    return [
+        {"id": i, "label": lbl, "visible": True}
+        for i, lbl in _section_ids_for(event_type)
+    ]
+
+
+def reconcile_sections(
+    stored: list[dict[str, Any]] | None, event_type: str
+) -> list[dict[str, Any]]:
+    """Keep the tenant's stored sections (order + visibility + custom ones) and
+    append any built-in sections for this vertical that aren't present yet — so
+    tenants seeded before a section was added still get it in the admin + site."""
+    stored = list(stored or [])
+    have = {s.get("id") for s in stored}
+    for s in _sections(event_type):
+        if s["id"] not in have:
+            stored.append(s)
+    return stored
 
 
 # --- Preset definitions ------------------------------------------------------
@@ -310,7 +342,9 @@ def build_tenant_fields(preset_key: str, name: str, slug: str) -> dict[str, Any]
         "contact_county": "",
         "contact_map_query": "",
         "navigation": p["navigation"],
-        "sections": _sections(),
+        "sections": _sections(
+            preset_key if preset_key in PRESETS else "festival"
+        ),
         "stats": [],
         "experiences": [],
     }

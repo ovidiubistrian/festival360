@@ -76,6 +76,9 @@ class Tenant(SQLModel, table=True):
     sections: list[dict[str, Any]] = Field(default_factory=list, sa_column=Column(JSON))
     stats: list[dict[str, Any]] = Field(default_factory=list, sa_column=Column(JSON))
     experiences: list[dict[str, Any]] = Field(default_factory=list, sa_column=Column(JSON))
+    # Resort-only homepage widgets (editable JSON blobs); empty → frontend default.
+    conditions: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    trails: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
 
     created_at: dt.datetime = Field(default_factory=utcnow)
     updated_at: dt.datetime = Field(default_factory=utcnow)

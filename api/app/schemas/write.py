@@ -271,6 +271,8 @@ class SettingsIn(CamelModel):
     # arrays from the per-section editors.
     stats: list[dict[str, Any]] | None = None
     experiences: list[dict[str, Any]] | None = None
+    conditions: dict[str, Any] | None = None
+    trails: dict[str, Any] | None = None
 
     def to_tenant_patch(self) -> dict[str, Any]:
         m = {
@@ -297,6 +299,8 @@ class SettingsIn(CamelModel):
             "logo_image": "logo_image",
             "stats": "stats",
             "experiences": "experiences",
+            "conditions": "conditions",
+            "trails": "trails",
         }
         patch: dict[str, Any] = {}
         for field, col in m.items():

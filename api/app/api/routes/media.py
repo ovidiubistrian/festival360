@@ -96,6 +96,31 @@ async def upload_media(
     return MediaAssetOut.from_model(asset)
 
 
+@router.post("/gpx", status_code=201)
+async def upload_gpx(
+    file: UploadFile = File(...),
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+) -> dict:
+    """Upload a GPX track file (rendered on the trails map). Returns its URL."""
+    name = (file.filename or "").lower()
+    data = await file.read()
+    head = data[:400].lstrip()[:6].lower()
+    if not (name.endswith(".gpx") or head.startswith(b"<?xml") or b"<gpx" in data[:400].lower()):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Fișier GPX invalid (așteptat .gpx).",
+        )
+    if len(data) > settings.MAX_UPLOAD_MB * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Fișierul depășește {settings.MAX_UPLOAD_MB} MB.",
+        )
+    filename = f"{new_id('gpx')}.gpx"
+    (_media_dir() / filename).write_bytes(data)
+    return {"url": f"{settings.MEDIA_URL_PREFIX}/{filename}"}
+
+
 @router.delete("/{item_id}", status_code=204)
 def delete_media(
     item_id: str,
