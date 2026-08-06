@@ -19,6 +19,7 @@ from app.models.content import (
     Restaurant,
 )
 from app.models.analytics import PageView
+from app.models.marketing import TenantEmailSettings
 from app.models.user import AdminUser
 from app.models.media import MediaAsset
 from app.models.billing import (
@@ -53,5 +54,6 @@ __all__ = [
     "Accommodation",
     "Restaurant",
     "PageView",
+    "TenantEmailSettings",
     "AdminUser",
 ]

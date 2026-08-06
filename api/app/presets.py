@@ -216,28 +216,28 @@ PRESETS: dict[str, dict[str, Any]] = {
 _MODULES: dict[str, list[str]] = {
     "festival": [
         "dashboard", "pages", "program", "exhibitors", "products", "partners",
-        "gallery", "media", "news", "messages", "newsletter", "analytics", "settings",
+        "gallery", "media", "news", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "resort": [
         "dashboard", "pages", "accommodations", "campinguri", "restaurants",
         "destinations", "products", "program", "partners", "gallery", "media",
-        "news", "messages", "newsletter", "analytics", "settings",
+        "news", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "museum": [
         "dashboard", "pages", "exhibitors", "program", "gallery", "media", "news",
-        "messages", "newsletter", "analytics", "settings",
+        "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "conference": [
         "dashboard", "pages", "program", "exhibitors", "partners", "gallery", "media",
-        "news", "messages", "newsletter", "analytics", "settings",
+        "news", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "institution": [
         "dashboard", "pages", "program", "partners", "gallery", "media", "news",
-        "messages", "newsletter", "analytics", "settings",
+        "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "experience": [
         "dashboard", "pages", "destinations", "program", "products", "partners",
-        "gallery", "media", "news", "messages", "newsletter", "analytics", "settings",
+        "gallery", "media", "news", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
 }
 

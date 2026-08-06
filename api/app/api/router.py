@@ -1,6 +1,15 @@
 from fastapi import APIRouter
 
-from app.api.routes import admin, auth, content, domains, media, platform, tenants
+from app.api.routes import (
+    admin,
+    auth,
+    content,
+    domains,
+    marketing,
+    media,
+    platform,
+    tenants,
+)
 
 api_router = APIRouter()
 
@@ -17,3 +26,4 @@ api_router.include_router(tenants.router)
 api_router.include_router(content.router)
 api_router.include_router(media.router)
 api_router.include_router(admin.router)
+api_router.include_router(marketing.router)
