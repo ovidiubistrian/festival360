@@ -1,14 +1,29 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import re
+import secrets
+from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    File,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+    status,
+)
 from sqlmodel import Session, select
 
 from app.api.deps import get_current_superuser
 from app.billing import settings_store
+from app.core.config import settings as app_settings
+from app.core.security import hash_password
 from app.billing.checkout import (
     CheckoutError,
     PaymentNotConfigured,
@@ -371,3 +386,89 @@ async def stripe_webhook(request: Request, session: Session = Depends(get_sessio
     if event.get("type"):
         fulfil_event(session, event)
     return {"received": True}
+
+
+# =========================================================================
+# Reset a tenant admin's password (super-admin) — for locked-out tenants
+# =========================================================================
+class TenantAdminPasswordIn(CamelModel):
+    email: str | None = None
+    password: str | None = None
+
+
+@router.post(
+    "/tenants/{slug}/admin-password", dependencies=[Depends(get_current_superuser)]
+)
+def reset_tenant_admin_password(
+    slug: str, payload: TenantAdminPasswordIn, session: Session = Depends(get_session)
+):
+    tenant = session.get(Tenant, slug)
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Site inexistent.")
+    email = (payload.email or f"admin@{slug}").strip().lower()
+    generated = not payload.password
+    pwd = payload.password or secrets.token_urlsafe(9)
+
+    user = session.exec(select(AdminUser).where(AdminUser.email == email)).first()
+    if user and user.is_superuser:
+        raise HTTPException(status_code=400, detail="Acest cont este super-admin de platformă.")
+    if user is None:
+        user = AdminUser(id=new_id("admin"), email=email)
+    user.tenant_id = slug
+    user.is_superuser = False
+    user.is_active = True
+    user.hashed_password = hash_password(pwd)
+    if not user.full_name:
+        user.full_name = f"Admin {tenant.name}"
+    session.add(user)
+    session.commit()
+    return {"email": email, "password": pwd if generated else None, "generated": generated}
+
+
+# =========================================================================
+# Landing page (marketing homepage) config — public read, super-admin write
+# =========================================================================
+LANDING_KEY = "landing.config"
+
+
+@router.get("/landing")
+def get_landing(session: Session = Depends(get_session)) -> dict[str, Any]:
+    raw = settings_store.get_setting(session, LANDING_KEY)
+    if not raw:
+        return {}
+    try:
+        return json.loads(raw)
+    except (ValueError, TypeError):
+        return {}
+
+
+@router.put("/landing", dependencies=[Depends(get_current_superuser)])
+def set_landing(
+    payload: dict[str, Any] = Body(...), session: Session = Depends(get_session)
+):
+    settings_store.set_setting(session, LANDING_KEY, json.dumps(payload))
+    return {"ok": True}
+
+
+# =========================================================================
+# Platform image upload (super-admin) — e.g. the landing hero image
+# =========================================================================
+_ALLOWED_IMG = {
+    "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp",
+    "image/gif": ".gif", "image/avif": ".avif",
+}
+
+
+@router.post("/media", dependencies=[Depends(get_current_superuser)])
+async def platform_upload(file: UploadFile = File(...)):
+    ext = _ALLOWED_IMG.get(file.content_type or "")
+    if not ext:
+        raise HTTPException(status_code=400, detail="Doar imagini (jpg, png, webp, gif, avif).")
+    data = await file.read()
+    if len(data) > app_settings.MAX_UPLOAD_MB * 1024 * 1024:
+        raise HTTPException(status_code=413, detail=f"Fișierul depășește {app_settings.MAX_UPLOAD_MB} MB.")
+    media_dir = Path(app_settings.MEDIA_DIR)
+    media_dir.mkdir(parents=True, exist_ok=True)
+    filename = f"{new_id('plat')}{ext}"
+    (media_dir / filename).write_bytes(data)
+    return {"url": f"{app_settings.MEDIA_URL_PREFIX}/{filename}"}
