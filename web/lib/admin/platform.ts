@@ -9,9 +9,9 @@
 
 import { getToken } from "@/lib/admin/api";
 import type { LandingConfig } from "@/lib/api";
+import { apiBaseUrl } from "@/lib/api-base";
 
-const API =
-  (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000") + "/api/v1";
+const API = `${apiBaseUrl()}/api/v1`;
 
 const PLATFORM = `${API}/platform`;
 
