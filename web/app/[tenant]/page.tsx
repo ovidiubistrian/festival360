@@ -1,3 +1,4 @@
+import { Fragment, type ReactNode } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -36,8 +37,6 @@ export default async function TenantHome({
   const { config, content, slug } = t;
   const isResort = config.eventType === "resort";
   const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
-  const visible = (id: string) =>
-    config.sections.find((s) => s.id === id)?.visible ?? true;
 
   const featuredExhibitors = content.exhibitors
     .filter((e) => e.featured && e.status === "published")
@@ -80,10 +79,334 @@ export default async function TenantHome({
     },
     organizer: {
       "@type": "Organization",
-      name: "Asociația VATRA",
+      name: config.info.name,
       url: config.social.website,
     },
   };
+
+  // Render one built-in homepage section by id. Returns null when the section
+  // has no content to show, so ordering + visibility can be data-driven.
+  const renderSection = (id: string): ReactNode => {
+    switch (id) {
+      case "hero":
+        return (
+          <HomeHero
+            info={config.info}
+            slug={slug}
+            labels={config.labels}
+            eventType={config.eventType}
+          />
+        );
+
+      case "about":
+        return (
+          <AboutSection
+            description={config.info.longDescription}
+            stats={config.stats}
+            labels={config.labels}
+            image={config.info.aboutImage}
+            image2={config.info.aboutImage2}
+          />
+        );
+
+      case "experiences":
+        return config.experiences.length > 0 ? (
+          <ExperiencesSection
+            experiences={config.experiences}
+            labels={config.labels}
+          />
+        ) : null;
+
+      case "program":
+        return content.program.length > 0 ? (
+          <section id="program" className="bg-warm-white py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("programEyebrow", "Program")}
+                  title={L("programTitle", "Trei zile, zeci de momente")}
+                  description={L(
+                    "programDescription",
+                    `${formatDateRange(
+                      config.info.startDate,
+                      config.info.endDate
+                    )} · ${config.info.locationName}, ${config.info.city}`
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/program`}>
+                    Programul complet
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="mt-10">
+                <ProgramSchedule events={content.program} limitPerDay={4} />
+              </div>
+            </Container>
+          </section>
+        ) : null;
+
+      // Resorts render their real accommodations in this slot; other verticals
+      // show exhibitors/producers.
+      case "exhibitors":
+        if (isResort) {
+          return featuredAccommodations.length > 0 ? (
+            <section id="cazare" className="bg-secondary py-16 sm:py-24">
+              <Container>
+                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                  <SectionHeading
+                    eyebrow={L("exhibitorsEyebrow", "Cazare & gazde")}
+                    title={L("exhibitorsTitle", "Unde stai")}
+                    description={L(
+                      "exhibitorsDescription",
+                      "Cabane, pensiuni și case de oaspeți, alese pentru tine."
+                    )}
+                  />
+                  <Button asChild variant="outline">
+                    <Link href={`/${slug}/cazari`}>
+                      Toate cazările
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+                <Reveal className="mt-10">
+                  <Carousel
+                    ariaLabel="Cazări evidențiate"
+                    slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
+                  >
+                    {featuredAccommodations.map((a) => (
+                      <AccommodationCard
+                        key={a.id}
+                        accommodation={a}
+                        slug={slug}
+                      />
+                    ))}
+                  </Carousel>
+                </Reveal>
+              </Container>
+            </section>
+          ) : null;
+        }
+        return featuredExhibitors.length > 0 ? (
+          <section id="expozanti" className="bg-secondary py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("exhibitorsEyebrow", "Expozanți și producători")}
+                  title={L(
+                    "exhibitorsTitle",
+                    "Oameni cu poveste, produse cu suflet"
+                  )}
+                  description={L(
+                    "exhibitorsDescription",
+                    "Peste 100 de producători și meșteșugari din toată țara, aleși pe sprânceană."
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/expozanti`}>
+                    Toți expozanții
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Reveal className="mt-10">
+                <Carousel
+                  ariaLabel="Expozanți evidențiați"
+                  slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
+                >
+                  {featuredExhibitors.map((e) => (
+                    <ExhibitorCard key={e.id} exhibitor={e} slug={slug} />
+                  ))}
+                </Carousel>
+              </Reveal>
+            </Container>
+          </section>
+        ) : null;
+
+      case "products":
+        return featuredProducts.length > 0 ? (
+          <section id="produse" className="bg-warm-white py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("productsEyebrow", "Produse locale")}
+                  title={L("productsTitle", "Gusturi cu origine cunoscută")}
+                  description={L(
+                    "productsDescription",
+                    "Fiecare produs are un producător, un loc și o poveste. Descoperă-le."
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/produse`}>
+                    Toate produsele
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Reveal className="mt-10">
+                <Carousel
+                  ariaLabel="Produse evidențiate"
+                  slideClassName="basis-[68%] sm:basis-[42%] lg:basis-1/4"
+                >
+                  {featuredProducts.map((p) => (
+                    <ProductCard key={p.id} product={p} slug={slug} />
+                  ))}
+                </Carousel>
+              </Reveal>
+            </Container>
+          </section>
+        ) : null;
+
+      case "destinations":
+        return content.destinations.length > 0 ? (
+          <DestinationsSection
+            destinations={content.destinations}
+            slug={slug}
+            labels={config.labels}
+          />
+        ) : null;
+
+      case "partners":
+        return homePartners.length > 0 ? (
+          <section id="parteneri" className="bg-secondary py-20 sm:py-24">
+            <Container>
+              <SectionHeading
+                align="center"
+                eyebrow={L("partnersEyebrow", "Parteneri și sponsori")}
+                title={L("partnersTitle", "Alături de noi")}
+                description={L(
+                  "partnersDescription",
+                  "Susținut de partenerii care cred în acest loc."
+                )}
+              />
+              <Carousel
+                ariaLabel="Parteneri și sponsori"
+                className="mx-auto mt-12 max-w-5xl"
+                slideClassName="basis-[78%] sm:basis-[45%] lg:basis-1/3"
+              >
+                {homePartners.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex h-full items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4"
+                  >
+                    <PartnerLogo
+                      logo={p.logo}
+                      name={p.name}
+                      className="h-11 w-11 text-base"
+                    />
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-charcoal">
+                        {p.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{p.tier}</p>
+                    </div>
+                  </div>
+                ))}
+              </Carousel>
+              <div className="mt-10 text-center">
+                <Button asChild variant="ghost">
+                  <Link href={`/${slug}/parteneri`}>
+                    Vezi toți partenerii
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </Container>
+          </section>
+        ) : null;
+
+      case "gallery":
+        return galleryPreview.length > 0 ? (
+          <section id="galerie" className="bg-warm-white py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("galleryEyebrow", "Galerie")}
+                  title={L("galleryTitle", "În imagini")}
+                  description={L(
+                    "galleryDescription",
+                    "Momente din edițiile trecute."
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/galerie`}>
+                    Toată galeria
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Carousel
+                ariaLabel="Galerie foto"
+                className="mt-10"
+                slideClassName="basis-[62%] sm:basis-[38%] lg:basis-1/4"
+              >
+                {galleryPreview.map((img) => (
+                  <div
+                    key={img.id}
+                    className="relative aspect-[3/4] overflow-hidden rounded-2xl"
+                  >
+                    <ImageWithFallback
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 640px) 62vw, (max-width: 1024px) 38vw, 25vw"
+                      fallbackLabel={img.category}
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                    />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent" />
+                  </div>
+                ))}
+              </Carousel>
+            </Container>
+          </section>
+        ) : null;
+
+      case "news":
+        return latestArticles.length > 0 ? (
+          <section id="noutati" className="bg-secondary py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("newsEyebrow", "Noutăți și povești")}
+                  title={L("newsTitle", "De citit înainte de vizită")}
+                  description={L(
+                    "newsDescription",
+                    "Ghiduri, interviuri și noutăți."
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/noutati`}>
+                    Toate articolele
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Reveal className="mt-10">
+                <Carousel
+                  ariaLabel="Noutăți și povești"
+                  slideClassName="basis-[84%] sm:basis-[47%] lg:basis-1/3"
+                >
+                  {latestArticles.map((a) => (
+                    <ArticleCard key={a.id} article={a} slug={slug} />
+                  ))}
+                </Carousel>
+              </Reveal>
+            </Container>
+          </section>
+        ) : null;
+
+      case "newsletter":
+        return <NewsletterSection />;
+
+      default:
+        return null;
+    }
+  };
+
+  // Sections render in the admin-defined order (config.sections), honoring both
+  // visibility and reordering. Custom sections use the generic renderer.
+  const orderedSections = config.sections.filter((s) => s.visible ?? true);
 
   return (
     <>
@@ -92,316 +415,28 @@ export default async function TenantHome({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {visible("hero") && (
-        <HomeHero
-          info={config.info}
-          slug={slug}
-          labels={config.labels}
-          eventType={config.eventType}
-        />
-      )}
-
-      {visible("about") && (
-        <AboutSection
-          description={config.info.longDescription}
-          stats={config.stats}
-          labels={config.labels}
-          image={config.info.aboutImage}
-          image2={config.info.aboutImage2}
-        />
-      )}
-
-      {isResort && <ConditionsWidget />}
-
-      {visible("experiences") && config.experiences.length > 0 && (
-        <ExperiencesSection
-          experiences={config.experiences}
-          labels={config.labels}
-        />
-      )}
-
-      {isResort && <TrailsMap />}
-
-      {visible("program") && content.program.length > 0 && (
-        <section id="program" className="bg-warm-white py-16 sm:py-24">
-          <Container>
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-              <SectionHeading
-                eyebrow={L("programEyebrow", "Program")}
-                title={L("programTitle", "Trei zile, zeci de momente")}
-                description={L(
-                  "programDescription",
-                  `${formatDateRange(
-                    config.info.startDate,
-                    config.info.endDate
-                  )} · ${config.info.locationName}, ${config.info.city}`
-                )}
-              />
-              <Button asChild variant="outline">
-                <Link href={`/${slug}/program`}>
-                  Programul complet
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <div className="mt-10">
-              <ProgramSchedule events={content.program} limitPerDay={4} />
-            </div>
-          </Container>
-        </section>
-      )}
-
-      {/* Resorts render their real accommodations in this zone; other verticals
-          show exhibitors/producers. Both share the "exhibitors" section slot so
-          admin visibility/order still applies. */}
-      {visible("exhibitors") &&
-        isResort &&
-        featuredAccommodations.length > 0 && (
-          <section id="cazare" className="bg-secondary py-16 sm:py-24">
-            <Container>
-              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-                <SectionHeading
-                  eyebrow={L("exhibitorsEyebrow", "Cazare & gazde")}
-                  title={L("exhibitorsTitle", "Unde stai")}
-                  description={L(
-                    "exhibitorsDescription",
-                    "Cabane, pensiuni și case de oaspeți, alese pentru tine."
-                  )}
-                />
-                <Button asChild variant="outline">
-                  <Link href={`/${slug}/cazari`}>
-                    Toate cazările
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-              <Reveal className="mt-10">
-                <Carousel
-                  ariaLabel="Cazări evidențiate"
-                  slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
-                >
-                  {featuredAccommodations.map((a) => (
-                    <AccommodationCard
-                      key={a.id}
-                      accommodation={a}
-                      slug={slug}
-                    />
-                  ))}
-                </Carousel>
-              </Reveal>
-            </Container>
-          </section>
-        )}
-
-      {visible("exhibitors") && !isResort && featuredExhibitors.length > 0 && (
-        <section id="expozanti" className="bg-secondary py-16 sm:py-24">
-          <Container>
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-              <SectionHeading
-                eyebrow={L("exhibitorsEyebrow", "Expozanți și producători")}
-                title={L(
-                  "exhibitorsTitle",
-                  "Oameni cu poveste, produse cu suflet"
-                )}
-                description={L(
-                  "exhibitorsDescription",
-                  "Peste 100 de producători și meșteșugari din toată țara, aleși pe sprânceană."
-                )}
-              />
-              <Button asChild variant="outline">
-                <Link href={`/${slug}/expozanti`}>
-                  Toți expozanții
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <Reveal className="mt-10">
-              <Carousel
-                ariaLabel="Expozanți evidențiați"
-                slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
-              >
-                {featuredExhibitors.map((e) => (
-                  <ExhibitorCard key={e.id} exhibitor={e} slug={slug} />
-                ))}
-              </Carousel>
-            </Reveal>
-          </Container>
-        </section>
-      )}
-
-      {visible("products") && featuredProducts.length > 0 && (
-        <section id="produse" className="bg-warm-white py-16 sm:py-24">
-          <Container>
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-              <SectionHeading
-                eyebrow={L("productsEyebrow", "Produse locale")}
-                title={L("productsTitle", "Gusturi cu origine cunoscută")}
-                description={L(
-                  "productsDescription",
-                  "Fiecare produs are un producător, un loc și o poveste. Descoperă-le."
-                )}
-              />
-              <Button asChild variant="outline">
-                <Link href={`/${slug}/produse`}>
-                  Toate produsele
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <Reveal className="mt-10">
-              <Carousel
-                ariaLabel="Produse evidențiate"
-                slideClassName="basis-[68%] sm:basis-[42%] lg:basis-1/4"
-              >
-                {featuredProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} slug={slug} />
-                ))}
-              </Carousel>
-            </Reveal>
-          </Container>
-        </section>
-      )}
-
-      {visible("destinations") && content.destinations.length > 0 && (
-        <DestinationsSection
-          destinations={content.destinations}
-          slug={slug}
-          labels={config.labels}
-        />
-      )}
-
-      {visible("partners") && homePartners.length > 0 && (
-        <section id="parteneri" className="bg-secondary py-20 sm:py-24">
-          <Container>
-            <SectionHeading
-              align="center"
-              eyebrow={L("partnersEyebrow", "Parteneri și sponsori")}
-              title={L("partnersTitle", "Alături de noi")}
-              description={L(
-                "partnersDescription",
-                "Festivalul VATRA este posibil datorită partenerilor care cred în satul românesc."
-              )}
+      {orderedSections.map((s) => {
+        if (s.custom) {
+          return (
+            <CustomSection
+              key={s.id}
+              section={s}
+              content={content}
+              slug={slug}
             />
-            <Carousel
-              ariaLabel="Parteneri și sponsori"
-              className="mx-auto mt-12 max-w-5xl"
-              slideClassName="basis-[78%] sm:basis-[45%] lg:basis-1/3"
-            >
-              {homePartners.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex h-full items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4"
-                >
-                  <PartnerLogo logo={p.logo} name={p.name} className="h-11 w-11 text-base" />
-                  <div className="text-left">
-                    <p className="text-sm font-semibold text-charcoal">{p.name}</p>
-                    <p className="text-xs text-muted-foreground">{p.tier}</p>
-                  </div>
-                </div>
-              ))}
-            </Carousel>
-            <div className="mt-10 text-center">
-              <Button asChild variant="ghost">
-                <Link href={`/${slug}/parteneri`}>
-                  Vezi toți partenerii
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Container>
-        </section>
-      )}
-
-      {visible("gallery") && galleryPreview.length > 0 && (
-        <section id="galerie" className="bg-warm-white py-16 sm:py-24">
-          <Container>
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-              <SectionHeading
-                eyebrow={L("galleryEyebrow", "Galerie")}
-                title={L("galleryTitle", "Festivalul, în imagini")}
-                description={L(
-                  "galleryDescription",
-                  "Momente din edițiile trecute: gastronomie, tradiții, concerte și natură."
-                )}
-              />
-              <Button asChild variant="outline">
-                <Link href={`/${slug}/galerie`}>
-                  Toată galeria
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <Carousel
-              ariaLabel="Galerie foto"
-              className="mt-10"
-              slideClassName="basis-[62%] sm:basis-[38%] lg:basis-1/4"
-            >
-              {galleryPreview.map((img) => (
-                <div
-                  key={img.id}
-                  className="relative aspect-[3/4] overflow-hidden rounded-2xl"
-                >
-                  <ImageWithFallback
-                    src={img.src}
-                    alt={img.alt}
-                    fill
-                    sizes="(max-width: 640px) 62vw, (max-width: 1024px) 38vw, 25vw"
-                    fallbackLabel={img.category}
-                    className="object-cover transition-transform duration-500 hover:scale-105"
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-charcoal/40 to-transparent" />
-                </div>
-              ))}
-            </Carousel>
-          </Container>
-        </section>
-      )}
-
-      {visible("news") && latestArticles.length > 0 && (
-        <section id="noutati" className="bg-secondary py-16 sm:py-24">
-          <Container>
-            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-              <SectionHeading
-                eyebrow={L("newsEyebrow", "Noutăți și povești")}
-                title={L("newsTitle", "De citit înainte de festival")}
-                description={L(
-                  "newsDescription",
-                  "Poveștile producătorilor, ghiduri și interviuri din lumea VATRA."
-                )}
-              />
-              <Button asChild variant="outline">
-                <Link href={`/${slug}/noutati`}>
-                  Toate articolele
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <Reveal className="mt-10">
-              <Carousel
-                ariaLabel="Noutăți și povești"
-                slideClassName="basis-[84%] sm:basis-[47%] lg:basis-1/3"
-              >
-                {latestArticles.map((a) => (
-                  <ArticleCard key={a.id} article={a} slug={slug} />
-                ))}
-              </Carousel>
-            </Reveal>
-          </Container>
-        </section>
-      )}
-
-      {config.sections
-        .filter((s) => s.custom && (s.visible ?? true))
-        .map((s) => (
-          <CustomSection
-            key={s.id}
-            section={s}
-            content={content}
-            slug={slug}
-          />
-        ))}
-
-      {visible("newsletter") && <NewsletterSection />}
+          );
+        }
+        const node = renderSection(s.id);
+        if (!node) return null;
+        return (
+          <Fragment key={s.id}>
+            {node}
+            {/* Resort-only decorative widgets anchored to their sibling zones. */}
+            {isResort && s.id === "about" && <ConditionsWidget />}
+            {isResort && s.id === "experiences" && <TrailsMap />}
+          </Fragment>
+        );
+      })}
     </>
   );
 }
