@@ -21,7 +21,7 @@ export function HomeHero({
   const L = (k: string, fb: string) => labels?.[k] ?? fb;
   const isResort = eventType === "resort";
   return (
-    <section className="relative flex min-h-[92vh] items-center overflow-hidden">
+    <section className="relative flex min-h-[88vh] items-end overflow-hidden">
       <ImageWithFallback
         src={info.heroImage}
         alt={`${info.name} — ${info.locationName}`}
@@ -36,7 +36,7 @@ export function HomeHero({
       <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-charcoal/20 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-r from-charcoal/55 via-charcoal/15 to-transparent" />
 
-      <Container className="relative z-10 pb-16 pt-28">
+      <Container className="relative z-10 pb-20 pt-28 sm:pb-28">
         <div className="max-w-2xl">
           {!isResort && (
             <Reveal>
