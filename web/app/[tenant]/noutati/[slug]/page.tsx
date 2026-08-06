@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Clock, User } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata, tenantPublicUrl } from "@/lib/seo";
+import { JsonLd, articleJsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -20,16 +22,13 @@ export async function generateMetadata({
   if (!t) return {};
   const article = t.content.articles.find((a) => a.slug === slug);
   if (!article) return {};
-  return {
-    title: article.title,
+  return tenantMetadata(t, {
+    pageTitle: article.title,
     description: article.excerpt,
-    openGraph: {
-      title: `${article.title} · ${t.config.info.name}`,
-      description: article.excerpt,
-      images: [article.coverImage],
-      type: "article",
-    },
-  };
+    path: `/noutati/${article.slug}`,
+    image: article.coverImage,
+    ogType: "article",
+  });
 }
 
 export default async function ArticleDetailPage({
@@ -50,8 +49,20 @@ export default async function ArticleDetailPage({
     .sort((a, b) => (b.category === article.category ? 1 : 0) - (a.category === article.category ? 1 : 0))
     .slice(0, 3);
 
+  const base = await tenantPublicUrl(t, "/");
+  const itemUrl = `${base}/noutati/${article.slug}`;
+  const jsonLd = [
+    articleJsonLd(article, itemUrl, t.config.info.name),
+    breadcrumbJsonLd(base, [
+      { name: "Acasă", path: "/" },
+      { name: "Noutăți", path: "/noutati" },
+      { name: article.title, path: `/noutati/${article.slug}` },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <PageHero
         eyebrow={article.category}
         title={article.title}

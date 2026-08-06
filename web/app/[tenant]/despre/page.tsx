@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Sparkles, Heart, Leaf, ShieldCheck } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -20,17 +21,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = `Despre ${info.name}`;
-  const description = info.shortDescription;
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Despre",
+    description: `Povestea ${info.name}: cine suntem, misiunea și valorile noastre.`,
+    path: "/despre",
+  });
 }
 
 const VALUES = [

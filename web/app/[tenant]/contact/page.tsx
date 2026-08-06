@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Mail, Phone, MapPin, CalendarDays } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import {
@@ -22,17 +23,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Contact";
-  const description = `Ia legătura cu echipa festivalului ${info.name}: email, telefon, adresă și formular de contact.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Contact",
+    description: `Ia legătura cu echipa ${info.name}: email, telefon, adresă și formular de contact.`,
+    path: "/contact",
+  });
 }
 
 export default async function ContactPage({

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -16,17 +17,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Destinații turistice";
-  const description = `Sate autentice, destinații de munte și experiențe în natură din regiunile festivalului ${info.name}.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Destinații turistice",
+    description: `Sate autentice, destinații de munte și experiențe în natură din regiunile ${info.name}.`,
+    path: "/destinatii",
+  });
 }
 
 export default async function DestinationsPage({

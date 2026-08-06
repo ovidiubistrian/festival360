@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
 import { AnalyticsBeacon } from "@/components/public/analytics-beacon";
@@ -14,21 +15,7 @@ export async function generateMetadata({
   const { tenant } = await params;
   const t = await getTenantBundle(tenant);
   if (!t) return {};
-  const { info } = t.config;
-  return {
-    title: {
-      default: `${info.name} — ${info.tagline}`,
-      template: `%s · ${info.name}`,
-    },
-    description: info.shortDescription,
-    openGraph: {
-      title: `${info.name} — ${info.tagline}`,
-      description: info.shortDescription,
-      images: [info.heroImage],
-      locale: "ro_RO",
-      type: "website",
-    },
-  };
+  return tenantMetadata(t, { path: "/" });
 }
 
 export default async function TenantLayout({

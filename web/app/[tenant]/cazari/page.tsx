@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -16,17 +17,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Cazări";
-  const description = `Unități de cazare recomandate în zona ${info.name}: hoteluri, pensiuni, cabane și vile.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Cazări",
+    description: `Unități de cazare recomandate în zona ${info.name}: hoteluri, pensiuni, cabane și vile.`,
+    path: "/cazari",
+  });
 }
 
 export default async function AccommodationsPage({

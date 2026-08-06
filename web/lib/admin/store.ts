@@ -18,6 +18,7 @@ import type {
   Product,
   Restaurant,
   SectionConfig,
+  SeoConfig,
   Stat,
   Tenant,
   Trails,
@@ -103,6 +104,8 @@ export interface AdminData {
   conditions?: Conditions;
   /** Resort-only "Trasee & hartă" widget config. */
   trails?: Trails;
+  /** Per-tenant SEO overrides (title, description, OG image, verification…). */
+  seo: SeoConfig;
   settings: AdminSettings;
   /** Vertical preset key (festival | resort | museum | …). */
   eventType?: string;
@@ -139,6 +142,9 @@ function seed(): AdminData {
       : {},
     trails: prispaTenant.config.trails
       ? structuredClone(prispaTenant.config.trails)
+      : {},
+    seo: prispaTenant.config.seo
+      ? structuredClone(prispaTenant.config.seo)
       : {},
     settings: {
       name: info.name,
@@ -194,6 +200,7 @@ function bundleToAdminData(bundle: Tenant): AdminData {
     experiences: config.experiences ?? [],
     conditions: config.conditions ?? {},
     trails: config.trails ?? {},
+    seo: config.seo ?? {},
     settings: {
       name: info.name,
       tagline: info.tagline,
@@ -245,6 +252,7 @@ function emptyData(): AdminData {
     experiences: [],
     conditions: {},
     trails: {},
+    seo: {},
     settings: {
       name: "",
       tagline: "",
@@ -406,6 +414,14 @@ export function updateSettings(patch: Partial<AdminSettings>) {
     draft.settings = { ...draft.settings, ...patch };
   });
   void sync(() => apiUpdateSettings(patch));
+}
+
+/** Persist the tenant's SEO config (title, description, OG image, etc.). */
+export function updateSeo(seo: SeoConfig) {
+  apply((draft) => {
+    draft.seo = { ...seo };
+  });
+  void sync(() => apiUpdateSettings({ seo }));
 }
 
 export function toggleSection(id: string) {

@@ -11,6 +11,8 @@ import {
   BookOpen,
 } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata, tenantPublicUrl } from "@/lib/seo";
+import { JsonLd, restaurantJsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -32,15 +34,12 @@ export async function generateMetadata({
     (r) => r.slug === slug
   );
   if (!restaurant) return {};
-  return {
-    title: restaurant.name,
+  return tenantMetadata(t, {
+    pageTitle: restaurant.name,
     description: restaurant.shortDescription,
-    openGraph: {
-      title: `${restaurant.name} · ${t.config.info.name}`,
-      description: restaurant.shortDescription,
-      images: [restaurant.image],
-    },
-  };
+    path: `/restaurante/${restaurant.slug}`,
+    image: restaurant.image,
+  });
 }
 
 export default async function RestaurantDetailPage({
@@ -85,8 +84,20 @@ export default async function RestaurantDetailPage({
     )
   );
 
+  const base = await tenantPublicUrl(t, "/");
+  const itemUrl = `${base}/restaurante/${restaurant.slug}`;
+  const jsonLd = [
+    restaurantJsonLd(restaurant, itemUrl),
+    breadcrumbJsonLd(base, [
+      { name: "Acasă", path: "/" },
+      { name: "Restaurante", path: "/restaurante" },
+      { name: restaurant.name, path: `/restaurante/${restaurant.slug}` },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <PageHero
         eyebrow={restaurant.cuisine || "Restaurant"}
         title={restaurant.name}

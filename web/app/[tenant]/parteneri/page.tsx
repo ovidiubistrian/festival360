@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Handshake } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Button } from "@/components/ui/button";
@@ -18,17 +19,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Parteneri și sponsori";
-  const description = `Organizatorii, partenerii și sponsorii care fac posibil festivalul ${info.name}.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Parteneri și sponsori",
+    description: `Organizatorii, partenerii și sponsorii care fac posibil ${info.name}.`,
+    path: "/parteneri",
+  });
 }
 
 export default async function PartnersPage({

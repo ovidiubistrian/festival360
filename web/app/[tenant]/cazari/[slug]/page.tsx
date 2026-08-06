@@ -11,6 +11,12 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata, tenantPublicUrl } from "@/lib/seo";
+import {
+  JsonLd,
+  accommodationJsonLd,
+  breadcrumbJsonLd,
+} from "@/lib/jsonld";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -35,15 +41,12 @@ export async function generateMetadata({
     (a) => a.slug === slug
   );
   if (!accommodation) return {};
-  return {
-    title: accommodation.name,
+  return tenantMetadata(t, {
+    pageTitle: accommodation.name,
     description: accommodation.shortDescription,
-    openGraph: {
-      title: `${accommodation.name} · ${t.config.info.name}`,
-      description: accommodation.shortDescription,
-      images: [accommodation.image],
-    },
-  };
+    path: `/cazari/${accommodation.slug}`,
+    image: accommodation.image,
+  });
 }
 
 export default async function AccommodationDetailPage({
@@ -81,6 +84,17 @@ export default async function AccommodationDetailPage({
 
   const bookHref = accommodation.bookingUrl || accommodation.contactWebsite;
 
+  const base = await tenantPublicUrl(t, "/");
+  const itemUrl = `${base}/cazari/${accommodation.slug}`;
+  const jsonLd = [
+    accommodationJsonLd(accommodation, itemUrl),
+    breadcrumbJsonLd(base, [
+      { name: "Acasă", path: "/" },
+      { name: "Cazări", path: "/cazari" },
+      { name: accommodation.name, path: `/cazari/${accommodation.slug}` },
+    ]),
+  ];
+
   // Cover first, then the rest of the gallery, deduped and with empties removed.
   const allPhotos = Array.from(
     new Set(
@@ -92,6 +106,7 @@ export default async function AccommodationDetailPage({
 
   return (
     <>
+      <JsonLd data={jsonLd} />
       <PageHero
         eyebrow={accommodationTypeLabel(accommodation.type)}
         title={accommodation.name}

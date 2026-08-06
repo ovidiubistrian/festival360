@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MapPin, Store, ArrowUpRight } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata, tenantPublicUrl } from "@/lib/seo";
+import { JsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
@@ -20,15 +22,12 @@ export async function generateMetadata({
   if (!t) return {};
   const product = t.content.products.find((p) => p.slug === slug);
   if (!product) return {};
-  return {
-    title: product.name,
+  return tenantMetadata(t, {
+    pageTitle: product.name,
     description: product.shortDescription,
-    openGraph: {
-      title: `${product.name} · ${t.config.info.name}`,
-      description: product.shortDescription,
-      images: [product.image],
-    },
-  };
+    path: `/produse/${product.slug}`,
+    image: product.image,
+  });
 }
 
 export default async function ProductDetailPage({
@@ -55,8 +54,32 @@ export default async function ProductDetailPage({
     )
     .slice(0, 4);
 
+  const base = await tenantPublicUrl(t, "/");
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    ...(product.shortDescription
+      ? { description: product.shortDescription }
+      : {}),
+    ...(product.image ? { image: [product.image] } : {}),
+    ...(product.category ? { category: product.category } : {}),
+    ...(product.producer
+      ? { brand: { "@type": "Brand", name: product.producer } }
+      : {}),
+  };
+  const jsonLd = [
+    productJsonLd,
+    breadcrumbJsonLd(base, [
+      { name: "Acasă", path: "/" },
+      { name: "Produse", path: "/produse" },
+      { name: product.name, path: `/produse/${product.slug}` },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <PageHero
         eyebrow={product.category}
         title={product.name}

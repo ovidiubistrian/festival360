@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { PageHero } from "@/components/public/page-hero";
@@ -15,17 +16,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Galerie";
-  const description = `Festivalul ${info.name} în imagini: gastronomie, tradiții, concerte, produse și natură din edițiile trecute.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Galerie",
+    description: `${info.name} în imagini: gastronomie, tradiții, concerte, produse și natură.`,
+    path: "/galerie",
+  });
 }
 
 export default async function GalleryPage({

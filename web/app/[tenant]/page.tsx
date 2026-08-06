@@ -26,6 +26,8 @@ import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { PartnerLogo } from "@/components/shared/partner-logo";
 import { Reveal } from "@/components/shared/reveal";
 import { formatDateRange } from "@/lib/utils";
+import { tenantPublicUrl } from "@/lib/seo";
+import { JsonLd, siteJsonLd } from "@/lib/jsonld";
 
 export default async function TenantHome({
   params,
@@ -71,32 +73,9 @@ export default async function TenantHome({
     .slice(0, 3);
   const galleryPreview = content.gallery.slice(0, 8);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Festival",
-    name: config.info.name,
-    description: config.info.shortDescription,
-    startDate: config.info.startDate,
-    endDate: config.info.endDate,
-    image: config.info.heroImage,
-    eventStatus: "https://schema.org/EventScheduled",
-    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    location: {
-      "@type": "Place",
-      name: config.info.locationName,
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: config.info.city,
-        addressRegion: config.info.county,
-        addressCountry: "RO",
-      },
-    },
-    organizer: {
-      "@type": "Organization",
-      name: config.info.name,
-      url: config.social.website,
-    },
-  };
+  // Vertical-aware primary schema (Festival / Resort / Museum / LocalBusiness…).
+  const homeUrl = await tenantPublicUrl(t, "/");
+  const jsonLd = siteJsonLd(t, homeUrl);
 
   // Render one built-in homepage section by id. Returns null when the section
   // has no content to show, so ordering + visibility can be data-driven.
@@ -505,10 +484,7 @@ export default async function TenantHome({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       {orderedSections.map((s) => {
         if (s.custom) {

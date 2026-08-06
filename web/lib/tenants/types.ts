@@ -184,6 +184,26 @@ export interface Trails {
 /** Per-tenant display copy overriding festival defaults (terminology system). */
 export type TenantLabels = Record<string, string>;
 
+/**
+ * Per-tenant SEO overrides. Every field is optional — empty keys fall back to
+ * sensible defaults (name/tagline/shortDescription/heroImage) so an unconfigured
+ * site still ships solid metadata.
+ */
+export interface SeoConfig {
+  /** Custom `<title>` for the homepage; empty → "{name} — {tagline}". */
+  title?: string;
+  /** Meta description (~155 chars); empty → shortDescription. */
+  description?: string;
+  /** Comma-separated keywords. */
+  keywords?: string;
+  /** Open Graph / social share image; empty → heroImage. */
+  ogImage?: string;
+  /** Google Search Console `google-site-verification` content value. */
+  googleSiteVerification?: string;
+  /** When true, the whole site is excluded from search engines. */
+  noindex?: boolean;
+}
+
 export interface TenantConfig {
   /** "festival" | "resort" | ... — the vertical preset. */
   eventType?: string;
@@ -207,6 +227,8 @@ export interface TenantConfig {
   conditions?: Conditions;
   /** Resort-only "Trasee & hartă" widget config; empty → frontend defaults. */
   trails?: Trails;
+  /** Per-tenant SEO overrides; empty keys fall back to sensible defaults. */
+  seo?: SeoConfig;
 }
 
 export type ExhibitorCategory =

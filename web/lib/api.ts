@@ -94,6 +94,19 @@ export async function getTenantSlugs(): Promise<string[]> {
   return (list ?? []).map((t) => t.slug);
 }
 
+/**
+ * Resolve a custom domain (Host header) to a tenant slug — the same lookup the
+ * middleware uses. Returns null when the host maps to no tenant. Used by the
+ * host-aware sitemap/robots routes.
+ */
+export async function getSlugByDomain(host: string): Promise<string | null> {
+  const res = await apiGet<{ slug?: string }>(
+    `/platform/tenant-by-domain?host=${encodeURIComponent(host)}`,
+    { noStore: true }
+  );
+  return res?.slug ?? null;
+}
+
 // --- Public write actions (called from client components) --------------------
 
 export async function submitContactMessage(

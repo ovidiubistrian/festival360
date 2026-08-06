@@ -8,6 +8,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata, tenantPublicUrl } from "@/lib/seo";
+import { JsonLd, eventJsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -27,15 +29,12 @@ export async function generateMetadata({
   if (!t) return {};
   const event = (t.content.events ?? []).find((e) => e.slug === slug);
   if (!event) return {};
-  return {
-    title: event.title,
+  return tenantMetadata(t, {
+    pageTitle: event.title,
     description: event.shortDescription,
-    openGraph: {
-      title: `${event.title} · ${t.config.info.name}`,
-      description: event.shortDescription,
-      images: [event.coverImage],
-    },
-  };
+    path: `/evenimente/${event.slug}`,
+    image: event.coverImage,
+  });
 }
 
 export default async function EventDetailPage({
@@ -74,8 +73,20 @@ export default async function EventDetailPage({
     )
   );
 
+  const base = await tenantPublicUrl(t, "/");
+  const itemUrl = `${base}/evenimente/${event.slug}`;
+  const jsonLd = [
+    eventJsonLd(event, itemUrl),
+    breadcrumbJsonLd(base, [
+      { name: "Acasă", path: "/" },
+      { name: "Evenimente", path: "/evenimente" },
+      { name: event.title, path: `/evenimente/${event.slug}` },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <PageHero
         eyebrow="Eveniment"
         title={event.title}

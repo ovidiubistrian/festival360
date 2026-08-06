@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -16,17 +17,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Restaurante";
-  const description = `Restaurante și localuri din zona ${info.name} — bucătărie locală, terase și rezervări.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Restaurante",
+    description: `Restaurante și localuri din zona ${info.name} — bucătărie locală, terase și rezervări.`,
+    path: "/restaurante",
+  });
 }
 
 export default async function RestaurantsPage({

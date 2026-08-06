@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Clock, ArrowUpRight } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -21,17 +22,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Noutăți și povești";
-  const description = `Poveștile producătorilor, ghiduri, interviuri și noutăți din lumea festivalului ${info.name}.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Noutăți și povești",
+    description: `Poveștile producătorilor, ghiduri, interviuri și noutăți din lumea ${info.name}.`,
+    path: "/noutati",
+  });
 }
 
 export default async function NewsPage({

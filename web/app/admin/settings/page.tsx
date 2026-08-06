@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Card,
   CardContent,
@@ -21,11 +22,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import {
   resetDemoData,
+  updateSeo,
   updateSettings,
   useAdminData,
   type AdminSettings,
 } from "@/lib/admin/store";
+import type { SeoConfig } from "@/lib/tenants/types";
 import { toast } from "sonner";
+
+const PLATFORM_DOMAIN =
+  process.env.NEXT_PUBLIC_PLATFORM_DOMAIN || "siteora.ro";
 
 function ColorField({
   label,
@@ -68,9 +74,37 @@ export default function SettingsPage() {
     setForm(data.settings);
   }
 
+  // SEO form — synced against the stored `seo` reference the same way.
+  const [seoForm, setSeoForm] = React.useState<SeoConfig>(data.seo);
+  const [syncedSeo, setSyncedSeo] = React.useState(data.seo);
+  if (data.seo !== syncedSeo) {
+    setSyncedSeo(data.seo);
+    setSeoForm(data.seo);
+  }
+
   function set<K extends keyof AdminSettings>(key: K, value: AdminSettings[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  function setSeo<K extends keyof SeoConfig>(key: K, value: SeoConfig[K]) {
+    setSeoForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function saveSeo() {
+    updateSeo(seoForm);
+    toast.success("Setările SEO au fost salvate.");
+  }
+
+  // Live Google-result preview values (with the same fallbacks the site uses).
+  const previewTitle =
+    seoForm.title?.trim() ||
+    (form.name && form.tagline
+      ? `${form.name} — ${form.tagline}`
+      : form.name || "Titlul site-ului");
+  const previewDescription =
+    seoForm.description?.trim() ||
+    form.shortDescription ||
+    "Descrierea site-ului apare aici, sub titlu, în rezultatele căutării.";
 
   function saveSection(keys: (keyof AdminSettings)[], message: string) {
     const patch: Partial<AdminSettings> = {};
@@ -96,6 +130,7 @@ export default function SettingsPage() {
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="contact">Contact & social</TabsTrigger>
           <TabsTrigger value="brand">Identitate vizuală</TabsTrigger>
+          <TabsTrigger value="seo">SEO</TabsTrigger>
         </TabsList>
 
         {/* General */}
@@ -349,6 +384,129 @@ export default function SettingsPage() {
                     )
                   }
                 >
+                  <Save className="h-4 w-4" />
+                  Salvează
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* SEO */}
+        <TabsContent value="seo">
+          <Card>
+            <CardHeader>
+              <CardTitle>Optimizare pentru motoarele de căutare</CardTitle>
+              <CardDescription>
+                Controlează cum apare site-ul în Google și în distribuirile pe
+                rețelele sociale. Câmpurile lăsate goale folosesc valori
+                implicite bune (nume, slogan, descriere scurtă, imagine hero).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {/* Google-result preview */}
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Previzualizare în Google
+                </p>
+                <div className="max-w-xl">
+                  <p className="truncate text-sm text-[#1a0dab]">
+                    {previewTitle}
+                  </p>
+                  <p className="truncate text-xs text-[#006621]">
+                    {PLATFORM_DOMAIN}
+                  </p>
+                  <p className="mt-0.5 line-clamp-2 text-sm text-charcoal/70">
+                    {previewDescription}
+                  </p>
+                </div>
+              </div>
+
+              <Field
+                label="Titlu SEO"
+                hint={`~60 de caractere. ${(seoForm.title ?? "").length}/60 folosite. Gol → „Nume — Slogan”.`}
+              >
+                <Input
+                  value={seoForm.title ?? ""}
+                  onChange={(e) => setSeo("title", e.target.value)}
+                  placeholder={
+                    form.name && form.tagline
+                      ? `${form.name} — ${form.tagline}`
+                      : "Titlul afișat în tab și în rezultate"
+                  }
+                />
+              </Field>
+
+              <Field
+                label="Descriere SEO"
+                hint={`~155 de caractere. ${(seoForm.description ?? "").length}/155 folosite. Gol → descrierea scurtă.`}
+              >
+                <Textarea
+                  value={seoForm.description ?? ""}
+                  onChange={(e) => setSeo("description", e.target.value)}
+                  rows={3}
+                  placeholder={
+                    form.shortDescription ||
+                    "Un rezumat scurt care apare sub titlu în rezultatele căutării."
+                  }
+                />
+              </Field>
+
+              <Field
+                label="Cuvinte cheie"
+                hint="Separate prin virgulă, ex: „cazare Brașov, pensiune munte, sejur”."
+              >
+                <Input
+                  value={seoForm.keywords ?? ""}
+                  onChange={(e) => setSeo("keywords", e.target.value)}
+                  placeholder="cuvânt cheie 1, cuvânt cheie 2, …"
+                />
+              </Field>
+
+              <div className="space-y-2">
+                <MediaPicker
+                  label="Imagine pentru share (Open Graph)"
+                  value={seoForm.ogImage ?? ""}
+                  onChange={(url) => setSeo("ogImage", url)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Apare când site-ul e distribuit pe Facebook, WhatsApp sau
+                  LinkedIn. Ideal 1200×630 px. Gol → imaginea hero.
+                </p>
+              </div>
+
+              <Field
+                label="Cod verificare Google Search Console"
+                hint="Doar conținutul din meta „google-site-verification” (fără tag)."
+              >
+                <Input
+                  value={seoForm.googleSiteVerification ?? ""}
+                  onChange={(e) =>
+                    setSeo("googleSiteVerification", e.target.value)
+                  }
+                  placeholder="ex: aBcD1234…"
+                />
+              </Field>
+
+              <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-card p-4">
+                <div className="space-y-0.5">
+                  <Label htmlFor="seo-noindex">
+                    Ascunde de motoarele de căutare
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Când e activ, site-ul nu este indexat de Google (noindex).
+                    Folosește doar pentru site-uri în lucru.
+                  </p>
+                </div>
+                <Switch
+                  id="seo-noindex"
+                  checked={seoForm.noindex ?? false}
+                  onCheckedChange={(checked) => setSeo("noindex", checked)}
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button variant="gold" onClick={saveSeo}>
                   <Save className="h-4 w-4" />
                   Salvează
                 </Button>

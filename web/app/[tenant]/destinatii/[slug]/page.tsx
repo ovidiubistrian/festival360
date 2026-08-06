@@ -9,6 +9,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata, tenantPublicUrl } from "@/lib/seo";
+import { JsonLd, destinationJsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -28,15 +30,12 @@ export async function generateMetadata({
   if (!t) return {};
   const destination = t.content.destinations.find((d) => d.slug === slug);
   if (!destination) return {};
-  return {
-    title: destination.name,
+  return tenantMetadata(t, {
+    pageTitle: destination.name,
     description: destination.shortDescription,
-    openGraph: {
-      title: `${destination.name} · ${t.config.info.name}`,
-      description: destination.shortDescription,
-      images: [destination.coverImage],
-    },
-  };
+    path: `/destinatii/${destination.slug}`,
+    image: destination.coverImage,
+  });
 }
 
 export default async function DestinationDetailPage({
@@ -77,8 +76,20 @@ export default async function DestinationDetailPage({
     },
   ].filter((c) => c.items.length > 0);
 
+  const base = await tenantPublicUrl(t, "/");
+  const itemUrl = `${base}/destinatii/${destination.slug}`;
+  const jsonLd = [
+    destinationJsonLd(destination, itemUrl),
+    breadcrumbJsonLd(base, [
+      { name: "Acasă", path: "/" },
+      { name: "Destinații", path: "/destinatii" },
+      { name: destination.name, path: `/destinatii/${destination.slug}` },
+    ]),
+  ];
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <PageHero
         eyebrow={destination.region}
         title={destination.name}

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { CalendarDays, MapPin } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Badge } from "@/components/ui/badge";
@@ -19,17 +20,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Program";
-  const description = `Programul complet al festivalului ${info.name}: trei zile de gastronomie, muzică, ateliere și meșteșuguri.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Program",
+    description: `Programul complet al ${info.name}: gastronomie, muzică, ateliere și meșteșuguri.`,
+    path: "/program",
+  });
 }
 
 export default async function ProgramPage({

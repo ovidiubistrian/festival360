@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata } from "@/lib/seo";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { PageHero } from "@/components/public/page-hero";
@@ -15,17 +16,11 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Produse locale";
-  const description = `Gusturi cu origine cunoscută de la ${info.name}: fiecare produs are un producător, un loc și o poveste.`;
-  return {
-    title,
-    description,
-    openGraph: {
-      title: `${title} · ${info.name}`,
-      description,
-      images: [info.heroImage],
-    },
-  };
+  return tenantMetadata(t, {
+    pageTitle: "Produse locale",
+    description: `Gusturi cu origine cunoscută de la ${info.name}: fiecare produs are un producător, un loc și o poveste.`,
+    path: "/produse",
+  });
 }
 
 export default async function ProductsPage({

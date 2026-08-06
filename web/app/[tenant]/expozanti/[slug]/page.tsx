@@ -8,6 +8,8 @@ import {
   Compass,
 } from "lucide-react";
 import { getTenantBundle } from "@/lib/api";
+import { tenantMetadata, tenantPublicUrl } from "@/lib/seo";
+import { JsonLd, breadcrumbJsonLd } from "@/lib/jsonld";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
@@ -30,15 +32,12 @@ export async function generateMetadata({
   if (!t) return {};
   const exhibitor = t.content.exhibitors.find((e) => e.slug === slug);
   if (!exhibitor) return {};
-  return {
-    title: exhibitor.name,
+  return tenantMetadata(t, {
+    pageTitle: exhibitor.name,
     description: exhibitor.shortDescription,
-    openGraph: {
-      title: `${exhibitor.name} · ${t.config.info.name}`,
-      description: exhibitor.shortDescription,
-      images: [exhibitor.image],
-    },
-  };
+    path: `/expozanti/${exhibitor.slug}`,
+    image: exhibitor.image,
+  });
 }
 
 export default async function ExhibitorDetailPage({
@@ -69,8 +68,16 @@ export default async function ExhibitorDetailPage({
     })
     .slice(0, 3);
 
+  const base = await tenantPublicUrl(t, "/");
+  const jsonLd = breadcrumbJsonLd(base, [
+    { name: "Acasă", path: "/" },
+    { name: "Expozanți", path: "/expozanti" },
+    { name: exhibitor.name, path: `/expozanti/${exhibitor.slug}` },
+  ]);
+
   return (
     <>
+      <JsonLd data={jsonLd} />
       <PageHero
         eyebrow={exhibitor.category}
         title={exhibitor.name}
