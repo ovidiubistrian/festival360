@@ -406,6 +406,7 @@ class TenantConfigOut(CamelModel):
     experiences: list[dict[str, Any]]
     conditions: dict[str, Any]
     trails: dict[str, Any]
+    seo: dict[str, Any]
 
     @classmethod
     def from_model(cls, t: Tenant) -> "TenantConfigOut":
@@ -459,6 +460,7 @@ class TenantConfigOut(CamelModel):
             experiences=t.experiences,
             conditions=t.conditions or {},
             trails=t.trails or {},
+            seo=t.seo or {},
         )
 
 

@@ -79,6 +79,9 @@ class Tenant(SQLModel, table=True):
     # Resort-only homepage widgets (editable JSON blobs); empty → frontend default.
     conditions: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
     trails: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    # SEO controls (admin-editable): {title, description, keywords, ogImage,
+    # googleSiteVerification, noindex}. Empty keys fall back to sensible defaults.
+    seo: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
 
     created_at: dt.datetime = Field(default_factory=utcnow)
     updated_at: dt.datetime = Field(default_factory=utcnow)

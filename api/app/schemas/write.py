@@ -299,6 +299,7 @@ class SettingsIn(CamelModel):
     experiences: list[dict[str, Any]] | None = None
     conditions: dict[str, Any] | None = None
     trails: dict[str, Any] | None = None
+    seo: dict[str, Any] | None = None
 
     def to_tenant_patch(self) -> dict[str, Any]:
         m = {
@@ -327,6 +328,7 @@ class SettingsIn(CamelModel):
             "experiences": "experiences",
             "conditions": "conditions",
             "trails": "trails",
+            "seo": "seo",
         }
         patch: dict[str, Any] = {}
         for field, col in m.items():
