@@ -166,7 +166,7 @@ export default async function FestivalHubLanding() {
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-primary text-cream">
-        <div className="absolute inset-0 opacity-25">
+        <div className="absolute inset-0 opacity-70">
           <ImageWithFallback
             src={heroImage}
             alt=""
@@ -176,7 +176,7 @@ export default async function FestivalHubLanding() {
             className="object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/70 to-primary" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/45 via-primary/55 to-primary/85" />
         <Container className="relative z-10 py-24 sm:py-32">
           <div className="mx-auto max-w-3xl text-center">
             <Reveal>
