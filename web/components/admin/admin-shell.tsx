@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Building2,
+  Home,
   LayoutTemplate,
   CalendarDays,
   Store,
@@ -67,6 +68,7 @@ interface NavLink {
 /** Platform tools — super-admin only. */
 const PLATFORM_NAV: NavLink[] = [
   { label: "Site-uri", href: "/admin/sites", icon: Building2 },
+  { label: "Pagina principală", href: "/admin/landing", icon: Home },
   { label: "Abonamente", href: "/admin/subscriptions", icon: CreditCard },
   { label: "Plăți", href: "/admin/billing", icon: Wallet },
   { label: "Solicitări", href: "/admin/leads", icon: Inbox },

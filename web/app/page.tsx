@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { Reveal } from "@/components/shared/reveal";
 import { SignupForm } from "@/components/public/signup-form";
-import { getPackages, formatBani } from "@/lib/api";
+import { getPackages, formatBani, getLanding } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { IMG } from "@/lib/tenants/prispa/images";
 
@@ -113,7 +113,29 @@ const advantages = [
 ];
 
 export default async function FestivalHubLanding() {
-  const packages = (await getPackages()) ?? [];
+  const [packages, landing] = await Promise.all([
+    getPackages().then((p) => p ?? []),
+    getLanding(),
+  ]);
+
+  // Hero content — config-driven, with the original hardcoded values as
+  // fallbacks so an empty config renders exactly as before.
+  const heroBadge = landing.heroBadge ?? "Platformă SaaS multi-tenant";
+  const heroTitle =
+    landing.heroTitle ??
+    "Construiește digital orice destinație, eveniment sau instituție.";
+  const heroTaglineEn =
+    landing.heroTaglineEn ??
+    "Build your destination, event or institution digitally.";
+  const heroDescription =
+    landing.heroDescription ??
+    "Un singur loc pentru site, conținut, program, parteneri, produse, bilete și promovare. Alegi o verticală, iar terminologia, tema și structura se adaptează automat.";
+  const heroImage = landing.heroImage ?? IMG.hero;
+  const heroCtaPrimaryLabel = landing.heroCtaPrimaryLabel ?? "Vezi un demo";
+  const heroCtaPrimaryHref = landing.heroCtaPrimaryHref ?? "/prispa";
+  const heroCtaSecondaryLabel =
+    landing.heroCtaSecondaryLabel ?? "Autentificare";
+  const heroCtaSecondaryHref = landing.heroCtaSecondaryHref ?? "/admin";
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -146,7 +168,7 @@ export default async function FestivalHubLanding() {
       <section className="relative overflow-hidden bg-primary text-cream">
         <div className="absolute inset-0 opacity-25">
           <ImageWithFallback
-            src={IMG.hero}
+            src={heroImage}
             alt=""
             fill
             priority
@@ -159,32 +181,29 @@ export default async function FestivalHubLanding() {
           <div className="mx-auto max-w-3xl text-center">
             <Reveal>
               <Badge variant="gold" className="bg-gold/20 text-gold">
-                Platformă SaaS multi-tenant
+                {heroBadge}
               </Badge>
             </Reveal>
             <Reveal delayIndex={1}>
               <h1 className="mt-6 font-serif text-4xl font-semibold leading-tight text-warm-white sm:text-6xl">
-                Construiește digital orice destinație, eveniment sau
-                instituție.
+                {heroTitle}
               </h1>
             </Reveal>
             <Reveal delayIndex={2}>
               <p className="mt-4 text-sm italic text-cream/70">
-                Build your destination, event or institution digitally.
+                {heroTaglineEn}
               </p>
             </Reveal>
             <Reveal delayIndex={2}>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/85">
-                Un singur loc pentru site, conținut, program, parteneri,
-                produse, bilete și promovare. Alegi o verticală, iar
-                terminologia, tema și structura se adaptează automat.
+                {heroDescription}
               </p>
             </Reveal>
             <Reveal delayIndex={3}>
               <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Button asChild size="lg" variant="gold">
-                  <Link href="/prispa">
-                    Vezi festivalul demo
+                  <Link href={heroCtaPrimaryHref}>
+                    {heroCtaPrimaryLabel}
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -194,9 +213,9 @@ export default async function FestivalHubLanding() {
                   variant="outline"
                   className="border-white/30 bg-white/5 text-warm-white hover:bg-white/15"
                 >
-                  <Link href="/admin">
+                  <Link href={heroCtaSecondaryHref}>
                     <LayoutDashboard className="h-4 w-4" />
-                    Autentificare
+                    {heroCtaSecondaryLabel}
                   </Link>
                 </Button>
               </div>

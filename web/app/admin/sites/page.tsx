@@ -12,10 +12,12 @@ import {
   Check,
   Sparkles,
   Globe,
+  KeyRound,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { DomainManager } from "@/components/admin/domain-manager";
+import { TenantAdminReset } from "@/components/admin/tenant-admin-reset";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,6 +86,17 @@ export default function SitesPage() {
   function openDomain(tenant: TenantSummary) {
     setDomainTarget(tenant);
     setDomainOpen(true);
+  }
+
+  // Reset-admin-password dialog. `resetTarget` stays set through the close
+  // animation while `resetOpen` drives visibility.
+  const [resetTarget, setResetTarget] =
+    React.useState<TenantSummary | null>(null);
+  const [resetOpen, setResetOpen] = React.useState(false);
+
+  function openReset(tenant: TenantSummary) {
+    setResetTarget(tenant);
+    setResetOpen(true);
   }
 
   // Wizard state.
@@ -460,6 +473,16 @@ export default function SitesPage() {
                       <Globe className="h-4 w-4" />
                       Domeniu
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9"
+                      onClick={() => openReset(tenant)}
+                      aria-label={`Resetează parola admin pentru ${tenant.name}`}
+                      title="Resetează parola admin"
+                    >
+                      <KeyRound className="h-4 w-4" />
+                    </Button>
                     {protectedSite ? null : (
                       <ConfirmDelete
                         itemLabel={`site-ul „${tenant.name}” (/${tenant.slug}) și tot conținutul lui`}
@@ -495,6 +518,13 @@ export default function SitesPage() {
         tenantName={domainTarget?.name ?? ""}
         open={domainOpen}
         onOpenChange={setDomainOpen}
+      />
+
+      <TenantAdminReset
+        slug={resetTarget?.slug ?? ""}
+        tenantName={resetTarget?.name ?? ""}
+        open={resetOpen}
+        onOpenChange={setResetOpen}
       />
     </AdminShell>
   );

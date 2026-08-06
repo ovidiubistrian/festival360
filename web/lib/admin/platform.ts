@@ -8,6 +8,7 @@
  */
 
 import { getToken } from "@/lib/admin/api";
+import type { LandingConfig } from "@/lib/api";
 
 const API =
   (process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000") + "/api/v1";
@@ -56,6 +57,114 @@ export async function listPresets(): Promise<Preset[]> {
   } catch (err) {
     console.error("listPresets failed", err);
     return [];
+  }
+}
+
+// --- Marketing landing (siteora.ro hero) ------------------------------------
+
+/** Read the current marketing landing config. Returns `{}` on any failure. */
+export async function getLandingConfig(): Promise<LandingConfig> {
+  try {
+    const res = await fetch(`${PLATFORM}/landing`, {
+      headers: authHeaders(),
+    });
+    if (!res.ok) return {};
+    return (await res.json()) as LandingConfig;
+  } catch (err) {
+    console.error("getLandingConfig failed", err);
+    return {};
+  }
+}
+
+/** Persist the full marketing landing config. Returns true on success. */
+export async function saveLandingConfig(
+  config: LandingConfig
+): Promise<boolean> {
+  try {
+    const res = await fetch(`${PLATFORM}/landing`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify(config),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("saveLandingConfig failed", err);
+    return false;
+  }
+}
+
+/**
+ * Upload a platform image (multipart/form-data, field `file`) and return the
+ * resulting `/media/...` URL. Returns null on failure. IMPORTANT: never set
+ * Content-Type by hand — the browser adds the multipart boundary; only the
+ * Authorization header is sent.
+ */
+export async function uploadPlatformImage(file: File): Promise<string | null> {
+  try {
+    const body = new FormData();
+    body.append("file", file);
+    const res = await fetch(`${PLATFORM}/media`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${getToken() ?? ""}` },
+      body,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { url?: unknown };
+    return typeof data?.url === "string" && data.url ? data.url : null;
+  } catch (err) {
+    console.error("uploadPlatformImage failed", err);
+    return null;
+  }
+}
+
+/**
+ * Reset (or generate) a tenant's admin password. When `password` is omitted the
+ * backend generates a strong one and RETURNS it in `password`; when provided,
+ * the response `password` is null. Surfaces the backend `detail` (404 site
+ * inexistent, 400 email belongs to a super-admin) as `error`.
+ */
+export async function resetTenantAdminPassword(
+  slug: string,
+  input: { email?: string; password?: string }
+): Promise<{
+  ok: boolean;
+  email?: string;
+  password?: string | null;
+  generated?: boolean;
+  error?: string;
+}> {
+  try {
+    const res = await fetch(
+      `${PLATFORM}/tenants/${slug}/admin-password`,
+      {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(input),
+      }
+    );
+    if (!res.ok) {
+      return {
+        ok: false,
+        error: await readDetail(
+          res,
+          `Resetarea parolei a eșuat (${res.status}).`
+        ),
+      };
+    }
+    const data = (await res.json()) as {
+      email?: string;
+      password?: string | null;
+      generated?: boolean;
+    };
+    return {
+      ok: true,
+      email: data.email,
+      password: data.password ?? null,
+      generated: data.generated,
+    };
+  } catch (err) {
+    console.error("resetTenantAdminPassword failed", err);
+    return { ok: false, error: "Eroare de rețea. Încearcă din nou." };
   }
 }
 

@@ -143,6 +143,31 @@ export function getPackages(): Promise<Package[] | null> {
 }
 
 /**
+ * Marketing landing (siteora.ro) hero configuration. Every field is optional —
+ * the landing falls back to its hardcoded defaults for any field left unset, so
+ * an empty config renders exactly as the original page.
+ */
+export type LandingConfig = {
+  heroBadge?: string;
+  heroTitle?: string;
+  heroTaglineEn?: string;
+  heroDescription?: string;
+  heroImage?: string;
+  heroCtaPrimaryLabel?: string;
+  heroCtaPrimaryHref?: string;
+  heroCtaSecondaryLabel?: string;
+  heroCtaSecondaryHref?: string;
+};
+
+/** Public landing config. Returns `{}` on any failure (revalidated ~30s). */
+export async function getLanding(): Promise<LandingConfig> {
+  const config = await apiGet<LandingConfig>("/platform/landing", {
+    revalidate: 30,
+  });
+  return config ?? {};
+}
+
+/**
  * Format a minor-unit (bani) amount as an integer RON string, e.g. 24900 →
  * "249 RON". Shows decimals only when the amount isn't a whole RON value.
  */
