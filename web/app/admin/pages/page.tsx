@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronUp, ChevronDown, Eye, ExternalLink, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, Eye, Trash2 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -67,17 +67,7 @@ export default function PagesPage() {
     <AdminShell
       title="Pagini și secțiuni"
       description="Fiecare rând este o zonă de pe pagina principală. Comutatorul o arată sau o ascunde, iar săgețile îi schimbă ordinea pe site."
-      actions={
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <a href="/prispa" target="_blank" rel="noreferrer">
-              <ExternalLink className="h-4 w-4" />
-              Previzualizează site-ul
-            </a>
-          </Button>
-          <AddSectionButton />
-        </div>
-      }
+      actions={<AddSectionButton />}
     >
       <Card>
         <CardHeader>

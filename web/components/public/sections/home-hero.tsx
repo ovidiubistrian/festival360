@@ -31,9 +31,10 @@ export function HomeHero({
         fallbackLabel={info.name}
         className="object-cover"
       />
-      {/* Discreet gradient for legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/55 to-charcoal/35" />
-      <div className="absolute inset-0 bg-gradient-to-r from-charcoal/50 to-transparent" />
+      {/* Light scrim only where the text sits (left + bottom), so the photo
+          stays visible on the right while the white copy stays legible. */}
+      <div className="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-charcoal/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-charcoal/55 via-charcoal/15 to-transparent" />
 
       <Container className="relative z-10 pb-16 pt-28">
         <div className="max-w-2xl">
