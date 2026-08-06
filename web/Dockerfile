@@ -16,6 +16,8 @@ ENV NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
 ARG NEXT_PUBLIC_PLATFORM_DOMAIN=siteora.ro
 ENV NEXT_PUBLIC_PLATFORM_DOMAIN=${NEXT_PUBLIC_PLATFORM_DOMAIN}
 ENV NEXT_TELEMETRY_DISABLED=1
+# Give Next's build room (the app has many routes) so CI doesn't OOM-kill it.
+ENV NODE_OPTIONS=--max-old-space-size=4096
 RUN npm run build
 
 FROM node:20-slim AS runner
