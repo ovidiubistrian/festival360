@@ -6,7 +6,6 @@ import {
   YoutubeIcon,
 } from "@/components/shared/social-icons";
 import { Container } from "@/components/shared/container";
-import { NewsletterForm } from "./newsletter-form";
 import { formatDateRange } from "@/lib/utils";
 import type { TenantConfig } from "@/lib/tenants/types";
 
@@ -23,8 +22,8 @@ export function SiteFooter({
   return (
     <footer className="mt-auto bg-primary text-cream">
       <Container className="py-16">
-        <div className="grid gap-12 lg:grid-cols-4">
-          <div className="lg:col-span-1">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+          <div className="sm:col-span-2 lg:col-span-1">
             <p className="font-serif text-3xl font-semibold text-warm-white">
               {info.logoText}
             </p>
@@ -68,11 +67,11 @@ export function SiteFooter({
             </div>
           </div>
 
-          <div>
+          <div className="lg:col-span-2">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-warm-white">
               Navigare
             </h3>
-            <ul className="mt-4 space-y-2.5 text-sm">
+            <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm">
               {navigation.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -110,21 +109,11 @@ export function SiteFooter({
                 </a>
               </li>
             </ul>
-            <p className="mt-5 text-sm font-medium text-warm-white">
-              {formatDateRange(info.startDate, info.endDate)}
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-warm-white">
-              Newsletter
-            </h3>
-            <p className="mt-4 text-sm text-cream/70">
-              Primește noutățile despre festival direct pe email.
-            </p>
-            <div className="mt-4">
-              <NewsletterForm compact />
-            </div>
+            {info.startDate && info.endDate && (
+              <p className="mt-5 text-sm font-medium text-warm-white">
+                {formatDateRange(info.startDate, info.endDate)}
+              </p>
+            )}
           </div>
         </div>
 

@@ -2,8 +2,10 @@ import { Mail } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { NewsletterForm } from "@/components/public/newsletter-form";
 import { Reveal } from "@/components/shared/reveal";
+import type { TenantLabels } from "@/lib/tenants/types";
 
-export function NewsletterSection() {
+export function NewsletterSection({ labels }: { labels?: TenantLabels }) {
+  const L = (k: string, fb: string) => labels?.[k] ?? fb;
   return (
     <section className="bg-secondary py-20 sm:py-24">
       <Container>
@@ -12,11 +14,13 @@ export function NewsletterSection() {
             <Mail className="h-6 w-6" />
           </span>
           <h2 className="mt-6 font-serif text-3xl font-semibold text-primary">
-            Rămâi aproape de festival
+            {L("newsletterTitle", "Rămâi aproape de noi")}
           </h2>
           <p className="mx-auto mt-3 max-w-md text-base leading-relaxed text-muted-foreground">
-            Abonează-te și primești programul, poveștile producătorilor și
-            noutățile ediției direct pe email. Fără spam, doar lucruri bune.
+            {L(
+              "newsletterDescription",
+              "Abonează-te și primești noutățile direct pe email. Fără spam, doar lucruri bune."
+            )}
           </p>
           <div className="mx-auto mt-7 max-w-md">
             <NewsletterForm />

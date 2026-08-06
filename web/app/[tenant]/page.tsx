@@ -441,7 +441,7 @@ export default async function TenantHome({
         ) : null;
 
       case "newsletter":
-        return <NewsletterSection />;
+        return <NewsletterSection labels={config.labels} />;
 
       default:
         return null;
