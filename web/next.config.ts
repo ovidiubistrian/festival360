@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
   // Produce a minimal standalone server bundle for the Docker image.
   output: "standalone",
   images: {
+    // Self-hosted VPS without an image-optimization CDN: serve images as-is
+    // (plain <img>). This makes user uploads at /media/... render reliably
+    // (the optimizer can't proxy-fetch them behind Caddy) and keeps remote
+    // Unsplash images working without per-host config.
+    unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "plus.unsplash.com" },

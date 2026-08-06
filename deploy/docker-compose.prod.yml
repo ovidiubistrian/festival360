@@ -34,10 +34,14 @@ services:
       # Self-hosted GeoIP DB (DB-IP City Lite) for visitor geolocation — persisted
       # in a volume, refreshed best-effort at container start.
       GEOIP_DB_PATH: /app/data/geoip/dbip-city-lite.mmdb
+      # Uploaded media (hero images, gallery, etc.) — persisted in a volume so it
+      # survives container restarts/redeploys.
+      MEDIA_DIR: /app/media_uploads
     expose:
       - "8000"
     volumes:
       - geoip_data:/app/data/geoip
+      - media_data:/app/media_uploads
 
   web:
     image: ${WEB_IMAGE}
@@ -75,5 +79,6 @@ services:
 volumes:
   pgdata:
   geoip_data:
+  media_data:
   caddy_data:
   caddy_config:
