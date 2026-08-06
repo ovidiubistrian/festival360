@@ -31,8 +31,13 @@ services:
       SEED_ON_STARTUP: ${SEED_ON_STARTUP:-true}
       CORS_ORIGINS: https://${DOMAIN},https://${API_DOMAIN}
       PLATFORM_DOMAIN: ${DOMAIN}
+      # Self-hosted GeoIP DB (DB-IP City Lite) for visitor geolocation — persisted
+      # in a volume, refreshed best-effort at container start.
+      GEOIP_DB_PATH: /app/data/geoip/dbip-city-lite.mmdb
     expose:
       - "8000"
+    volumes:
+      - geoip_data:/app/data/geoip
 
   web:
     image: ${WEB_IMAGE}
@@ -69,5 +74,6 @@ services:
 
 volumes:
   pgdata:
+  geoip_data:
   caddy_data:
   caddy_config:

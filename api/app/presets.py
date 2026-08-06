@@ -75,7 +75,7 @@ PRESETS: dict[str, dict[str, Any]] = {
             "gold": "#C9A24B", "charcoal": "#1E2A2C", "background": "#F5F8F7",
         },
         "navigation": _nav([
-            ("Despre", "/despre"), ("Cazare", "/expozanti"), ("Experiențe", "/produse"),
+            ("Despre", "/despre"), ("Cazări", "/cazari"), ("Experiențe", "/produse"),
             ("Atracții", "/destinatii"), ("Evenimente", "/program"),
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
@@ -196,6 +196,47 @@ PRESETS: dict[str, dict[str, Any]] = {
         },
     },
 }
+
+
+# --- Per-vertical admin module ordering -------------------------------------
+# Ordered content-module keys each vertical shows in the admin panel. The
+# frontend reads this as `t.config.modules` and filters/relabels its nav.
+_MODULES: dict[str, list[str]] = {
+    "festival": [
+        "dashboard", "pages", "program", "exhibitors", "products", "partners",
+        "gallery", "media", "news", "messages", "newsletter", "analytics", "settings",
+    ],
+    "resort": [
+        "dashboard", "pages", "accommodations", "destinations", "products", "program",
+        "partners", "gallery", "media", "news", "messages", "newsletter", "analytics",
+        "settings",
+    ],
+    "museum": [
+        "dashboard", "pages", "exhibitors", "program", "gallery", "media", "news",
+        "messages", "newsletter", "analytics", "settings",
+    ],
+    "conference": [
+        "dashboard", "pages", "program", "exhibitors", "partners", "gallery", "media",
+        "news", "messages", "newsletter", "analytics", "settings",
+    ],
+    "institution": [
+        "dashboard", "pages", "program", "partners", "gallery", "media", "news",
+        "messages", "newsletter", "analytics", "settings",
+    ],
+    "experience": [
+        "dashboard", "pages", "destinations", "program", "products", "partners",
+        "gallery", "media", "news", "messages", "newsletter", "analytics", "settings",
+    ],
+}
+
+for _key, _mods in _MODULES.items():
+    PRESETS[_key]["modules"] = _mods
+
+
+def modules_for(event_type: str) -> list[str]:
+    """Ordered admin module keys for a vertical; festival is the safe fallback."""
+    preset = PRESETS.get(event_type) or PRESETS["festival"]
+    return list(preset.get("modules") or _MODULES["festival"])
 
 
 def list_presets() -> list[dict[str, Any]]:

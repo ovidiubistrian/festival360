@@ -17,6 +17,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from app.models import (
+    Accommodation,
     Article,
     ContactMessage,
     Destination,
@@ -613,6 +614,89 @@ PRODUCTS: list[dict[str, Any]] = [
     },
 ]
 
+# Accommodations -> Cazări (dedicated accommodation content type)
+ACCOMMODATIONS: list[dict[str, Any]] = [
+    {
+        "id": "pm-ac-1",
+        "tenant_id": TENANT_ID,
+        "slug": "cabana-lacul-verde",
+        "name": "Cabana Lacul Verde",
+        "type": "cabana",
+        "short_description": "Cabană de lemn chiar pe malul lacului de smarald, cu terasă spre apă.",
+        "description": (
+            "Cabana Lacul Verde stă chiar pe malul lacului de acumulare, la câțiva pași de "
+            "apă. Camerele de lemn au vedere spre munte, iar terasa este locul perfect pentru "
+            "o cafea în zori. Gazdele organizează ieșiri cu barca, partide de pescuit și seri "
+            "la foc de tabără."
+        ),
+        "image": VILLAGE,
+        "gallery": [VILLAGE, MOUNTAIN_LAKE, MEADOW],
+        "price_from": "de la 280 RON/noapte",
+        "capacity": 12,
+        "rooms": 5,
+        "amenities": ["wifi", "parcare", "mic-dejun", "terasa", "foc-de-tabara"],
+        "address": "Malul Lacului nr. 3, Poiana Mărului",
+        "contact_phone": "+40 745 210 111",
+        "contact_website": "https://cabanalaculverde.ro",
+        "booking_url": "https://cabanalaculverde.ro/rezervari",
+        "featured": True,
+        "status": "published",
+        "sort_order": 0,
+    },
+    {
+        "id": "pm-ac-2",
+        "tenant_id": TENANT_ID,
+        "slug": "pensiunea-la-prispa",
+        "name": "Pensiunea La Prispă",
+        "type": "pensiune",
+        "short_description": "Pensiune cu prispă și bucătărie de munte, la poalele Munților Țarcu.",
+        "description": (
+            "Pensiunea La Prispă oferă mai mult decât cazare: cine cu produse din curte, "
+            "drumeții ghidate spre lac și seri la foc. Prispa lungă de lemn privește spre "
+            "creste, iar micul dejun se servește cu brânză de stână și miere de munte."
+        ),
+        "image": VALLEY,
+        "gallery": [VALLEY, VILLAGE, DISH],
+        "price_from": "de la 220 RON/noapte",
+        "capacity": 16,
+        "rooms": 7,
+        "amenities": ["wifi", "parcare", "mic-dejun", "restaurant", "gratar"],
+        "address": "Strada Prispei nr. 8, Poiana Mărului",
+        "contact_phone": "+40 749 999 000",
+        "contact_website": "https://pensiunealaprispa.ro",
+        "booking_url": "",
+        "featured": True,
+        "status": "published",
+        "sort_order": 1,
+    },
+    {
+        "id": "pm-ac-3",
+        "tenant_id": TENANT_ID,
+        "slug": "hotel-tarcu",
+        "name": "Hotel Țarcu",
+        "type": "hotel",
+        "short_description": "Hotel de munte cu spa, restaurant panoramic și acces facil spre pârtii.",
+        "description": (
+            "Hotel Țarcu este cea mai mare unitate din stațiune, cu camere spațioase, un "
+            "restaurant panoramic și o zonă de spa cu saună și piscină interioară. Iarna, "
+            "oaspeții pleacă direct spre pârtiile de la Muntele Mic."
+        ),
+        "image": MOUNTAINS,
+        "gallery": [MOUNTAINS, PEAKS, VALLEY],
+        "price_from": "de la 420 RON/noapte",
+        "capacity": 80,
+        "rooms": 40,
+        "amenities": ["wifi", "parcare", "mic-dejun", "spa", "piscina", "restaurant"],
+        "address": "Strada Principală nr. 20, Poiana Mărului",
+        "contact_phone": "+40 255 300 400",
+        "contact_website": "https://hoteltarcu.ro",
+        "booking_url": "https://hoteltarcu.ro/booking",
+        "featured": False,
+        "status": "published",
+        "sort_order": 2,
+    },
+]
+
 # Destinations -> Atracții (attractions)
 DESTINATIONS: list[dict[str, Any]] = [
     {
@@ -1091,6 +1175,7 @@ def _wipe_poiana(session: Session, tenant_id: str = TENANT_ID) -> None:
     for model in (
         Product,  # child of exhibitor — delete before exhibitor
         Exhibitor,
+        Accommodation,
         Destination,
         ProgramEvent,
         Partner,
@@ -1133,6 +1218,8 @@ def run_poiana_seed(session: Session, *, force: bool = False) -> None:
 
     for row in PRODUCTS:
         session.add(Product(**row))
+    for row in ACCOMMODATIONS:
+        session.add(Accommodation(**row))
     for row in DESTINATIONS:
         session.add(Destination(**row))
     for row in PROGRAM:

@@ -15,7 +15,9 @@ from app.models.content import (
     Article,
     ContactMessage,
     NewsletterSubscriber,
+    Accommodation,
 )
+from app.models.analytics import PageView
 from app.models.user import AdminUser
 from app.models.media import MediaAsset
 from app.models.billing import (
@@ -47,5 +49,7 @@ __all__ = [
     "Article",
     "ContactMessage",
     "NewsletterSubscriber",
+    "Accommodation",
+    "PageView",
     "AdminUser",
 ]

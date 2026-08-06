@@ -3,6 +3,7 @@ from __future__ import annotations
 from sqlmodel import Session, select
 
 from app.models import (
+    Accommodation,
     Article,
     ContactMessage,
     Destination,
@@ -30,6 +31,16 @@ def exhibitors_for(session: Session, tenant_id: str) -> list[Exhibitor]:
             select(Exhibitor)
             .where(Exhibitor.tenant_id == tenant_id)
             .order_by(Exhibitor.sort_order)
+        ).all()
+    )
+
+
+def accommodations_for(session: Session, tenant_id: str) -> list[Accommodation]:
+    return list(
+        session.exec(
+            select(Accommodation)
+            .where(Accommodation.tenant_id == tenant_id)
+            .order_by(Accommodation.sort_order)
         ).all()
     )
 

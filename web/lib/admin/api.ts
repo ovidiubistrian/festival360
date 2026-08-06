@@ -41,6 +41,7 @@ export function authHeaders(): Record<string, string> {
 export type ApiCollection =
   | "exhibitors"
   | "products"
+  | "accommodations"
   | "destinations"
   | "program"
   | "partners"

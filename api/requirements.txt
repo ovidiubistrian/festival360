@@ -18,3 +18,6 @@ passlib[bcrypt]>=1.7
 python-multipart>=0.0.12       # form data / file uploads
 dnspython>=2.6
 stripe>=11.0
+
+# --- Analytics (GeoIP) ---
+geoip2>=4.8                    # pulls maxminddb; reads DB-IP City Lite .mmdb

@@ -55,6 +55,32 @@ class ExhibitorIn(CamelModel):
         }
 
 
+class AccommodationIn(CamelModel):
+    id: str | None = None
+    slug: str
+    name: str
+    type: str = ""
+    short_description: str = ""
+    description: str = ""
+    image: str = ""
+    gallery: list[str] = []
+    price_from: str = ""
+    capacity: int = 0
+    rooms: int = 0
+    amenities: list[str] = []
+    address: str = ""
+    contact_phone: str = ""
+    contact_website: str = ""
+    booking_url: str = ""
+    featured: bool = False
+    status: str = "published"
+
+    def to_kwargs(self, tenant_id: str) -> dict[str, Any]:
+        d = self.model_dump(exclude={"id"})
+        d["tenant_id"] = tenant_id
+        return d
+
+
 class ProductIn(CamelModel):
     id: str | None = None
     slug: str

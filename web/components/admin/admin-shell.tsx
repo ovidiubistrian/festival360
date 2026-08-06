@@ -11,6 +11,7 @@ import {
   CalendarDays,
   Store,
   ShoppingBasket,
+  BedDouble,
   MapPin,
   Handshake,
   Image as ImageIcon,
@@ -18,6 +19,7 @@ import {
   Newspaper,
   Mail,
   Send,
+  BarChart3,
   Settings,
   Menu,
   ExternalLink,
@@ -49,7 +51,13 @@ import {
 } from "@/components/ui/select";
 import { Toaster } from "@/components/ui/sonner";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
-import { isLoggedIn, logout, refresh, resetDemoData } from "@/lib/admin/store";
+import {
+  isLoggedIn,
+  logout,
+  refresh,
+  resetDemoData,
+  useAdminData,
+} from "@/lib/admin/store";
 import {
   getCurrentTenant,
   isSuperadmin,
@@ -65,6 +73,18 @@ interface NavLink {
   icon: LucideIcon;
 }
 
+/** A content module: its vertical key, default label, route and icon. */
+interface ContentModuleDef {
+  /** Module key matching the tenant `config.modules` vocabulary. */
+  key: string;
+  /** Tenant-label override key (terminology system). */
+  labelKey: string;
+  /** Default (festival) label. */
+  label: string;
+  href: string;
+  icon: LucideIcon;
+}
+
 /** Platform tools — super-admin only. */
 const PLATFORM_NAV: NavLink[] = [
   { label: "Site-uri", href: "/admin/sites", icon: Building2 },
@@ -74,22 +94,148 @@ const PLATFORM_NAV: NavLink[] = [
   { label: "Solicitări", href: "/admin/leads", icon: Inbox },
 ];
 
-/** Content modules — always available; operate on the current tenant. */
-const CONTENT_NAV: NavLink[] = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Pagini și secțiuni", href: "/admin/pages", icon: LayoutTemplate },
-  { label: "Program", href: "/admin/program", icon: CalendarDays },
-  { label: "Expozanți", href: "/admin/exhibitors", icon: Store },
-  { label: "Produse", href: "/admin/products", icon: ShoppingBasket },
-  { label: "Destinații", href: "/admin/destinations", icon: MapPin },
-  { label: "Parteneri", href: "/admin/partners", icon: Handshake },
-  { label: "Galerie", href: "/admin/gallery", icon: ImageIcon },
-  { label: "Bibliotecă media", href: "/admin/media", icon: Images },
-  { label: "Noutăți", href: "/admin/news", icon: Newspaper },
-  { label: "Mesaje", href: "/admin/messages", icon: Mail },
-  { label: "Newsletter", href: "/admin/newsletter", icon: Send },
-  { label: "Setări", href: "/admin/settings", icon: Settings },
+/**
+ * All content modules, keyed by the vertical `modules` vocabulary. The active
+ * set + ordering is chosen per-tenant from `config.modules`; labels can be
+ * overridden per-tenant via `config.labels[labelKey]`.
+ */
+const CONTENT_MODULE_DEFS: ContentModuleDef[] = [
+  {
+    key: "dashboard",
+    labelKey: "navDashboard",
+    label: "Dashboard",
+    href: "/admin/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    key: "pages",
+    labelKey: "navPages",
+    label: "Pagini și secțiuni",
+    href: "/admin/pages",
+    icon: LayoutTemplate,
+  },
+  {
+    key: "accommodations",
+    labelKey: "navAccommodations",
+    label: "Cazări",
+    href: "/admin/accommodations",
+    icon: BedDouble,
+  },
+  {
+    key: "program",
+    labelKey: "navProgram",
+    label: "Program",
+    href: "/admin/program",
+    icon: CalendarDays,
+  },
+  {
+    key: "exhibitors",
+    labelKey: "navExhibitors",
+    label: "Expozanți",
+    href: "/admin/exhibitors",
+    icon: Store,
+  },
+  {
+    key: "products",
+    labelKey: "navProducts",
+    label: "Produse",
+    href: "/admin/products",
+    icon: ShoppingBasket,
+  },
+  {
+    key: "destinations",
+    labelKey: "navDestinations",
+    label: "Destinații",
+    href: "/admin/destinations",
+    icon: MapPin,
+  },
+  {
+    key: "partners",
+    labelKey: "navPartners",
+    label: "Parteneri",
+    href: "/admin/partners",
+    icon: Handshake,
+  },
+  {
+    key: "gallery",
+    labelKey: "navGallery",
+    label: "Galerie",
+    href: "/admin/gallery",
+    icon: ImageIcon,
+  },
+  {
+    key: "media",
+    labelKey: "navMedia",
+    label: "Bibliotecă media",
+    href: "/admin/media",
+    icon: Images,
+  },
+  {
+    key: "news",
+    labelKey: "navNews",
+    label: "Noutăți",
+    href: "/admin/news",
+    icon: Newspaper,
+  },
+  {
+    key: "messages",
+    labelKey: "navMessages",
+    label: "Mesaje",
+    href: "/admin/messages",
+    icon: Mail,
+  },
+  {
+    key: "newsletter",
+    labelKey: "navNewsletter",
+    label: "Newsletter",
+    href: "/admin/newsletter",
+    icon: Send,
+  },
+  {
+    key: "analytics",
+    labelKey: "navAnalytics",
+    label: "Analiză trafic",
+    href: "/admin/analytics",
+    icon: BarChart3,
+  },
+  {
+    key: "settings",
+    labelKey: "navSettings",
+    label: "Setări",
+    href: "/admin/settings",
+    icon: Settings,
+  },
 ];
+
+/** Full default nav (festival vertical) — the fallback before modules load. */
+const DEFAULT_CONTENT_NAV: NavLink[] = CONTENT_MODULE_DEFS.filter(
+  (d) => d.key !== "accommodations"
+).map((d) => ({ label: d.label, href: d.href, icon: d.icon }));
+
+/**
+ * Build the content nav for the current tenant: filter + order by the tenant's
+ * `modules` list and relabel via `labels`. Falls back to the full default list
+ * when modules aren't loaded yet (never crashes).
+ */
+function buildContentNav(
+  modules: string[] | undefined,
+  labels: Record<string, string> | undefined
+): NavLink[] {
+  if (!modules || modules.length === 0) return DEFAULT_CONTENT_NAV;
+  const byKey = new Map(CONTENT_MODULE_DEFS.map((d) => [d.key, d]));
+  const nav: NavLink[] = [];
+  for (const key of modules) {
+    const def = byKey.get(key);
+    if (!def) continue;
+    nav.push({
+      label: labels?.[def.labelKey] ?? def.label,
+      href: def.href,
+      icon: def.icon,
+    });
+  }
+  // Safety: if the module list matched nothing known, show the default nav.
+  return nav.length > 0 ? nav : DEFAULT_CONTENT_NAV;
+}
 
 /** Route prefixes that require super-admin (platform endpoints). */
 const PLATFORM_PREFIXES = PLATFORM_NAV.map((n) => n.href);
@@ -145,6 +291,8 @@ function SidebarContent({
   onNavigate,
 }: SidebarProps) {
   const router = useRouter();
+  const data = useAdminData();
+  const contentNav = buildContentNav(data.modules, data.labels);
 
   function handleReset() {
     resetDemoData();
@@ -222,7 +370,7 @@ function SidebarContent({
             </p>
           </>
         ) : null}
-        {CONTENT_NAV.map((item) => (
+        {contentNav.map((item) => (
           <NavItem key={item.href} item={item} onNavigate={onNavigate} />
         ))}
       </nav>

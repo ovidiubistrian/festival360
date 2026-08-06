@@ -182,3 +182,31 @@ class NewsletterSubscriber(SQLModel, table=True):
     date: dt.date | None = None
     source: str = ""
     created_at: dt.datetime = Field(default_factory=utcnow)
+
+
+class Accommodation(SQLModel, table=True):
+    __tablename__ = "accommodation"
+
+    id: str = Field(primary_key=True)
+    tenant_id: str = Field(foreign_key="tenant.id", index=True)
+    slug: str = Field(index=True)
+    name: str
+    # hotel | pensiune | cabana | apartament | camping | vila | other
+    type: str = ""
+    short_description: str = ""
+    description: str = ""
+    image: str = ""
+    gallery: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    price_from: str = ""  # free text, e.g. "de la 250 RON/noapte"
+    capacity: int = 0  # max persons; 0 = unspecified
+    rooms: int = 0
+    amenities: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    address: str = ""
+    contact_phone: str = ""
+    contact_website: str = ""
+    booking_url: str = ""
+    featured: bool = False
+    status: str = "published"
+    sort_order: int = 0
+    created_at: dt.datetime = Field(default_factory=utcnow)
+    updated_at: dt.datetime = Field(default_factory=utcnow)

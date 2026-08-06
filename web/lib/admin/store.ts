@@ -3,6 +3,7 @@
 import * as React from "react";
 import { prispaTenant } from "@/lib/tenants/prispa";
 import type {
+  Accommodation,
   Article,
   ContactMessage,
   Destination,
@@ -72,6 +73,7 @@ export interface AdminSettings {
 export interface AdminData {
   exhibitors: Exhibitor[];
   products: Product[];
+  accommodations: Accommodation[];
   destinations: Destination[];
   program: ProgramEvent[];
   partners: Partner[];
@@ -81,6 +83,12 @@ export interface AdminData {
   newsletter: NewsletterSubscriber[];
   sections: SectionConfig[];
   settings: AdminSettings;
+  /** Vertical preset key (festival | resort | museum | …). */
+  eventType?: string;
+  /** Ordered content-module keys for the vertical-aware admin nav. */
+  modules?: string[];
+  /** Per-tenant label overrides (terminology system). */
+  labels?: Record<string, string>;
 }
 
 function seed(): AdminData {
@@ -92,6 +100,7 @@ function seed(): AdminData {
   return {
     exhibitors: structuredClone(c.exhibitors),
     products: structuredClone(c.products),
+    accommodations: structuredClone(c.accommodations),
     destinations: structuredClone(c.destinations),
     program: structuredClone(c.program),
     partners: structuredClone(c.partners),
@@ -120,6 +129,9 @@ function seed(): AdminData {
       heroImage: info.heroImage,
       logoText: info.logoText,
     },
+    eventType: prispaTenant.config.eventType,
+    modules: prispaTenant.config.modules,
+    labels: prispaTenant.config.labels,
   };
 }
 
@@ -131,6 +143,7 @@ function bundleToAdminData(bundle: Tenant): AdminData {
   return {
     exhibitors: content.exhibitors ?? [],
     products: content.products ?? [],
+    accommodations: content.accommodations ?? [],
     destinations: content.destinations ?? [],
     program: content.program ?? [],
     partners: content.partners ?? [],
@@ -159,6 +172,9 @@ function bundleToAdminData(bundle: Tenant): AdminData {
       heroImage: info.heroImage,
       logoText: info.logoText,
     },
+    eventType: config.eventType,
+    modules: config.modules,
+    labels: config.labels,
   };
 }
 
@@ -167,6 +183,7 @@ function emptyData(): AdminData {
   return {
     exhibitors: [],
     products: [],
+    accommodations: [],
     destinations: [],
     program: [],
     partners: [],
@@ -262,6 +279,7 @@ export function useAdminData(): AdminData {
 export type CollectionKey =
   | "exhibitors"
   | "products"
+  | "accommodations"
   | "destinations"
   | "program"
   | "partners"

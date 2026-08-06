@@ -46,6 +46,13 @@ class Settings(BaseSettings):
     # --- Seed / demo ---
     SEED_ON_STARTUP: bool = False
 
+    # --- Analytics (cookieless, geolocated) ---
+    # Path to a MaxMind-format .mmdb (DB-IP City Lite is compatible). Downloaded
+    # by app/scripts/download_geoip.py. Missing DB simply disables geolocation.
+    GEOIP_DB_PATH: str = "data/geoip/dbip-city-lite.mmdb"
+    # If False, /track is a 204 no-op and aggregation returns zeros.
+    ANALYTICS_ENABLED: bool = True
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]

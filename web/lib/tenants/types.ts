@@ -94,6 +94,12 @@ export interface TenantConfig {
   eventType?: string;
   /** Optional label overrides; the UI falls back to festival copy. */
   labels?: TenantLabels;
+  /**
+   * Ordered content-module keys this vertical exposes in the admin panel
+   * (e.g. "dashboard", "accommodations", "analytics"). Drives the vertical-aware
+   * admin navigation. When absent, the admin falls back to the full module list.
+   */
+  modules?: string[];
   info: FestivalInfo;
   theme: TenantTheme;
   navigation: NavItem[];
@@ -182,6 +188,41 @@ export interface Destination {
   featured: boolean;
   editorial: boolean;
   status: PublishStatus;
+}
+
+export type AccommodationType =
+  | "hotel"
+  | "pensiune"
+  | "cabana"
+  | "apartament"
+  | "camping"
+  | "vila"
+  | "other";
+
+export interface Accommodation {
+  id: string;
+  slug: string;
+  name: string;
+  /** hotel | pensiune | cabana | apartament | camping | vila | other. */
+  type: string;
+  shortDescription: string;
+  description: string;
+  image: string;
+  gallery: string[];
+  /** Free-text starting price, e.g. "de la 250 RON/noapte". */
+  priceFrom: string;
+  /** Max persons; 0 = unspecified. */
+  capacity: number;
+  rooms: number;
+  /** Facility keys, e.g. ["wifi", "parcare", "mic-dejun", "piscina"]. */
+  amenities: string[];
+  address: string;
+  contactPhone: string;
+  contactWebsite: string;
+  bookingUrl: string;
+  featured: boolean;
+  status: PublishStatus;
+  sortOrder: number;
 }
 
 export type ProgramCategory =
@@ -286,6 +327,7 @@ export interface NewsletterSubscriber {
 export interface TenantContent {
   exhibitors: Exhibitor[];
   products: Product[];
+  accommodations: Accommodation[];
   destinations: Destination[];
   program: ProgramEvent[];
   partners: Partner[];

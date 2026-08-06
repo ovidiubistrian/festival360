@@ -9,6 +9,7 @@ from app.models import ContactMessage, NewsletterSubscriber, Tenant
 from app.models.base import new_id, utcnow
 from app.services import tenant_service as svc
 from app.schemas.public import (
+    AccommodationOut,
     ArticleOut,
     DestinationOut,
     ExhibitorOut,
@@ -44,6 +45,29 @@ def get_exhibitor(
         if x.slug == item_slug:
             return ExhibitorOut.from_model(x)
     raise _not_found("Expozant")
+
+
+# --- Accommodations (cazări) ---
+@router.get("/accommodations", response_model=list[AccommodationOut])
+def list_accommodations(
+    tenant: Tenant = Depends(tenant_or_404), session: Session = Depends(get_session)
+):
+    return [
+        AccommodationOut.from_model(x)
+        for x in svc.accommodations_for(session, tenant.id)
+    ]
+
+
+@router.get("/accommodations/{item_slug}", response_model=AccommodationOut)
+def get_accommodation(
+    item_slug: str,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    for x in svc.accommodations_for(session, tenant.id):
+        if x.slug == item_slug:
+            return AccommodationOut.from_model(x)
+    raise _not_found("Cazare")
 
 
 # --- Products ---

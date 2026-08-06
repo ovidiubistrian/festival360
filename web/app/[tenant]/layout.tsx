@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTenantBundle } from "@/lib/api";
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
+import { AnalyticsBeacon } from "@/components/public/analytics-beacon";
 import { Toaster } from "@/components/ui/sonner";
 
 export async function generateMetadata({
@@ -69,6 +70,7 @@ export default async function TenantLayout({
 
   return (
     <div style={themeVars}>
+      <AnalyticsBeacon slug={t.slug} />
       <SiteHeader
         slug={t.slug}
         logoText={t.config.info.logoText}

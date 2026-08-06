@@ -2,6 +2,7 @@ import type {
   Tenant,
   Exhibitor,
   Product,
+  Accommodation,
   Destination,
   Article,
 } from "@/lib/tenants/types";
@@ -56,6 +57,15 @@ export function getProduct(
   itemSlug: string
 ): Promise<Product | null> {
   return apiGet<Product>(`/tenants/${slug}/products/${itemSlug}`, {
+    noStore: true,
+  });
+}
+
+export function getAccommodation(
+  slug: string,
+  itemSlug: string
+): Promise<Accommodation | null> {
+  return apiGet<Accommodation>(`/tenants/${slug}/accommodations/${itemSlug}`, {
     noStore: true,
   });
 }

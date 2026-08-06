@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlmodel import Session
 
 from app.api.deps import get_current_user, require_tenant_admin, tenant_or_404
+from app.core.config import settings
 from app.core.db import get_session
 from app.models import (
+    Accommodation,
     AdminUser,
     Article,
     ContactMessage,
@@ -21,6 +23,7 @@ from app.models import (
 from app.models.base import new_id, utcnow
 from app.services import crud
 from app.schemas.public import (
+    AccommodationOut,
     ArticleOut,
     DestinationOut,
     ExhibitorOut,
@@ -31,6 +34,7 @@ from app.schemas.public import (
     TenantConfigOut,
 )
 from app.schemas.write import (
+    AccommodationIn,
     ArticleIn,
     DestinationIn,
     ExhibitorIn,
@@ -81,6 +85,48 @@ def update_exhibitor(
     if not obj:
         raise _notfound("Expozant")
     return ExhibitorOut.from_model(crud.update(session, obj, payload.to_kwargs(tenant.id)))
+
+
+# =========================================================================
+# Accommodations (cazări)
+# =========================================================================
+@router.get("/accommodations", response_model=list[AccommodationOut])
+def list_accommodations(
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    from app.services import tenant_service as svc
+
+    return [
+        AccommodationOut.from_model(x)
+        for x in svc.accommodations_for(session, tenant.id)
+    ]
+
+
+@router.post("/accommodations", response_model=AccommodationOut, status_code=201)
+def create_accommodation(
+    payload: AccommodationIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    return AccommodationOut.from_model(
+        crud.create(session, Accommodation, payload.to_kwargs(tenant.id), "ac")
+    )
+
+
+@router.put("/accommodations/{item_id}", response_model=AccommodationOut)
+def update_accommodation(
+    item_id: str,
+    payload: AccommodationIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    obj = crud.get_owned(session, Accommodation, item_id, tenant.id)
+    if not obj:
+        raise _notfound("Cazare")
+    return AccommodationOut.from_model(
+        crud.update(session, obj, payload.to_kwargs(tenant.id))
+    )
 
 
 # =========================================================================
@@ -256,6 +302,7 @@ def update_article(
 # =========================================================================
 _MODELS: dict[str, type] = {
     "exhibitors": Exhibitor,
+    "accommodations": Accommodation,
     "products": Product,
     "destinations": Destination,
     "program": ProgramEvent,
@@ -263,7 +310,14 @@ _MODELS: dict[str, type] = {
     "gallery": GalleryImage,
     "articles": Article,
 }
-_STATUS_MODELS = {"exhibitors", "products", "destinations", "partners", "articles"}
+_STATUS_MODELS = {
+    "exhibitors",
+    "accommodations",
+    "products",
+    "destinations",
+    "partners",
+    "articles",
+}
 
 
 def _model_or_400(collection: str) -> type:
@@ -317,6 +371,158 @@ def toggle_item_status(
         raise _notfound("Element")
     crud.toggle_status(session, obj)
     return {"id": item_id, "status": obj.status}
+
+
+# =========================================================================
+# Analytics aggregation (tenant-admin)
+# =========================================================================
+_RANGE_DAYS = {"7d": 7, "30d": 30, "90d": 90}
+
+
+def _empty_analytics(range_key: str, days: int) -> dict:
+    import datetime as dt
+
+    today = dt.date.today()
+    start = today - dt.timedelta(days=days - 1)
+    series = [
+        {
+            "date": (start + dt.timedelta(days=i)).isoformat(),
+            "views": 0,
+            "uniques": 0,
+        }
+        for i in range(days)
+    ]
+    return {
+        "range": range_key,
+        "totals": {"views": 0, "uniques": 0, "viewsPrev": 0, "uniquesPrev": 0},
+        "timeseries": series,
+        "topPages": [],
+        "topCountries": [],
+        "topCities": [],
+        "referrers": [],
+        "devices": [],
+    }
+
+
+@router.get("/analytics")
+def get_analytics(
+    range_: str = Query("7d", alias="range"),
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+) -> dict:
+    import datetime as dt
+    from collections import defaultdict
+
+    from sqlmodel import select
+
+    from app.models import PageView
+
+    range_key = range_ if range_ in _RANGE_DAYS else "7d"
+    days = _RANGE_DAYS[range_key]
+
+    if not settings.ANALYTICS_ENABLED:
+        return _empty_analytics(range_key, days)
+
+    today = dt.date.today()
+    start = today - dt.timedelta(days=days - 1)
+    prev_start = start - dt.timedelta(days=days)  # N days before the window
+
+    rows = list(
+        session.exec(
+            select(PageView)
+            .where(PageView.tenant_id == tenant.id)
+            .where(PageView.day >= prev_start)
+        ).all()
+    )
+
+    # --- totals (current + previous window) ---
+    cur_views = prev_views = 0
+    cur_uniques: set[str] = set()
+    prev_uniques: set[str] = set()
+    # --- per-day (current window) ---
+    day_views: dict[str, int] = defaultdict(int)
+    day_uniques: dict[str, set[str]] = defaultdict(set)
+    # --- breakdowns (current window) ---
+    page_views: dict[str, int] = defaultdict(int)
+    country_views: dict[str, int] = defaultdict(int)
+    country_names: dict[str, str] = {}
+    city_views: dict[tuple[str, str], int] = defaultdict(int)
+    referrer_views: dict[str, int] = defaultdict(int)
+    device_views: dict[str, int] = defaultdict(int)
+
+    for r in rows:
+        if r.day < start:
+            # previous window: only used for the trend baseline
+            if prev_start <= r.day < start:
+                prev_views += 1
+                if r.visitor_hash:
+                    prev_uniques.add(r.visitor_hash)
+            continue
+        # current window
+        cur_views += 1
+        if r.visitor_hash:
+            cur_uniques.add(r.visitor_hash)
+        d = r.day.isoformat()
+        day_views[d] += 1
+        if r.visitor_hash:
+            day_uniques[d].add(r.visitor_hash)
+        if r.path:
+            page_views[r.path] += 1
+        if r.country:
+            country_views[r.country] += 1
+            if r.country not in country_names and r.country_name:
+                country_names[r.country] = r.country_name
+        if r.city:
+            city_views[(r.city, r.country)] += 1
+        referrer_views[r.referrer_host] += 1  # "" => Direct
+        if r.device:
+            device_views[r.device] += 1
+
+    timeseries = []
+    for i in range(days):
+        d = (start + dt.timedelta(days=i)).isoformat()
+        timeseries.append(
+            {"date": d, "views": day_views.get(d, 0), "uniques": len(day_uniques.get(d, ()))}
+        )
+
+    top_pages = [
+        {"path": p, "views": v}
+        for p, v in sorted(page_views.items(), key=lambda kv: kv[1], reverse=True)[:10]
+    ]
+    top_countries = [
+        {"country": c, "countryName": country_names.get(c, ""), "views": v}
+        for c, v in sorted(country_views.items(), key=lambda kv: kv[1], reverse=True)[:10]
+    ]
+    top_cities = [
+        {"city": city, "country": country, "views": v}
+        for (city, country), v in sorted(
+            city_views.items(), key=lambda kv: kv[1], reverse=True
+        )[:10]
+    ]
+    referrers = [
+        {"referrer": (r or "Direct"), "views": v}
+        for r, v in sorted(referrer_views.items(), key=lambda kv: kv[1], reverse=True)[:10]
+    ]
+    devices = [
+        {"device": dv, "views": v}
+        for dv, v in sorted(device_views.items(), key=lambda kv: kv[1], reverse=True)
+    ]
+
+    return {
+        "range": range_key,
+        "totals": {
+            "views": cur_views,
+            "uniques": len(cur_uniques),
+            "viewsPrev": prev_views,
+            "uniquesPrev": len(prev_uniques),
+        },
+        "timeseries": timeseries,
+        "topPages": top_pages,
+        "topCountries": top_countries,
+        "topCities": top_cities,
+        "referrers": referrers,
+        "devices": devices,
+    }
 
 
 # =========================================================================

@@ -5,6 +5,7 @@ from typing import Any
 
 from app.schemas.common import CamelModel
 from app.models import (
+    Accommodation,
     Article,
     ContactMessage,
     Destination,
@@ -16,6 +17,7 @@ from app.models import (
     Product,
     Tenant,
 )
+from app.presets import modules_for
 
 
 def _iso(d: dt.date | None) -> str | None:
@@ -70,6 +72,31 @@ class ExhibitorOut(CamelModel):
                 phone=m.contact_phone or None, website=m.contact_website or None
             ),
         )
+
+
+class AccommodationOut(CamelModel):
+    id: str
+    slug: str
+    name: str
+    type: str
+    short_description: str
+    description: str
+    image: str
+    gallery: list[str]
+    price_from: str
+    capacity: int
+    rooms: int
+    amenities: list[str]
+    address: str
+    contact_phone: str
+    contact_website: str
+    booking_url: str
+    featured: bool
+    status: str
+
+    @classmethod
+    def from_model(cls, m: Accommodation) -> "AccommodationOut":
+        return cls.model_validate(m)
 
 
 class ProductOut(CamelModel):
@@ -297,6 +324,7 @@ class ContactInfoOut(CamelModel):
 class TenantConfigOut(CamelModel):
     event_type: str
     labels: dict[str, Any]
+    modules: list[str]
     info: FestivalInfoOut
     theme: ThemeOut
     navigation: list[dict[str, Any]]
@@ -311,6 +339,7 @@ class TenantConfigOut(CamelModel):
         return cls(
             event_type=t.event_type,
             labels=t.labels or {},
+            modules=modules_for(t.event_type),
             info=FestivalInfoOut(
                 name=t.name,
                 slug=t.slug,
@@ -364,6 +393,7 @@ class TenantSummaryOut(CamelModel):
 
 class TenantContentOut(CamelModel):
     exhibitors: list[ExhibitorOut]
+    accommodations: list[AccommodationOut]
     products: list[ProductOut]
     destinations: list[DestinationOut]
     program: list[ProgramEventOut]

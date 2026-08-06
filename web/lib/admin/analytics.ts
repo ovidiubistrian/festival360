@@ -1,40 +1,105 @@
+"use client";
+
 /**
- * Deterministic mock analytics for the DEMO dashboard.
+ * Real, cookieless traffic analytics for the admin.
  *
- * There is NO real analytics backend. These values are hardcoded so the charts
- * render identically on server and client (no hydration mismatch) and never use
- * Math.random / Date.now at module scope.
+ * Reads aggregated stats for the currently-selected tenant from the FastAPI
+ * backend (`GET /tenants/{slug}/admin/analytics?range=`) using the same
+ * Bearer-token pattern as the rest of the admin API. Never throws — returns
+ * `null` on any failure so callers can render a friendly empty state.
  */
 
-export interface VisitorsPoint {
-  /** Short Romanian day label. */
-  day: string;
-  vizitatori: number;
-  pagini: number;
+import { getToken } from "@/lib/admin/api";
+import { getCurrentTenant } from "@/lib/admin/session";
+import { apiBaseUrl } from "@/lib/api-base";
+
+const API = `${apiBaseUrl()}/api/v1`;
+
+export type AnalyticsRange = "7d" | "30d" | "90d";
+
+export interface AnalyticsTotals {
+  views: number;
+  uniques: number;
+  viewsPrev: number;
+  uniquesPrev: number;
 }
 
-/** ~14 days of mock traffic. */
-export const visitorsSeries: VisitorsPoint[] = [
-  { day: "21 iul", vizitatori: 1840, pagini: 4210 },
-  { day: "22 iul", vizitatori: 2120, pagini: 4980 },
-  { day: "23 iul", vizitatori: 1990, pagini: 4610 },
-  { day: "24 iul", vizitatori: 2460, pagini: 5720 },
-  { day: "25 iul", vizitatori: 3180, pagini: 7340 },
-  { day: "26 iul", vizitatori: 3820, pagini: 8910 },
-  { day: "27 iul", vizitatori: 3510, pagini: 8120 },
-  { day: "28 iul", vizitatori: 2980, pagini: 6980 },
-  { day: "29 iul", vizitatori: 3240, pagini: 7510 },
-  { day: "30 iul", vizitatori: 3960, pagini: 9240 },
-  { day: "31 iul", vizitatori: 4520, pagini: 10680 },
-  { day: "1 aug", vizitatori: 5210, pagini: 12440 },
-  { day: "2 aug", vizitatori: 4870, pagini: 11520 },
-  { day: "3 aug", vizitatori: 4310, pagini: 10190 },
-];
+export interface TimeseriesPoint {
+  /** ISO day, "YYYY-MM-DD". */
+  date: string;
+  views: number;
+  uniques: number;
+}
 
-/** Mock KPI totals for the demo dashboard. */
-export const mockTraffic = {
-  visitorsTotal: 32480,
-  pageViewsTotal: 118560,
-  avgSessionMinutes: 3.4,
-  bounceRate: 38,
-};
+export interface TopPage {
+  path: string;
+  views: number;
+}
+
+export interface TopCountry {
+  /** ISO-2 country code, e.g. "RO". */
+  country: string;
+  countryName: string;
+  views: number;
+}
+
+export interface TopCity {
+  city: string;
+  country: string;
+  views: number;
+}
+
+export interface ReferrerRow {
+  referrer: string;
+  views: number;
+}
+
+export interface DeviceRow {
+  device: string;
+  views: number;
+}
+
+export interface Analytics {
+  range: AnalyticsRange;
+  totals: AnalyticsTotals;
+  timeseries: TimeseriesPoint[];
+  topPages: TopPage[];
+  topCountries: TopCountry[];
+  topCities: TopCity[];
+  referrers: ReferrerRow[];
+  devices: DeviceRow[];
+}
+
+/**
+ * Fetch aggregated analytics for the current tenant and range. Returns `null`
+ * when no tenant is selected, on a non-OK response, or on any network error.
+ */
+export async function getAnalytics(
+  range: AnalyticsRange
+): Promise<Analytics | null> {
+  const slug = getCurrentTenant();
+  if (!slug) return null;
+  try {
+    const res = await fetch(
+      `${API}/tenants/${slug}/admin/analytics?range=${range}`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken() ?? ""}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) return null;
+    return (await res.json()) as Analytics;
+  } catch (err) {
+    console.error("getAnalytics failed", err);
+    return null;
+  }
+}
+
+/** True when an analytics payload carries no recorded traffic at all. */
+export function isAnalyticsEmpty(a: Analytics | null): boolean {
+  if (!a) return true;
+  return (a.totals?.views ?? 0) === 0 && (a.totals?.uniques ?? 0) === 0;
+}

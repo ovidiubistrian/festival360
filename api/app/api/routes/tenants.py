@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request, Response
+from pydantic import BaseModel
 from sqlmodel import Session
 
+from app.core.config import settings
 from app.core.db import get_session
 from app.models import Tenant
 from app.services import tenant_service as svc
 from app.schemas.public import (
+    AccommodationOut,
     ArticleOut,
     ContactMessageOut,
     DestinationOut,
@@ -29,6 +32,10 @@ def build_bundle(session: Session, tenant: Tenant) -> TenantBundleOut:
     tid = tenant.id
     content = TenantContentOut(
         exhibitors=[ExhibitorOut.from_model(x) for x in svc.exhibitors_for(session, tid)],
+        accommodations=[
+            AccommodationOut.from_model(x)
+            for x in svc.accommodations_for(session, tid)
+        ],
         products=[ProductOut.from_model(x) for x in svc.products_for(session, tid)],
         destinations=[
             DestinationOut.from_model(x) for x in svc.destinations_for(session, tid)
@@ -75,3 +82,75 @@ def get_tenant_bundle(
             detail=f"Festivalul '{slug}' nu a fost găsit.",
         )
     return build_bundle(session, tenant)
+
+
+# =========================================================================
+# Analytics ingestion (public, cookieless) — POST /tenants/{slug}/track
+# =========================================================================
+class TrackIn(BaseModel):
+    path: str
+    referrer: str = ""
+
+
+@router.post("/{slug}/track", status_code=204)
+def track_pageview(
+    slug: str,
+    payload: TrackIn,
+    request: Request,
+    session: Session = Depends(get_session),
+) -> Response:
+    """Record one page view. Never 500s — analytics must never break a page."""
+    if not settings.ANALYTICS_ENABLED:
+        return Response(status_code=204)
+    try:
+        from app.analytics.geo import lookup
+        from app.analytics.track import client_ip, referrer_host, visitor_hash
+        from app.analytics.useragent import is_bot, parse_ua
+        from app.models import PageView, Tenant
+        from app.models.base import new_id, utcnow
+
+        path = (payload.path or "").strip()[:400]
+        if not path:
+            return Response(status_code=204)
+
+        ua = request.headers.get("user-agent", "")
+        if is_bot(ua):
+            return Response(status_code=204)
+
+        tenant = session.get(Tenant, slug)
+        if not tenant:  # don't leak which slugs exist
+            return Response(status_code=204)
+
+        ip = client_ip(request)
+        country, country_name, city, region = lookup(ip)
+        device, browser, os_name = parse_ua(ua)
+
+        internal_hosts = [
+            settings.PLATFORM_DOMAIN,
+            tenant.custom_domain or "",
+            f"{tenant.slug}.{settings.PLATFORM_DOMAIN}",
+        ]
+        rhost = referrer_host(payload.referrer, *internal_hosts)
+
+        now = utcnow()
+        view = PageView(
+            id=new_id("pv"),
+            tenant_id=tenant.id,
+            path=path,
+            referrer_host=rhost,
+            country=country,
+            country_name=country_name,
+            city=city,
+            region=region,
+            device=device,
+            browser=browser,
+            os=os_name,
+            visitor_hash=visitor_hash(ip, ua, tenant.slug),
+            day=now.date(),
+            created_at=now,
+        )
+        session.add(view)
+        session.commit()
+    except Exception:
+        session.rollback()
+    return Response(status_code=204)
