@@ -220,6 +220,8 @@ export interface Destination {
   experiences: string[];
   gastronomy: string[];
   externalLink?: string;
+  /** CTA button text; empty falls back to a default label. */
+  ctaLabel?: string;
   featured: boolean;
   editorial: boolean;
   status: PublishStatus;

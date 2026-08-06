@@ -118,6 +118,7 @@ class DestinationIn(CamelModel):
     experiences: list[str] = []
     gastronomy: list[str] = []
     external_link: str | None = None
+    cta_label: str = ""
     featured: bool = False
     editorial: bool = False
     status: str = "published"

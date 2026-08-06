@@ -79,6 +79,7 @@ class Destination(SQLModel, table=True):
     experiences: list[str] = Field(default_factory=list, sa_column=Column(JSON))
     gastronomy: list[str] = Field(default_factory=list, sa_column=Column(JSON))
     external_link: str | None = None
+    cta_label: str = ""  # CTA button text (falls back to a default in the UI)
     featured: bool = False
     editorial: bool = False
     status: str = "published"

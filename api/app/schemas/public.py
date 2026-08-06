@@ -135,6 +135,7 @@ class DestinationOut(CamelModel):
     experiences: list[str]
     gastronomy: list[str]
     external_link: str | None
+    cta_label: str
     featured: bool
     editorial: bool
     status: str

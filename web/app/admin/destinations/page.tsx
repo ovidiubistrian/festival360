@@ -72,6 +72,7 @@ function emptyDestination(): Destination {
     experiences: [],
     gastronomy: [],
     externalLink: "",
+    ctaLabel: "",
     featured: false,
     editorial: false,
     status: "draft",
@@ -382,6 +383,16 @@ export default function DestinationsPage() {
                 value={form.externalLink ?? ""}
                 onChange={(e) => set("externalLink", e.target.value)}
                 placeholder="https://..."
+              />
+            </Field>
+            <Field
+              label="Text buton (CTA)"
+              hint="ex: Rezervă, Vezi pe hartă, Află mai multe"
+            >
+              <Input
+                value={form.ctaLabel ?? ""}
+                onChange={(e) => set("ctaLabel", e.target.value)}
+                placeholder="Află mai multe"
               />
             </Field>
             <Field label="Status">

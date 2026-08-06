@@ -120,7 +120,7 @@ export default async function DestinationDetailPage({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Planifică vizita
+                    {destination.ctaLabel?.trim() || "Planifică vizita"}
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </Button>
