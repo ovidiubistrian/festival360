@@ -43,6 +43,10 @@ class Tenant(SQLModel, table=True):
     hero_image: str = ""
     hero_badge: str = ""
     logo_text: str = ""
+    # "Despre" section images (main collage + small inset); "" falls back to the
+    # frontend defaults.
+    about_image: str = ""
+    about_image_2: str = ""
 
     # --- Theme (brand palette) ---
     theme_primary: str = "#183C32"

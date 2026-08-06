@@ -236,6 +236,8 @@ class SettingsIn(CamelModel):
     gold_color: str | None = None
     hero_image: str | None = None
     hero_badge: str | None = None
+    about_image: str | None = None
+    about_image_2: str | None = None
     logo_text: str | None = None
     # Homepage zone content (About "cifre" + Experiences grid), edited as whole
     # arrays from the per-section editors.
@@ -261,6 +263,8 @@ class SettingsIn(CamelModel):
             "gold_color": "theme_gold",
             "hero_image": "hero_image",
             "hero_badge": "hero_badge",
+            "about_image": "about_image",
+            "about_image_2": "about_image_2",
             "logo_text": "logo_text",
             "stats": "stats",
             "experiences": "experiences",

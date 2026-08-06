@@ -106,6 +106,8 @@ export default async function TenantHome({
           description={config.info.longDescription}
           stats={config.stats}
           labels={config.labels}
+          image={config.info.aboutImage}
+          image2={config.info.aboutImage2}
         />
       )}
 

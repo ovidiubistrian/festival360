@@ -340,6 +340,12 @@ function AboutEditor({ onClose }: { onClose: () => void }) {
   const [longDescription, setLongDescription] = React.useState(
     () => data.settings.longDescription
   );
+  const [aboutImage, setAboutImage] = React.useState(
+    () => data.settings.aboutImage
+  );
+  const [aboutImage2, setAboutImage2] = React.useState(
+    () => data.settings.aboutImage2
+  );
   const [stats, setStats] = React.useState<StatRow[]>(() =>
     data.stats.map((s) => ({
       value: s.value,
@@ -366,6 +372,8 @@ function AboutEditor({ onClose }: { onClose: () => void }) {
     await persist(
       {
         longDescription: longDescription.trim(),
+        aboutImage: aboutImage.trim(),
+        aboutImage2: aboutImage2.trim(),
         stats: stats
           .filter((s) => s.value.trim() || s.label.trim())
           .map((s) => ({
@@ -389,6 +397,21 @@ function AboutEditor({ onClose }: { onClose: () => void }) {
             value={longDescription}
             onChange={(e) => setLongDescription(e.target.value)}
             className="min-h-[120px]"
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ImageField
+            id="about-image"
+            label="Imagine principală"
+            value={aboutImage}
+            onChange={setAboutImage}
+          />
+          <ImageField
+            id="about-image-2"
+            label="Imagine secundară (mică)"
+            value={aboutImage2}
+            onChange={setAboutImage2}
           />
         </div>
 

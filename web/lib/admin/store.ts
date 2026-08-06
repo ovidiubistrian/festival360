@@ -71,6 +71,8 @@ export interface AdminSettings {
   secondaryColor: string;
   goldColor: string;
   heroImage: string;
+  aboutImage: string;
+  aboutImage2: string;
   logoText: string;
 }
 
@@ -139,6 +141,8 @@ function seed(): AdminData {
       secondaryColor: theme.secondary,
       goldColor: theme.gold,
       heroImage: info.heroImage,
+      aboutImage: info.aboutImage ?? "",
+      aboutImage2: info.aboutImage2 ?? "",
       logoText: info.logoText,
     },
     eventType: prispaTenant.config.eventType,
@@ -186,6 +190,8 @@ function bundleToAdminData(bundle: Tenant): AdminData {
       secondaryColor: config.theme.secondary,
       goldColor: config.theme.gold,
       heroImage: info.heroImage,
+      aboutImage: info.aboutImage ?? "",
+      aboutImage2: info.aboutImage2 ?? "",
       logoText: info.logoText,
     },
     eventType: config.eventType,
@@ -230,6 +236,8 @@ function emptyData(): AdminData {
       secondaryColor: "",
       goldColor: "",
       heroImage: "",
+      aboutImage: "",
+      aboutImage2: "",
       logoText: "",
     },
   };
