@@ -1,9 +1,27 @@
 "use client";
 
+import * as React from "react";
 import dynamic from "next/dynamic";
-import { Footprints, Mountain, Clock, Ruler, TrendingUp } from "lucide-react";
+import {
+  Footprints,
+  Mountain,
+  Clock,
+  Ruler,
+  TrendingUp,
+  Images,
+  MapPin,
+} from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { AccommodationGallery } from "@/components/public/accommodation-gallery";
 import type { Trail, TrailDifficulty, Trails } from "@/lib/tenants/types";
 import { cn } from "@/lib/utils";
 
@@ -63,6 +81,28 @@ const DEFAULTS = {
   ] as Trail[],
 } satisfies Required<Omit<Trails, "items">> & { items: Trail[] };
 
+/** One metric line inside a trail card / the details dialog. */
+function TrailMeta({ trail }: { trail: Trail }) {
+  return (
+    <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-charcoal/70">
+      <span className="inline-flex items-center gap-1.5">
+        <Clock className="h-4 w-4 text-primary" />
+        {trail.duration}
+      </span>
+      <span className="inline-flex items-center gap-1.5">
+        <Ruler className="h-4 w-4 text-primary" />
+        {trail.length}
+      </span>
+      {trail.elevation?.trim() ? (
+        <span className="inline-flex items-center gap-1.5">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          {trail.elevation}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 export function TrailsMap({ trails }: { trails?: Trails }) {
   const eyebrow = trails?.eyebrow?.trim() || DEFAULTS.eyebrow;
   const title = trails?.title?.trim() || DEFAULTS.title;
@@ -70,6 +110,18 @@ export function TrailsMap({ trails }: { trails?: Trails }) {
   const mapQuery = trails?.mapQuery?.trim() || DEFAULTS.mapQuery;
   const items =
     trails?.items && trails.items.length > 0 ? trails.items : DEFAULTS.items;
+
+  // Which card is emphasized on the map (toggle), and which one has its
+  // details dialog open.
+  const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
+  const [detailIndex, setDetailIndex] = React.useState<number | null>(null);
+
+  const handleSelect = React.useCallback((i: number) => {
+    setSelectedIndex((prev) => (prev === i ? null : i));
+  }, []);
+
+  const detailTrail = detailIndex != null ? items[detailIndex] : null;
+  const detailPhotos = (detailTrail?.gallery ?? []).filter(Boolean);
 
   return (
     <section id="trasee" className="bg-secondary py-16 sm:py-24">
@@ -82,51 +134,132 @@ export function TrailsMap({ trails }: { trails?: Trails }) {
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
           <div className="aspect-video overflow-hidden rounded-2xl border border-border">
-            <TrailsLeafletMap trails={items} mapQuery={mapQuery} />
+            <TrailsLeafletMap
+              trails={items}
+              mapQuery={mapQuery}
+              selectedIndex={selectedIndex}
+              onSelect={handleSelect}
+            />
           </div>
 
           <ul className="space-y-4">
-            {items.map((trail, i) => (
-              <li
-                key={`${trail.name}-${i}`}
-                className="rounded-2xl border border-border bg-card p-5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="flex items-center gap-2 font-serif text-lg font-semibold text-primary">
-                    <Footprints className="h-5 w-5 shrink-0 text-terracotta" />
-                    {trail.name}
-                  </h3>
-                  <span
-                    className={cn(
-                      "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
-                      DIFFICULTY_STYLES[trail.difficulty]
-                    )}
+            {items.map((trail, i) => {
+              const selected = selectedIndex === i;
+              const photos = (trail.gallery ?? []).filter(Boolean);
+              const hasDetails = !!trail.description?.trim() || photos.length > 0;
+              return (
+                <li
+                  key={`${trail.name}-${i}`}
+                  className={cn(
+                    "rounded-2xl border bg-card p-5 transition-colors",
+                    selected
+                      ? "border-primary ring-2 ring-primary/60"
+                      : "border-border"
+                  )}
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSelect(i)}
+                    aria-pressed={selected}
+                    className="w-full rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <Mountain className="h-3.5 w-3.5" />
-                    {trail.difficulty}
-                  </span>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-charcoal/70">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Clock className="h-4 w-4 text-primary" />
-                    {trail.duration}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <Ruler className="h-4 w-4 text-primary" />
-                    {trail.length}
-                  </span>
-                  {trail.elevation?.trim() ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      <TrendingUp className="h-4 w-4 text-primary" />
-                      {trail.elevation}
-                    </span>
-                  ) : null}
-                </div>
-              </li>
-            ))}
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="flex items-center gap-2 font-serif text-lg font-semibold text-primary">
+                        <Footprints className="h-5 w-5 shrink-0 text-terracotta" />
+                        {trail.name}
+                      </h3>
+                      <span
+                        className={cn(
+                          "inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
+                          DIFFICULTY_STYLES[trail.difficulty]
+                        )}
+                      >
+                        <Mountain className="h-3.5 w-3.5" />
+                        {trail.difficulty}
+                      </span>
+                    </div>
+                    <TrailMeta trail={trail} />
+                  </button>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      variant={selected ? "gold" : "outline"}
+                      size="sm"
+                      onClick={() => handleSelect(i)}
+                    >
+                      <MapPin className="h-4 w-4" />
+                      {selected ? "Ascunsă pe hartă" : "Vezi pe hartă"}
+                    </Button>
+                    {hasDetails ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDetailIndex(i)}
+                      >
+                        {photos.length > 0 ? (
+                          <Images className="h-4 w-4" />
+                        ) : null}
+                        Detalii
+                      </Button>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </Container>
+
+      <Dialog
+        open={detailIndex != null}
+        onOpenChange={(open) => {
+          if (!open) setDetailIndex(null);
+        }}
+      >
+        <DialogContent className="max-w-2xl">
+          {detailTrail ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Footprints className="h-5 w-5 shrink-0 text-terracotta" />
+                  {detailTrail.name}
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Detalii despre traseul {detailTrail.name}.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <span
+                  className={cn(
+                    "inline-flex w-fit items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
+                    DIFFICULTY_STYLES[detailTrail.difficulty]
+                  )}
+                >
+                  <Mountain className="h-3.5 w-3.5" />
+                  {detailTrail.difficulty}
+                </span>
+                <TrailMeta trail={detailTrail} />
+
+                {detailPhotos.length > 0 ? (
+                  <AccommodationGallery
+                    images={detailPhotos}
+                    name={detailTrail.name}
+                  />
+                ) : null}
+
+                {detailTrail.description?.trim() ? (
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-charcoal/80">
+                    {detailTrail.description}
+                  </p>
+                ) : null}
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

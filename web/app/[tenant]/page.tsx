@@ -14,6 +14,7 @@ import { ExperiencesSection } from "@/components/public/sections/experiences-sec
 import { DestinationsSection } from "@/components/public/sections/destinations-section";
 import { NewsletterSection } from "@/components/public/sections/newsletter-section";
 import { CustomSection } from "@/components/public/sections/custom-section";
+import { EventFeature } from "@/components/public/sections/event-feature";
 import { ProgramSchedule } from "@/components/public/program-schedule";
 import { ExhibitorCard } from "@/components/public/cards/exhibitor-card";
 import { AccommodationCard } from "@/components/public/cards/accommodation-card";
@@ -285,14 +286,18 @@ export default async function TenantHome({
                 </Button>
               </div>
               <Reveal className="mt-10">
-                <Carousel
-                  ariaLabel="Evenimente evidențiate"
-                  slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
-                >
-                  {featuredEvents.map((e) => (
-                    <EventCard key={e.id} event={e} slug={slug} />
-                  ))}
-                </Carousel>
+                {featuredEvents.length === 1 ? (
+                  <EventFeature event={featuredEvents[0]} slug={slug} />
+                ) : (
+                  <Carousel
+                    ariaLabel="Evenimente evidențiate"
+                    slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
+                  >
+                    {featuredEvents.map((e) => (
+                      <EventCard key={e.id} event={e} slug={slug} />
+                    ))}
+                  </Carousel>
+                )}
               </Reveal>
             </Container>
           </section>

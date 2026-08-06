@@ -1190,6 +1190,8 @@ function TrailsEditor({ onClose }: { onClose: () => void }) {
               elevation: t.elevation.trim(),
               duration: t.duration.trim(),
               gpx: t.gpx || undefined,
+              description: t.description?.trim() || undefined,
+              gallery: (t.gallery ?? []).map((g) => g.trim()).filter(Boolean),
             })),
         },
       },
@@ -1341,9 +1343,33 @@ function TrailsEditor({ onClose }: { onClose: () => void }) {
                     />
                   </div>
                 </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`trail-desc-${i}`}>Descriere (opțional)</Label>
+                  <Textarea
+                    id={`trail-desc-${i}`}
+                    value={it.description ?? ""}
+                    onChange={(e) =>
+                      updateItem(i, { description: e.target.value })
+                    }
+                    placeholder="O scurtă descriere a traseului, afișată la „Detalii”."
+                  />
+                </div>
                 <GpxField
                   value={it.gpx}
                   onChange={(url) => updateItem(i, { gpx: url })}
+                />
+                <GalleryManager
+                  images={it.gallery ?? []}
+                  onImagesChange={(next) => updateItem(i, { gallery: next })}
+                  cover={it.gallery?.[0] ?? ""}
+                  onCoverChange={(url) =>
+                    updateItem(i, {
+                      gallery: [
+                        url,
+                        ...(it.gallery ?? []).filter((g) => g !== url),
+                      ],
+                    })
+                  }
                 />
               </li>
             ))}

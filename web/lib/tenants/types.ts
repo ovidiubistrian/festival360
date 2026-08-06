@@ -166,6 +166,10 @@ export interface Trail {
   duration: string;
   /** Uploaded GPX track URL, ex: "/media/xxx.gpx". */
   gpx?: string;
+  /** Descriere liberă a traseului, afișată în dialogul de detalii. */
+  description?: string;
+  /** Poze ale traseului; prima e considerată copertă. */
+  gallery?: string[];
 }
 
 /**
