@@ -80,6 +80,8 @@ export interface Experience {
   description: string;
   icon: string;
   image: string;
+  /** Extra photos shown as a card carousel (the cover is `image`). */
+  gallery?: string[];
 }
 
 /** Content collection a custom section can draw its items from. */

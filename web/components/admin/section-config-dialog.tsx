@@ -41,6 +41,7 @@ import {
   useAdminData,
 } from "@/lib/admin/store";
 import { uploadMedia } from "@/lib/admin/media";
+import { GalleryManager } from "@/components/admin/gallery-manager";
 import type {
   CustomSectionSource,
   Experience,
@@ -523,6 +524,7 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
         description: "",
         icon: "",
         image: "",
+        gallery: [],
       },
     ]);
   }
@@ -550,6 +552,9 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
             description: it.description.trim(),
             icon: it.icon.trim(),
             image: it.image.trim(),
+            gallery: (it.gallery ?? [])
+              .map((g) => g.trim())
+              .filter(Boolean),
           })),
       },
       onClose
@@ -562,7 +567,8 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
       <div className="space-y-4 py-2">
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Fiecare card afișează un titlu, o descriere, un icon și o imagine.
+            Fiecare card afișează un titlu, o descriere, un icon și un mic
+            carusel foto (poza principală + galerie).
           </p>
           <Button variant="outline" size="sm" onClick={addItem}>
             <Plus className="h-4 w-4" />
@@ -653,9 +659,15 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
                 </div>
                 <ImageField
                   id={`exp-image-${i}`}
-                  label="Imagine"
+                  label="Imagine principală (profil)"
                   value={it.image}
                   onChange={(url) => updateItem(i, { image: url })}
+                />
+                <GalleryManager
+                  images={it.gallery ?? []}
+                  onImagesChange={(next) => updateItem(i, { gallery: next })}
+                  cover={it.image}
+                  onCoverChange={(url) => updateItem(i, { image: url })}
                 />
               </li>
             ))}
