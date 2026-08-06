@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Icon } from "@/components/shared/icon";
+import { Icon, ICON_OPTIONS } from "@/components/shared/icon";
 import { apiUpdateSettings } from "@/lib/admin/api";
 import {
   addSection,
@@ -555,6 +555,8 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
             gallery: (it.gallery ?? [])
               .map((g) => g.trim())
               .filter(Boolean),
+            link: it.link?.trim() || "",
+            ctaLabel: it.ctaLabel?.trim() || "",
           })),
       },
       onClose
@@ -638,13 +640,29 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor={`exp-icon-${i}`}>Icon (lucide)</Label>
-                    <Input
-                      id={`exp-icon-${i}`}
-                      value={it.icon}
-                      onChange={(e) => updateItem(i, { icon: e.target.value })}
-                      placeholder="UtensilsCrossed"
-                    />
+                    <Label htmlFor={`exp-icon-${i}`}>Iconiță</Label>
+                    <Select
+                      value={
+                        ICON_OPTIONS.some((o) => o.value === it.icon)
+                          ? it.icon
+                          : undefined
+                      }
+                      onValueChange={(v) => updateItem(i, { icon: v })}
+                    >
+                      <SelectTrigger id={`exp-icon-${i}`}>
+                        <SelectValue placeholder="Alege o iconiță" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {ICON_OPTIONS.map((o) => (
+                          <SelectItem key={o.value} value={o.value}>
+                            <span className="flex items-center gap-2">
+                              <Icon name={o.value} className="h-4 w-4" />
+                              {o.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className="space-y-1.5">
@@ -656,6 +674,28 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
                       updateItem(i, { description: e.target.value })
                     }
                   />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`exp-link-${i}`}>Link (opțional)</Label>
+                    <Input
+                      id={`exp-link-${i}`}
+                      value={it.link ?? ""}
+                      onChange={(e) => updateItem(i, { link: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`exp-cta-${i}`}>Text buton (CTA)</Label>
+                    <Input
+                      id={`exp-cta-${i}`}
+                      value={it.ctaLabel ?? ""}
+                      onChange={(e) =>
+                        updateItem(i, { ctaLabel: e.target.value })
+                      }
+                      placeholder="Află mai multe"
+                    />
+                  </div>
                 </div>
                 <ImageField
                   id={`exp-image-${i}`}

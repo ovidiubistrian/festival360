@@ -82,6 +82,10 @@ export interface Experience {
   image: string;
   /** Extra photos shown as a card carousel (the cover is `image`). */
   gallery?: string[];
+  /** Optional CTA link (opens in a new tab). */
+  link?: string;
+  /** CTA button text; empty falls back to a default label. */
+  ctaLabel?: string;
 }
 
 /** Content collection a custom section can draw its items from. */

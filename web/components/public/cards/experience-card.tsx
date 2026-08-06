@@ -3,9 +3,10 @@
 import * as React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaCarouselType } from "embla-carousel";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { Icon } from "@/components/shared/icon";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Experience } from "@/lib/tenants/types";
 
@@ -55,6 +56,20 @@ export function ExperienceCard({ experience }: { experience: Experience }) {
           >
             {expanded ? "Vezi mai puțin" : "Vezi mai mult"}
           </button>
+        ) : null}
+        {experience.link?.trim() ? (
+          <div className="mt-auto pt-4">
+            <Button asChild size="sm" variant="outline">
+              <a
+                href={experience.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {experience.ctaLabel?.trim() || "Află mai multe"}
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
         ) : null}
       </div>
     </div>
