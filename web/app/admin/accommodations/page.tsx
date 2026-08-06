@@ -137,6 +137,15 @@ export default function AccommodationsPage() {
   const [isEdit, setIsEdit] = React.useState(false);
   const [form, setForm] = React.useState<Accommodation>(emptyAccommodation);
 
+  // Deep-link support: /admin/accommodations?nou=camping opens the create form
+  // with the type pre-filled (used by the custom "Campinguri" section button).
+  // Read from the URL directly (client-only) to avoid a Suspense boundary.
+  const nouParam =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("nou")
+      : null;
+  const [deepLinkHandled, setDeepLinkHandled] = React.useState(false);
+
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     return data.accommodations.filter((a) => {
@@ -164,6 +173,18 @@ export default function AccommodationsPage() {
   if (filterSig !== lastFilterSig) {
     setLastFilterSig(filterSig);
     setPage(1);
+  }
+
+  // Open the create dialog pre-filled when arriving via ?nou=<type> (once).
+  if (nouParam && !deepLinkHandled) {
+    setDeepLinkHandled(true);
+    const draft = emptyAccommodation();
+    if (nouParam in TYPE_LABELS) {
+      draft.type = nouParam as AccommodationType;
+    }
+    setForm(draft);
+    setIsEdit(false);
+    setDialogOpen(true);
   }
 
   function openAdd() {
