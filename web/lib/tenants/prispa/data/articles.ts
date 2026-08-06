@@ -5,19 +5,19 @@ export const articles: Article[] = [
   {
     id: "ar-1",
     slug: "de-ce-prispa",
-    title: "De ce PRISPA: povestea din spatele festivalului",
+    title: "De ce VATRA: povestea din spatele festivalului",
     excerpt:
-      "Prispa este locul unde satul se deschide către oaspete. Am construit un festival în jurul acestei idei simple și calde.",
+      "Vatra este inima casei, locul cald în jurul căruia se adună satul. Am construit un festival în jurul acestei idei simple și calde.",
     category: "Festival",
-    author: "Echipa PRISPA",
+    author: "Echipa VATRA",
     date: "2025-07-10",
     readingMinutes: 5,
     coverImage: IMG.aboutCollage,
     featured: true,
     status: "published",
-    body: `<p>Prispa a fost dintotdeauna locul întâlnirii. Acolo se stătea la povești seara, se primeau oaspeții, se sărbătoreau bucuriile satului. Am pornit de la această imagine când am imaginat festivalul: un loc în care România autentică își deschide poarta.</p>
+    body: `<p>Vatra a fost dintotdeauna inima casei. În jurul ei se stătea la povești seara, se primeau oaspeții, se sărbătoreau bucuriile satului. Am pornit de la această imagine când am imaginat festivalul: un loc în care România autentică își deschide poarta.</p>
 <h2>O idee simplă</h2>
-<p>Am vrut să aducem la un loc oameni care fac lucruri cu mâna lor și cu inima: producători, meșteșugari, bucătari, gazde de la munte. Nu un târg oarecare, ci o prispă uriașă, unde fiecare are o poveste de spus.</p>
+<p>Am vrut să aducem la un loc oameni care fac lucruri cu mâna lor și cu inima: producători, meșteșugari, bucătari, gazde de la munte. Nu un târg oarecare, ci o vatră uriașă, unde fiecare are o poveste de spus.</p>
 <blockquote>Nu vindem doar produse. Ducem mai departe gesturi, gusturi și locuri.</blockquote>
 <h2>De la sat la Piața Sfatului</h2>
 <p>Am ales Brașovul și Piața Sfatului pentru că este un loc de întâlnire firesc, la granița dintre oraș și munte. Timp de trei zile, centrul istoric devine o hartă vie a României rurale.</p>
@@ -46,7 +46,7 @@ export const articles: Article[] = [
 <li>Cheile Nerei și Cascada Bigăr</li>
 </ul>
 <h2>Gustul locului</h2>
-<p>Brânza afumată de stână, mierea polifloră de munte și afinata de casă sunt doar începutul. La PRISPA aducem producătorii care le fac, ca să le cunoști povestea direct de la sursă.</p>`,
+<p>Brânza afumată de stână, mierea polifloră de munte și afinata de casă sunt doar începutul. La VATRA aducem producătorii care le fac, ca să le cunoști povestea direct de la sursă.</p>`,
   },
   {
     id: "ar-3",
@@ -91,17 +91,17 @@ export const articles: Article[] = [
   {
     id: "ar-5",
     slug: "ghid-festival-cu-copii",
-    title: "Ghid: cum să vizitezi PRISPA cu copiii",
+    title: "Ghid: cum să vizitezi VATRA cu copiii",
     excerpt:
       "Ateliere, jocuri și gustări prietenoase. Tot ce trebuie să știi pentru o zi reușită în familie.",
     category: "Ghid",
-    author: "Echipa PRISPA",
+    author: "Echipa VATRA",
     date: "2025-08-10",
     readingMinutes: 4,
     coverImage: IMG.children,
     featured: false,
     status: "published",
-    body: `<p>PRISPA este un festival gândit pentru toate vârstele. Iată cum să-ți organizezi vizita dacă vii cu cei mici.</p>
+    body: `<p>VATRA este un festival gândit pentru toate vârstele. Iată cum să-ți organizezi vizita dacă vii cu cei mici.</p>
 <h2>Zona Copiilor</h2>
 <p>În fiecare zi găsești ateliere de olărit, jocuri tradiționale și povești. Programul este afișat la intrarea în zonă.</p>
 <h3>Sfaturi practice</h3>
@@ -144,7 +144,7 @@ export const articles: Article[] = [
     coverImage: IMG.village,
     featured: false,
     status: "published",
-    body: `<p>PRISPA durează trei zile, dar Brașovul și împrejurimile merită mai mult. Iată o idee de program.</p>
+    body: `<p>VATRA durează trei zile, dar Brașovul și împrejurimile merită mai mult. Iată o idee de program.</p>
 <h2>Vineri</h2>
 <p>Deschiderea festivalului și o seară în centrul istoric, cu concertul de deschidere în Piața Sfatului.</p>
 <h2>Sâmbătă</h2>
@@ -159,7 +159,7 @@ export const articles: Article[] = [
     excerpt:
       "Mai mulți producători, o zonă turistică extinsă și noi ateliere. Îți spunem la ce ne gândim.",
     category: "Festival",
-    author: "Echipa PRISPA",
+    author: "Echipa VATRA",
     date: "2025-08-25",
     readingMinutes: 3,
     coverImage: IMG.festivalCrowd,

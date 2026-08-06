@@ -9,7 +9,7 @@ export const partners: Partner[] = [
   {
     id: "pa-1",
     slug: "asociatia-prispa",
-    name: "Asociația PRISPA",
+    name: "Asociația VATRA",
     tier: "Organizator",
     logo: "PR",
     description:
@@ -149,7 +149,7 @@ export const partners: Partner[] = [
   {
     id: "pa-12",
     slug: "voluntarii-prispa",
-    name: "Voluntarii PRISPA",
+    name: "Voluntarii VATRA",
     tier: "Partener local",
     logo: "VP",
     description:

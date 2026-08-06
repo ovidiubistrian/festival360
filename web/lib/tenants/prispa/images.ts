@@ -1,5 +1,5 @@
 /**
- * Central image pool for the PRISPA demo.
+ * Central image pool for the VATRA demo.
  *
  * All public imagery references these constants, so swapping the demo Unsplash
  * photos for real festival photos means editing THIS FILE ONLY (or dropping

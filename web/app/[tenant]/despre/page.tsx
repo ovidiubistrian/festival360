@@ -97,8 +97,8 @@ export default async function AboutPage({
               </p>
               <p className="mt-4 text-base leading-relaxed text-charcoal/75">
                 {formatDateRange(info.startDate, info.endDate)}, la{" "}
-                {info.locationName} din {info.city}, {info.county}, PRISPA
-                transformă orașul într-o prispă mare, unde satul românesc își
+                {info.locationName} din {info.city}, {info.county}, VATRA
+                transformă orașul într-o vatră mare, unde satul românesc își
                 spune povestea prin gust, meșteșug și muzică.
               </p>
             </Reveal>
@@ -124,7 +124,7 @@ export default async function AboutPage({
           <SectionHeading
             align="center"
             eyebrow="Festivalul în cifre"
-            title="PRISPA, dintr-o privire"
+            title="VATRA, dintr-o privire"
           />
           <dl className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4">
             {stats.map((s, i) => (
@@ -159,7 +159,7 @@ export default async function AboutPage({
               </h2>
               <p className="mt-5 text-base leading-relaxed text-charcoal/75">
                 Credem că tradiția nu se conservă în muzee, ci în oameni, în
-                gesturi și în gust. PRISPA aduce producătorii, meșteșugarii și
+                gesturi și în gust. VATRA aduce producătorii, meșteșugarii și
                 comunitățile rurale mai aproape de public, oferindu-le o scenă și
                 un public care apreciază munca din spatele fiecărui produs.
               </p>
@@ -198,7 +198,7 @@ export default async function AboutPage({
             align="center"
             eyebrow="Zone și experiențe"
             title="Șase lumi, într-un singur festival"
-            description="De la gustul preparatelor gătite pe loc, la gesturile meșterilor și liniștea muntelui — PRISPA este o experiență completă."
+            description="De la gustul preparatelor gătite pe loc, la gesturile meșterilor și liniștea muntelui — VATRA este o experiență completă."
           />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {experiences.map((exp, i) => (

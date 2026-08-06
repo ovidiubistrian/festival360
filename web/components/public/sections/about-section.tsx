@@ -54,7 +54,7 @@ export function AboutSection({
                 alt="Atmosferă de festival în Piața Sfatului"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                fallbackLabel="PRISPA"
+                fallbackLabel="VATRA"
                 className="object-cover"
               />
             </div>

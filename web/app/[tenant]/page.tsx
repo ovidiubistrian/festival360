@@ -73,7 +73,7 @@ export default async function TenantHome({
     },
     organizer: {
       "@type": "Organization",
-      name: "Asociația PRISPA",
+      name: "Asociația VATRA",
       url: config.social.website,
     },
   };
@@ -228,7 +228,7 @@ export default async function TenantHome({
               title={L("partnersTitle", "Alături de noi")}
               description={L(
                 "partnersDescription",
-                "Festivalul PRISPA este posibil datorită partenerilor care cred în satul românesc."
+                "Festivalul VATRA este posibil datorită partenerilor care cred în satul românesc."
               )}
             />
             <Carousel
@@ -315,7 +315,7 @@ export default async function TenantHome({
                 title={L("newsTitle", "De citit înainte de festival")}
                 description={L(
                   "newsDescription",
-                  "Poveștile producătorilor, ghiduri și interviuri din lumea PRISPA."
+                  "Poveștile producătorilor, ghiduri și interviuri din lumea VATRA."
                 )}
               />
               <Button asChild variant="outline">

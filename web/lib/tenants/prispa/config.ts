@@ -3,13 +3,13 @@ import { IMG } from "./images";
 
 export const prispaConfig: TenantConfig = {
   info: {
-    name: "PRISPA",
+    name: "VATRA",
     slug: "prispa",
-    tagline: "România autentică se întâlnește la PRISPA",
+    tagline: "România autentică se întâlnește la VATRA",
     shortDescription:
       "Descoperă gusturi locale, meșteșuguri, tradiții și unele dintre cele mai frumoase destinații ale României.",
     longDescription:
-      "PRISPA este festivalul care aduce în inima Brașovului esența satului românesc: producători cu poveste, meșteșugari care păstrează gesturi vechi de sute de ani, bucătari care gătesc după rețete moștenite și destinații turistice care așteaptă să fie descoperite. Timp de trei zile, Piața Sfatului devine o prispă uriașă, un loc de întâlnire între tradiție și prezent, între oameni și locurile care îi definesc.",
+      "VATRA este festivalul care aduce în inima Brașovului esența satului românesc: producători cu poveste, meșteșugari care păstrează gesturi vechi de sute de ani, bucătari care gătesc după rețete moștenite și destinații turistice care așteaptă să fie descoperite. Timp de trei zile, Piața Sfatului devine o vatră uriașă, un loc de întâlnire între tradiție și prezent, între oameni și locurile care îi definesc.",
     startDate: "2025-09-12",
     endDate: "2025-09-14",
     locationName: "Piața Sfatului",
@@ -17,7 +17,7 @@ export const prispaConfig: TenantConfig = {
     county: "Brașov",
     heroImage: IMG.hero,
     heroBadge: "Tradiții • Gastronomie • Turism",
-    logoText: "PRISPA",
+    logoText: "VATRA",
   },
   theme: {
     primary: "#183C32",

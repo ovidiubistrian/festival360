@@ -8,7 +8,7 @@ export const program: ProgramEvent[] = [
     date: "2025-09-12",
     startTime: "12:00",
     endTime: "12:30",
-    title: "Deschiderea festivalului PRISPA",
+    title: "Deschiderea festivalului VATRA",
     description:
       "Ceremonia de deschidere cu fanfară și un cuvânt din partea organizatorilor și partenerilor.",
     stage: "Scena Mare",

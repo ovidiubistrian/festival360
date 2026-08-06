@@ -53,7 +53,7 @@ export default async function NewsPage({
       <PageHero
         eyebrow="Noutăți și povești"
         title="De citit înainte de festival"
-        description="Poveștile producătorilor, ghiduri de călătorie, interviuri și noutăți din lumea PRISPA."
+        description="Poveștile producătorilor, ghiduri de călătorie, interviuri și noutăți din lumea VATRA."
         image={config.info.heroImage}
         crumbs={[{ label: "Acasă", href: `/${slug}` }, { label: "Noutăți" }]}
       />

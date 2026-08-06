@@ -79,7 +79,7 @@ const verticals = [
 const demos = [
   {
     slug: "prispa",
-    name: "PRISPA",
+    name: "VATRA",
     type: "Festival",
     tagline: "Festival de tradiții și gastronomie · Brașov",
     color: "#183C32",

@@ -11,7 +11,7 @@ export const destinations: Destination[] = [
     shortDescription:
       "O lume de munte cu sate autentice, ape cristaline și oameni care trăiesc încă în ritmul naturii.",
     description:
-      "Banatul Montan este România pe care mulți o caută și puțini o cunosc: creste de calcar, păduri seculare, lacuri de un albastru imposibil și sate în care timpul curge altfel. De la Poiana Mărului la Muntele Mic și Munții Țarcu, este un ținut al ciobanilor, al morilor de apă și al gospodăriilor cu prispă. Aici, turismul înseamnă drumeții pe poteci nemarcate de turmă, cine cu produse din curte și seri la foc, sub un cer plin de stele. PRISPA aduce Banatul Montan la Brașov, ca invitație de a-l descoperi pe îndelete.",
+      "Banatul Montan este România pe care mulți o caută și puțini o cunosc: creste de calcar, păduri seculare, lacuri de un albastru imposibil și sate în care timpul curge altfel. De la Poiana Mărului la Muntele Mic și Munții Țarcu, este un ținut al ciobanilor, al morilor de apă și al gospodăriilor cu prispă. Aici, turismul înseamnă drumeții pe poteci nemarcate de turmă, cine cu produse din curte și seri la foc, sub un cer plin de stele. VATRA aduce Banatul Montan la Brașov, ca invitație de a-l descoperi pe îndelete.",
     coverImage: IMG.mountainLake,
     gallery: [IMG.mountainLake, IMG.valley, IMG.village, IMG.river, IMG.meadow],
     attractions: [
@@ -47,7 +47,7 @@ export const destinations: Destination[] = [
     shortDescription:
       "Sat de munte la poalele Țarcului, cu un lac de smarald și stâne cu tradiție.",
     description:
-      "Poiana Mărului este poarta de intrare în Munții Țarcu, un sat risipit pe văi, cu case de lemn și gospodării vii. Lacul de acumulare, de un verde-smarald, este locul perfect pentru o zi de liniște, iar potecile duc spre stânele de sus și spre crestele alpine. Este locul de unde vin unele dintre cele mai bune brânzeturi prezente la PRISPA.",
+      "Poiana Mărului este poarta de intrare în Munții Țarcu, un sat risipit pe văi, cu case de lemn și gospodării vii. Lacul de acumulare, de un verde-smarald, este locul perfect pentru o zi de liniște, iar potecile duc spre stânele de sus și spre crestele alpine. Este locul de unde vin unele dintre cele mai bune brânzeturi prezente la VATRA.",
     coverImage: IMG.valley,
     gallery: [IMG.valley, IMG.mountainLake, IMG.meadow],
     attractions: ["Lacul Poiana Mărului", "Stânele din Țarcu", "Valea Bistrei Mărului"],
@@ -123,7 +123,7 @@ export const destinations: Destination[] = [
     shortDescription:
       "Cetatea de la poalele Tâmpei și satele de sub Piatra Craiului.",
     description:
-      "Brașovul este gazda festivalului PRISPA, dar și punctul de plecare spre o lume întreagă de experiențe: cetatea medievală, satele săsești din jur, Piatra Craiului și traseele Zărneștiului. Este locul unde orașul și muntele se ating, iar tradiția mocănească trăiește încă în Săcele și Bran.",
+      "Brașovul este gazda festivalului VATRA, dar și punctul de plecare spre o lume întreagă de experiențe: cetatea medievală, satele săsești din jur, Piatra Craiului și traseele Zărneștiului. Este locul unde orașul și muntele se ating, iar tradiția mocănească trăiește încă în Săcele și Bran.",
     coverImage: IMG.village,
     gallery: [IMG.village, IMG.autumn, IMG.forest],
     attractions: ["Piața Sfatului", "Muntele Tâmpa", "Piatra Craiului", "Bran"],
@@ -142,7 +142,7 @@ export const destinations: Destination[] = [
     shortDescription:
       "Țara lemnului și a bisericilor de lemn, cu porți sculptate și tradiții vii.",
     description:
-      "Maramureșul este ultima Europă rurală, un ținut unde lemnul spune povești: porți sculptate, biserici cu turle ascuțite și Cimitirul Vesel de la Săpânța. Aici, meșteșugurile nu sunt muzeu, ci viață de zi cu zi. De la Maramureș vin olarii și țesătoarele prezente la PRISPA.",
+      "Maramureșul este ultima Europă rurală, un ținut unde lemnul spune povești: porți sculptate, biserici cu turle ascuțite și Cimitirul Vesel de la Săpânța. Aici, meșteșugurile nu sunt muzeu, ci viață de zi cu zi. De la Maramureș vin olarii și țesătoarele prezente la VATRA.",
     coverImage: IMG.autumn,
     gallery: [IMG.autumn, IMG.village, IMG.crafts],
     attractions: ["Cimitirul Vesel", "Bisericile de lemn", "Mocănița de pe Vaser"],

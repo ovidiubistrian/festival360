@@ -53,7 +53,7 @@ export default async function GalleryPage({
         <Container>
           <SectionHeading
             eyebrow="Galerie"
-            title="Atmosfera PRISPA, cadru cu cadru"
+            title="Atmosfera VATRA, cadru cu cadru"
             description="Filtrează după categorie și deschide imaginile pentru a le vedea la dimensiune completă."
           />
           <div className="mt-10">
