@@ -337,6 +337,10 @@ function SidebarContent({
   const tenantEditMode = superadmin && !!currentTenant;
   const activeTenantName =
     tenants.find((t) => t.slug === currentTenant)?.name ?? currentTenant ?? "";
+  // Brandul din colțul stânga-sus: logo-ul site-ului administrat (încărcat din
+  // Setări → Identitate vizuală). În modul platformă rămâne marca Siteora,
+  // fiindcă acolo nu administrezi un singur site.
+  const brandLogo = platformMode ? "" : data.settings.logoImage?.trim();
 
   function handleLogout() {
     logout();
@@ -353,10 +357,23 @@ function SidebarContent({
           onClick={onNavigate}
           className="flex items-center gap-2"
         >
-          <span className="font-serif text-lg font-semibold text-warm-white">
-            Siteora
-          </span>
-          {superadmin ? <Badge variant="gold">Platformă</Badge> : null}
+          {brandLogo ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={brandLogo}
+              alt={data.settings.logoText || activeTenantName || "Logo"}
+              className="h-9 w-auto max-w-[160px] object-contain object-left"
+            />
+          ) : (
+            <span className="font-serif text-lg font-semibold text-warm-white">
+              {platformMode
+                ? "Siteora"
+                : data.settings.logoText || activeTenantName || "Siteora"}
+            </span>
+          )}
+          {platformMode && superadmin ? (
+            <Badge variant="gold">Platformă</Badge>
+          ) : null}
         </Link>
         <p className="mt-3 text-[11px] leading-snug text-cream/70">
           {platformMode
