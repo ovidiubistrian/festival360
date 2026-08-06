@@ -16,6 +16,7 @@ import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Field } from "@/components/admin/field";
 import { MediaPicker } from "@/components/admin/media-picker";
+import { GalleryManager } from "@/components/admin/gallery-manager";
 import { Pager } from "@/components/admin/pager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -485,13 +486,14 @@ export default function AccommodationsPage() {
                 rows={4}
               />
             </Field>
-            <Field label="Galerie — URL-uri (unul pe linie)">
-              <Textarea
-                value={toLines(form.gallery)}
-                onChange={(e) => set("gallery", fromLines(e.target.value))}
-                rows={4}
+            <div className="sm:col-span-2">
+              <GalleryManager
+                images={form.gallery}
+                onImagesChange={(next) => set("gallery", next)}
+                cover={form.image}
+                onCoverChange={(url) => set("image", url)}
               />
-            </Field>
+            </div>
             <Field label="Adresă" className="sm:col-span-2">
               <Input
                 value={form.address}

@@ -14,10 +14,10 @@ import { getTenantBundle } from "@/lib/api";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { Reveal } from "@/components/shared/reveal";
-import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/public/page-hero";
+import { AccommodationGallery } from "@/components/public/accommodation-gallery";
 import {
   AccommodationCard,
   accommodationTypeLabel,
@@ -80,6 +80,15 @@ export default async function AccommodationDetailPage({
   ].filter((x): x is { icon: typeof Users; label: string } => x !== null);
 
   const bookHref = accommodation.bookingUrl || accommodation.contactWebsite;
+
+  // Cover first, then the rest of the gallery, deduped and with empties removed.
+  const allPhotos = Array.from(
+    new Set(
+      [accommodation.image, ...accommodation.gallery]
+        .map((src) => src?.trim())
+        .filter((src): src is string => Boolean(src))
+    )
+  );
 
   return (
     <>
@@ -209,30 +218,15 @@ export default async function AccommodationDetailPage({
       </section>
 
       {/* Gallery */}
-      {accommodation.gallery.length > 0 && (
+      {allPhotos.length > 0 && (
         <section className="bg-secondary py-20 sm:py-28">
           <Container>
             <SectionHeading eyebrow="Galerie" title="Imagini" />
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {accommodation.gallery.map((src, i) => (
-                <div
-                  key={i}
-                  className={
-                    i === 0
-                      ? "relative aspect-[4/3] overflow-hidden rounded-2xl border border-border sm:col-span-2 sm:aspect-[16/9]"
-                      : "relative aspect-[4/3] overflow-hidden rounded-2xl border border-border"
-                  }
-                >
-                  <ImageWithFallback
-                    src={src}
-                    alt={`${accommodation.name} — imagine ${i + 1}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    fallbackLabel={accommodation.name}
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+            <div className="mt-8">
+              <AccommodationGallery
+                images={allPhotos}
+                name={accommodation.name}
+              />
             </div>
           </Container>
         </section>

@@ -20,10 +20,13 @@ export function SiteHeader({
   slug,
   logoText,
   navigation,
+  ctaLabel = "Vezi programul",
 }: {
   slug: string;
   logoText: string;
   navigation: NavItem[];
+  /** Header CTA label — vertical-aware (e.g. "Vezi evenimentele" for resorts). */
+  ctaLabel?: string;
 }) {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -96,7 +99,7 @@ export function SiteHeader({
             >
               <Link href={`${base}/program`}>
                 <CalendarDays className="h-4 w-4" />
-                Vezi programul
+                {ctaLabel}
               </Link>
             </Button>
 
@@ -149,7 +152,7 @@ export function SiteHeader({
                       <Button asChild className="w-full">
                         <Link href={`${base}/program`}>
                           <CalendarDays className="h-4 w-4" />
-                          Vezi programul
+                          {ctaLabel}
                         </Link>
                       </Button>
                     </SheetClose>

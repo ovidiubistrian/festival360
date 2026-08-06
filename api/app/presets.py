@@ -80,6 +80,7 @@ PRESETS: dict[str, dict[str, Any]] = {
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
         "labels": {
+            "headerCta": "Vezi evenimentele",
             "heroCtaPrimary": "Planifică vizita", "heroCtaSecondary": "Vezi cazarea",
             "aboutEyebrow": "Despre destinație", "aboutTitle": "Muntele care te așteaptă",
             "experiencesEyebrow": "Experiențe", "experiencesTitle": "Ce poți face aici",
@@ -89,6 +90,9 @@ PRESETS: dict[str, dict[str, Any]] = {
             "programEyebrow": "Evenimente", "programTitle": "Ce se întâmplă",
             "exhibitorsPageTitle": "Cazare & gazde", "productsPageTitle": "Experiențe & activități",
             "destinationsPageTitle": "Atracții & obiective", "programPageTitle": "Evenimente",
+            # Admin nav relabels (vertical-aware sidebar).
+            "navProgram": "Evenimente", "navAccommodations": "Cazări",
+            "navDestinations": "Atracții", "navProducts": "Experiențe",
         },
     },
     "museum": {
@@ -106,6 +110,7 @@ PRESETS: dict[str, dict[str, Any]] = {
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
         "labels": {
+            "headerCta": "Vezi evenimentele",
             "heroCtaPrimary": "Planifică vizita", "heroCtaSecondary": "Vezi expozițiile",
             "aboutEyebrow": "Despre muzeu", "aboutTitle": "Un muzeu viu",
             "experiencesEyebrow": "Ce vei descoperi", "experiencesTitle": "Colecții & experiențe",
@@ -132,6 +137,7 @@ PRESETS: dict[str, dict[str, Any]] = {
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
         "labels": {
+            "headerCta": "Vezi agenda",
             "heroCtaPrimary": "Înscrie-te", "heroCtaSecondary": "Vezi agenda",
             "aboutEyebrow": "Despre eveniment", "aboutTitle": "O zi despre viitor",
             "experiencesEyebrow": "De ce să participi", "experiencesTitle": "Ce te așteaptă",
@@ -158,6 +164,7 @@ PRESETS: dict[str, dict[str, Any]] = {
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
         "labels": {
+            "headerCta": "Vezi anunțurile",
             "heroCtaPrimary": "Vezi serviciile", "heroCtaSecondary": "Contactează-ne",
             "aboutEyebrow": "Despre instituție", "aboutTitle": "În slujba comunității",
             "experiencesEyebrow": "Ce oferim", "experiencesTitle": "Servicii pentru cetățeni",
@@ -184,6 +191,7 @@ PRESETS: dict[str, dict[str, Any]] = {
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
         "labels": {
+            "headerCta": "Vezi programul",
             "heroCtaPrimary": "Planifică vizita", "heroCtaSecondary": "Vezi activitățile",
             "aboutEyebrow": "Despre", "aboutTitle": "Aventura începe aici",
             "experiencesEyebrow": "Ce poți face", "experiencesTitle": "Experiențe de neuitat",

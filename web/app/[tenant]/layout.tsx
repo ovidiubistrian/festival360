@@ -75,6 +75,7 @@ export default async function TenantLayout({
         slug={t.slug}
         logoText={t.config.info.logoText}
         navigation={t.config.navigation}
+        ctaLabel={t.config.labels?.headerCta ?? "Vezi programul"}
       />
       <main className="flex-1">{children}</main>
       <SiteFooter slug={t.slug} config={t.config} />
