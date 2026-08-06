@@ -7,6 +7,7 @@ import { Reveal } from "@/components/shared/reveal";
 import { Carousel } from "@/components/public/carousel";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import { AccommodationCard } from "@/components/public/cards/accommodation-card";
+import { RestaurantCard } from "@/components/public/cards/restaurant-card";
 import { ProductCard } from "@/components/public/cards/product-card";
 import { ExhibitorCard } from "@/components/public/cards/exhibitor-card";
 import { ArticleCard } from "@/components/public/cards/article-card";
@@ -20,6 +21,7 @@ import type {
   GalleryImage,
   Product,
   ProgramEvent,
+  Restaurant,
   SectionConfig,
   TenantContent,
 } from "@/lib/tenants/types";
@@ -36,6 +38,7 @@ import type {
 /** Custom section source → the `content` collection key it draws from. */
 const SOURCE_TO_KEY: Record<CustomSectionSource, keyof TenantContent> = {
   accommodations: "accommodations",
+  restaurants: "restaurants",
   products: "products",
   destinations: "destinations",
   exhibitors: "exhibitors",
@@ -47,6 +50,7 @@ const SOURCE_TO_KEY: Record<CustomSectionSource, keyof TenantContent> = {
 /** Per-source slide widths, mirroring the built-in homepage carousels. */
 const SLIDE_CLASS: Record<CustomSectionSource, string> = {
   accommodations: "basis-[80%] sm:basis-[47%] lg:basis-1/3",
+  restaurants: "basis-[80%] sm:basis-[47%] lg:basis-1/3",
   exhibitors: "basis-[80%] sm:basis-[47%] lg:basis-1/3",
   destinations: "basis-[80%] sm:basis-[47%] lg:basis-1/3",
   products: "basis-[68%] sm:basis-[42%] lg:basis-1/4",
@@ -102,6 +106,11 @@ export function CustomSection({
     case "accommodations":
       cards = (items as unknown as Accommodation[]).map((a) => (
         <AccommodationCard key={a.id} accommodation={a} slug={slug} />
+      ));
+      break;
+    case "restaurants":
+      cards = (items as unknown as Restaurant[]).map((r) => (
+        <RestaurantCard key={r.id} restaurant={r} slug={slug} />
       ));
       break;
     case "products":

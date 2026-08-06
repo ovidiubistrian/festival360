@@ -17,6 +17,7 @@ import { CustomSection } from "@/components/public/sections/custom-section";
 import { ProgramSchedule } from "@/components/public/program-schedule";
 import { ExhibitorCard } from "@/components/public/cards/exhibitor-card";
 import { AccommodationCard } from "@/components/public/cards/accommodation-card";
+import { RestaurantCard } from "@/components/public/cards/restaurant-card";
 import { ProductCard } from "@/components/public/cards/product-card";
 import { ArticleCard } from "@/components/public/cards/article-card";
 import { Carousel } from "@/components/public/carousel";
@@ -49,6 +50,11 @@ export default async function TenantHome({
   // avoid duplication.
   const featuredAccommodations = content.accommodations
     .filter((a) => a.status === "published" && a.type !== "camping")
+    .sort((a, b) => Number(b.featured) - Number(a.featured))
+    .slice(0, 6);
+  // Resort "Restaurante" zone shows featured/published restaurants.
+  const featuredRestaurants = (content.restaurants ?? [])
+    .filter((r) => r.status === "published")
     .sort((a, b) => Number(b.featured) - Number(a.featured))
     .slice(0, 6);
   const homePartners = content.partners
@@ -219,6 +225,42 @@ export default async function TenantHome({
                 >
                   {featuredExhibitors.map((e) => (
                     <ExhibitorCard key={e.id} exhibitor={e} slug={slug} />
+                  ))}
+                </Carousel>
+              </Reveal>
+            </Container>
+          </section>
+        ) : null;
+
+      // Resort-only gastronomy zone.
+      case "restaurants":
+        if (!isResort) return null;
+        return featuredRestaurants.length > 0 ? (
+          <section id="restaurante" className="bg-warm-white py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("restaurantsEyebrow", "Gastronomie")}
+                  title={L("restaurantsTitle", "Unde mănânci")}
+                  description={L(
+                    "restaurantsDescription",
+                    "Restaurante și localuri din zonă."
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/restaurante`}>
+                    Vezi toate
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Reveal className="mt-10">
+                <Carousel
+                  ariaLabel="Restaurante evidențiate"
+                  slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
+                >
+                  {featuredRestaurants.map((r) => (
+                    <RestaurantCard key={r.id} restaurant={r} slug={slug} />
                   ))}
                 </Carousel>
               </Reveal>

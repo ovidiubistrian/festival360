@@ -14,6 +14,7 @@ import type {
   Partner,
   ProgramEvent,
   Product,
+  Restaurant,
   SectionConfig,
   Stat,
   Tenant,
@@ -80,6 +81,7 @@ export interface AdminData {
   exhibitors: Exhibitor[];
   products: Product[];
   accommodations: Accommodation[];
+  restaurants: Restaurant[];
   destinations: Destination[];
   program: ProgramEvent[];
   partners: Partner[];
@@ -111,6 +113,7 @@ function seed(): AdminData {
     exhibitors: structuredClone(c.exhibitors),
     products: structuredClone(c.products),
     accommodations: structuredClone(c.accommodations),
+    restaurants: structuredClone(c.restaurants ?? []),
     destinations: structuredClone(c.destinations),
     program: structuredClone(c.program),
     partners: structuredClone(c.partners),
@@ -160,6 +163,7 @@ function bundleToAdminData(bundle: Tenant): AdminData {
     exhibitors: content.exhibitors ?? [],
     products: content.products ?? [],
     accommodations: content.accommodations ?? [],
+    restaurants: content.restaurants ?? [],
     destinations: content.destinations ?? [],
     program: content.program ?? [],
     partners: content.partners ?? [],
@@ -206,6 +210,7 @@ function emptyData(): AdminData {
     exhibitors: [],
     products: [],
     accommodations: [],
+    restaurants: [],
     destinations: [],
     program: [],
     partners: [],
@@ -308,6 +313,7 @@ export type CollectionKey =
   | "exhibitors"
   | "products"
   | "accommodations"
+  | "restaurants"
   | "destinations"
   | "program"
   | "partners"

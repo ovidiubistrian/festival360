@@ -86,6 +86,12 @@ const MODULE_LINKS: Record<
     explanation:
       "Această secțiune afișează cazările disponibile. Ele se administrează din modulul Cazări.",
   },
+  restaurants: {
+    href: "/admin/restaurants",
+    cta: "Gestionează restaurantele",
+    explanation:
+      "Această secțiune afișează restaurantele și localurile. Ele se administrează din modulul Restaurante.",
+  },
   products: {
     href: "/admin/products",
     cta: "Gestionează produsele",
@@ -774,6 +780,7 @@ const CUSTOM_SOURCES: {
   defaultHref: string;
 }[] = [
   { value: "accommodations", label: "Cazări", defaultHref: "cazari" },
+  { value: "restaurants", label: "Restaurante", defaultHref: "restaurante" },
   { value: "products", label: "Produse", defaultHref: "produse" },
   { value: "destinations", label: "Atracții", defaultHref: "destinatii" },
   { value: "exhibitors", label: "Expozanți", defaultHref: "expozanti" },

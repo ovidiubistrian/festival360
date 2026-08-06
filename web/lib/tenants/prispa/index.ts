@@ -56,6 +56,7 @@ export const prispaTenant: Tenant = {
     exhibitors,
     products,
     accommodations: [],
+    restaurants: [],
     destinations,
     program,
     partners,

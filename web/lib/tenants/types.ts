@@ -91,6 +91,7 @@ export interface Experience {
 /** Content collection a custom section can draw its items from. */
 export type CustomSectionSource =
   | "accommodations"
+  | "restaurants"
   | "products"
   | "destinations"
   | "exhibitors"
@@ -266,6 +267,34 @@ export interface Accommodation {
   sortOrder: number;
 }
 
+export interface Restaurant {
+  id: string;
+  slug: string;
+  name: string;
+  /** Tip bucătărie, ex: "Românească", "Pește", "Pizza", "Internațională". */
+  cuisine: string;
+  shortDescription: string;
+  description: string;
+  image: string;
+  gallery: string[];
+  /** Free-text interval de preț, ex: "$$" sau "80–150 RON / persoană". */
+  priceRange: string;
+  /** Program, ex: "L–D 10:00–22:00". */
+  hours: string;
+  address: string;
+  contactPhone: string;
+  contactWebsite: string;
+  /** Link către meniu. */
+  menuUrl: string;
+  /** Link către rezervări. */
+  bookingUrl: string;
+  /** Facility keys, e.g. ["terasă", "parcare", "wifi", "live-music"]. */
+  amenities: string[];
+  featured: boolean;
+  status: PublishStatus;
+  sortOrder: number;
+}
+
 export type ProgramCategory =
   | "Gastronomie"
   | "Muzică"
@@ -369,6 +398,7 @@ export interface TenantContent {
   exhibitors: Exhibitor[];
   products: Product[];
   accommodations: Accommodation[];
+  restaurants: Restaurant[];
   destinations: Destination[];
   program: ProgramEvent[];
   partners: Partner[];
