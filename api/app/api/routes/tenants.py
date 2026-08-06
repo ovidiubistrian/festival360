@@ -19,6 +19,7 @@ from app.schemas.public import (
     PartnerOut,
     ProductOut,
     ProgramEventOut,
+    RestaurantOut,
     TenantBundleOut,
     TenantConfigOut,
     TenantContentOut,
@@ -35,6 +36,9 @@ def build_bundle(session: Session, tenant: Tenant) -> TenantBundleOut:
         accommodations=[
             AccommodationOut.from_model(x)
             for x in svc.accommodations_for(session, tid)
+        ],
+        restaurants=[
+            RestaurantOut.from_model(x) for x in svc.restaurants_for(session, tid)
         ],
         products=[ProductOut.from_model(x) for x in svc.products_for(session, tid)],
         destinations=[

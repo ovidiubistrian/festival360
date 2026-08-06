@@ -16,6 +16,7 @@ from app.models.content import (
     ContactMessage,
     NewsletterSubscriber,
     Accommodation,
+    Restaurant,
 )
 from app.models.analytics import PageView
 from app.models.user import AdminUser
@@ -50,6 +51,7 @@ __all__ = [
     "ContactMessage",
     "NewsletterSubscriber",
     "Accommodation",
+    "Restaurant",
     "PageView",
     "AdminUser",
 ]

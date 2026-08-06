@@ -15,9 +15,10 @@ from app.models import (
     Partner,
     ProgramEvent,
     Product,
+    Restaurant,
     Tenant,
 )
-from app.presets import modules_for
+from app.presets import modules_for, navigation_for
 
 
 def _iso(d: dt.date | None) -> str | None:
@@ -96,6 +97,31 @@ class AccommodationOut(CamelModel):
 
     @classmethod
     def from_model(cls, m: Accommodation) -> "AccommodationOut":
+        return cls.model_validate(m)
+
+
+class RestaurantOut(CamelModel):
+    id: str
+    slug: str
+    name: str
+    cuisine: str
+    short_description: str
+    description: str
+    image: str
+    gallery: list[str]
+    price_range: str
+    hours: str
+    address: str
+    contact_phone: str
+    contact_website: str
+    menu_url: str
+    booking_url: str
+    amenities: list[str]
+    featured: bool
+    status: str
+
+    @classmethod
+    def from_model(cls, m: Restaurant) -> "RestaurantOut":
         return cls.model_validate(m)
 
 
@@ -368,7 +394,7 @@ class TenantConfigOut(CamelModel):
                 charcoal=t.theme_charcoal,
                 background=t.theme_background,
             ),
-            navigation=t.navigation,
+            navigation=navigation_for(t.event_type),
             social=SocialOut(
                 facebook=t.social_facebook or None,
                 instagram=t.social_instagram or None,
@@ -399,6 +425,7 @@ class TenantSummaryOut(CamelModel):
 class TenantContentOut(CamelModel):
     exhibitors: list[ExhibitorOut]
     accommodations: list[AccommodationOut]
+    restaurants: list[RestaurantOut]
     products: list[ProductOut]
     destinations: list[DestinationOut]
     program: list[ProgramEventOut]

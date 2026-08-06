@@ -211,3 +211,30 @@ class Accommodation(SQLModel, table=True):
     sort_order: int = 0
     created_at: dt.datetime = Field(default_factory=utcnow)
     updated_at: dt.datetime = Field(default_factory=utcnow)
+
+
+class Restaurant(SQLModel, table=True):
+    __tablename__ = "restaurant"
+
+    id: str = Field(primary_key=True)
+    tenant_id: str = Field(foreign_key="tenant.id", index=True)
+    slug: str = Field(index=True)
+    name: str
+    cuisine: str = ""  # tip bucătărie (ex: Românească, Pește, Pizza, Internațională)
+    short_description: str = ""
+    description: str = ""
+    image: str = ""
+    gallery: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    price_range: str = ""  # ex: "$$" sau "80–150 RON / persoană"
+    hours: str = ""  # program, ex: "L–D 10:00–22:00"
+    address: str = ""
+    contact_phone: str = ""
+    contact_website: str = ""
+    menu_url: str = ""  # link meniu
+    booking_url: str = ""  # link rezervări
+    amenities: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    featured: bool = False
+    status: str = "published"
+    sort_order: int = 0
+    created_at: dt.datetime = Field(default_factory=utcnow)
+    updated_at: dt.datetime = Field(default_factory=utcnow)

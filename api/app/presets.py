@@ -35,6 +35,7 @@ _SECTION_IDS = [
     ("exhibitors", "Directoar"),
     ("products", "Catalog"),
     ("destinations", "Locuri"),
+    ("restaurants", "Restaurante"),
     ("partners", "Parteneri"),
     ("gallery", "Galerie"),
     ("news", "Noutăți"),
@@ -75,8 +76,8 @@ PRESETS: dict[str, dict[str, Any]] = {
             "gold": "#C9A24B", "charcoal": "#1E2A2C", "background": "#F5F8F7",
         },
         "navigation": _nav([
-            ("Despre", "/despre"), ("Cazări", "/cazari"), ("Experiențe", "/produse"),
-            ("Atracții", "/destinatii"), ("Evenimente", "/program"),
+            ("Despre", "/despre"), ("Cazări", "/cazari"), ("Restaurante", "/restaurante"),
+            ("Experiențe", "/produse"), ("Atracții", "/destinatii"), ("Evenimente", "/program"),
             ("Galerie", "/galerie"), ("Noutăți", "/noutati"), ("Contact", "/contact"),
         ]),
         "labels": {
@@ -85,6 +86,8 @@ PRESETS: dict[str, dict[str, Any]] = {
             "aboutEyebrow": "Despre destinație", "aboutTitle": "Muntele care te așteaptă",
             "experiencesEyebrow": "Experiențe", "experiencesTitle": "Ce poți face aici",
             "exhibitorsEyebrow": "Cazare & gazde", "exhibitorsTitle": "Unde stai",
+            "restaurantsEyebrow": "Gastronomie", "restaurantsTitle": "Unde mănânci",
+            "restaurantsDescription": "Restaurante și localuri din zonă.",
             "productsEyebrow": "Experiențe", "productsTitle": "Ce poți face",
             "destinationsEyebrow": "Atracții", "destinationsTitle": "Ce vezi în zonă",
             "programEyebrow": "Evenimente", "programTitle": "Ce se întâmplă",
@@ -92,6 +95,7 @@ PRESETS: dict[str, dict[str, Any]] = {
             "destinationsPageTitle": "Atracții & obiective", "programPageTitle": "Evenimente",
             # Admin nav relabels (vertical-aware sidebar).
             "navProgram": "Evenimente", "navAccommodations": "Cazări",
+            "navRestaurants": "Restaurante",
             "navDestinations": "Atracții", "navProducts": "Experiențe",
         },
     },
@@ -215,9 +219,9 @@ _MODULES: dict[str, list[str]] = {
         "gallery", "media", "news", "messages", "newsletter", "analytics", "settings",
     ],
     "resort": [
-        "dashboard", "pages", "accommodations", "campinguri", "destinations",
-        "products", "program", "partners", "gallery", "media", "news", "messages",
-        "newsletter", "analytics", "settings",
+        "dashboard", "pages", "accommodations", "campinguri", "restaurants",
+        "destinations", "products", "program", "partners", "gallery", "media",
+        "news", "messages", "newsletter", "analytics", "settings",
     ],
     "museum": [
         "dashboard", "pages", "exhibitors", "program", "gallery", "media", "news",
@@ -245,6 +249,14 @@ def modules_for(event_type: str) -> list[str]:
     """Ordered admin module keys for a vertical; festival is the safe fallback."""
     preset = PRESETS.get(event_type) or PRESETS["festival"]
     return list(preset.get("modules") or _MODULES["festival"])
+
+
+def navigation_for(event_type: str) -> list[dict[str, str]]:
+    """Public site nav for a vertical, derived from the preset (not stored), so
+    it always matches the current terminology/structure (e.g. resort → Cazări,
+    Restaurante) even for tenants seeded before a preset change."""
+    preset = PRESETS.get(event_type) or PRESETS["festival"]
+    return [dict(item) for item in preset["navigation"]]
 
 
 def list_presets() -> list[dict[str, Any]]:

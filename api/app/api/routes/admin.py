@@ -18,6 +18,7 @@ from app.models import (
     Partner,
     ProgramEvent,
     Product,
+    Restaurant,
     Tenant,
 )
 from app.models.base import new_id, utcnow
@@ -31,6 +32,7 @@ from app.schemas.public import (
     PartnerOut,
     ProductOut,
     ProgramEventOut,
+    RestaurantOut,
     TenantConfigOut,
 )
 from app.schemas.write import (
@@ -45,6 +47,7 @@ from app.schemas.write import (
     PartnerIn,
     ProductIn,
     ProgramEventIn,
+    RestaurantIn,
     SectionsIn,
     SettingsIn,
 )
@@ -125,6 +128,48 @@ def update_accommodation(
     if not obj:
         raise _notfound("Cazare")
     return AccommodationOut.from_model(
+        crud.update(session, obj, payload.to_kwargs(tenant.id))
+    )
+
+
+# =========================================================================
+# Restaurants (restaurante)
+# =========================================================================
+@router.get("/restaurants", response_model=list[RestaurantOut])
+def list_restaurants(
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    from app.services import tenant_service as svc
+
+    return [
+        RestaurantOut.from_model(x)
+        for x in svc.restaurants_for(session, tenant.id)
+    ]
+
+
+@router.post("/restaurants", response_model=RestaurantOut, status_code=201)
+def create_restaurant(
+    payload: RestaurantIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    return RestaurantOut.from_model(
+        crud.create(session, Restaurant, payload.to_kwargs(tenant.id), "re")
+    )
+
+
+@router.put("/restaurants/{item_id}", response_model=RestaurantOut)
+def update_restaurant(
+    item_id: str,
+    payload: RestaurantIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    obj = crud.get_owned(session, Restaurant, item_id, tenant.id)
+    if not obj:
+        raise _notfound("Restaurant")
+    return RestaurantOut.from_model(
         crud.update(session, obj, payload.to_kwargs(tenant.id))
     )
 
@@ -303,6 +348,7 @@ def update_article(
 _MODELS: dict[str, type] = {
     "exhibitors": Exhibitor,
     "accommodations": Accommodation,
+    "restaurants": Restaurant,
     "products": Product,
     "destinations": Destination,
     "program": ProgramEvent,
@@ -313,6 +359,7 @@ _MODELS: dict[str, type] = {
 _STATUS_MODELS = {
     "exhibitors",
     "accommodations",
+    "restaurants",
     "products",
     "destinations",
     "partners",

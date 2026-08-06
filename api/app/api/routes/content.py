@@ -17,6 +17,7 @@ from app.schemas.public import (
     PartnerOut,
     ProductOut,
     ProgramEventOut,
+    RestaurantOut,
 )
 from app.schemas.write import ContactMessageIn, NewsletterIn
 
@@ -68,6 +69,28 @@ def get_accommodation(
         if x.slug == item_slug:
             return AccommodationOut.from_model(x)
     raise _not_found("Cazare")
+
+
+# --- Restaurants (restaurante) ---
+@router.get("/restaurants", response_model=list[RestaurantOut])
+def list_restaurants(
+    tenant: Tenant = Depends(tenant_or_404), session: Session = Depends(get_session)
+):
+    return [
+        RestaurantOut.from_model(x) for x in svc.restaurants_for(session, tenant.id)
+    ]
+
+
+@router.get("/restaurants/{item_slug}", response_model=RestaurantOut)
+def get_restaurant(
+    item_slug: str,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    for x in svc.restaurants_for(session, tenant.id):
+        if x.slug == item_slug:
+            return RestaurantOut.from_model(x)
+    raise _not_found("Restaurant")
 
 
 # --- Products ---

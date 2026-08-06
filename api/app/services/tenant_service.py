@@ -13,6 +13,7 @@ from app.models import (
     Partner,
     ProgramEvent,
     Product,
+    Restaurant,
     Tenant,
 )
 
@@ -41,6 +42,16 @@ def accommodations_for(session: Session, tenant_id: str) -> list[Accommodation]:
             select(Accommodation)
             .where(Accommodation.tenant_id == tenant_id)
             .order_by(Accommodation.sort_order)
+        ).all()
+    )
+
+
+def restaurants_for(session: Session, tenant_id: str) -> list[Restaurant]:
+    return list(
+        session.exec(
+            select(Restaurant)
+            .where(Restaurant.tenant_id == tenant_id)
+            .order_by(Restaurant.sort_order)
         ).all()
     )
 
