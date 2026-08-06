@@ -29,7 +29,7 @@ export default function DemoAdminLoginPage() {
   async function handleLogin() {
     if (submitting) return;
     setSubmitting(true);
-    const user = await login(email.trim(), password);
+    const user = await login(email.trim().toLowerCase(), password);
     setSubmitting(false);
     if (!user) {
       toast.error("Email sau parolă incorecte");
@@ -79,6 +79,8 @@ export default function DemoAdminLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   placeholder="nume@exemplu.ro"
                   required
                 />

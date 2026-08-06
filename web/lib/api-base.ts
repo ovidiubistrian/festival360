@@ -19,6 +19,16 @@ export function apiBaseUrl(): string {
       "http://localhost:8000"
     );
   }
-  if (configured && /localhost|127\.0\.0\.1/.test(configured)) return configured;
+  // Escape hatch doar pentru dev: un API pe localhost e fără sens în browserul
+  // din producție (ar lovi calculatorul vizitatorului). Un build care a uitat
+  // NEXT_PUBLIC_API_BASE_URL nu trebuie să spargă tăcut toate cererile —
+  // în producție cădem întotdeauna pe same-origin, proxiat de Caddy.
+  if (
+    process.env.NODE_ENV !== "production" &&
+    configured &&
+    /localhost|127\.0\.0\.1/.test(configured)
+  ) {
+    return configured;
+  }
   return ""; // relative → same-origin (proxied by Caddy)
 }

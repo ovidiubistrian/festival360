@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlmodel import Session, select
 
 from app.api.deps import get_current_user
@@ -14,8 +15,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=TokenOut)
 def login(payload: LoginIn, session: Session = Depends(get_session)) -> TokenOut:
+    # Emailul e case-insensitive: conturile se salvează lowercase (vezi
+    # create_superadmin), dar tastaturile de mobil pun majusculă la primul
+    # caracter — o comparație exactă returna 401 cu parola corectă.
+    email = payload.email.strip().lower()
     user = session.exec(
-        select(AdminUser).where(AdminUser.email == payload.email)
+        select(AdminUser).where(func.lower(AdminUser.email) == email)
     ).first()
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
