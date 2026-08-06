@@ -21,6 +21,7 @@ import {
   Newspaper,
   Mail,
   Send,
+  Megaphone,
   BarChart3,
   Settings,
   Menu,
@@ -208,6 +209,13 @@ const CONTENT_MODULE_DEFS: ContentModuleDef[] = [
     icon: Send,
   },
   {
+    key: "marketing",
+    labelKey: "navMarketing",
+    label: "Marketing",
+    href: "/admin/marketing",
+    icon: Megaphone,
+  },
+  {
     key: "analytics",
     labelKey: "navAnalytics",
     label: "Analiză trafic",
@@ -228,7 +236,8 @@ const DEFAULT_CONTENT_NAV: NavLink[] = CONTENT_MODULE_DEFS.filter(
   (d) =>
     d.key !== "accommodations" &&
     d.key !== "campinguri" &&
-    d.key !== "restaurants"
+    d.key !== "restaurants" &&
+    d.key !== "marketing"
 ).map((d) => ({ label: d.label, href: d.href, icon: d.icon }));
 
 /**
