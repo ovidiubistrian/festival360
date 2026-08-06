@@ -20,14 +20,20 @@ export function SiteHeader({
   slug,
   logoText,
   navigation,
+  eventType = "festival",
   ctaLabel = "Vezi programul",
 }: {
   slug: string;
   logoText: string;
   navigation: NavItem[];
-  /** Header CTA label — vertical-aware (e.g. "Vezi evenimentele" for resorts). */
+  /** Vertical preset — gates festival-only chrome ("FEST" tag + program CTA). */
+  eventType?: string;
+  /** Header CTA label (festival only). */
   ctaLabel?: string;
 }) {
+  // Festival-specific header chrome: the "FEST" logo tag and the prominent
+  // "Vezi programul" button don't fit resorts/museums/etc.
+  const isFestival = eventType === "festival";
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
@@ -61,14 +67,16 @@ export function SiteHeader({
             )}
           >
             {logoText}
-            <span
-              className={cn(
-                "ml-1 align-super text-[10px] font-sans font-medium tracking-widest",
-                scrolled ? "text-terracotta" : "text-gold"
-              )}
-            >
-              FEST
-            </span>
+            {isFestival && (
+              <span
+                className={cn(
+                  "ml-1 align-super text-[10px] font-sans font-medium tracking-widest",
+                  scrolled ? "text-terracotta" : "text-gold"
+                )}
+              >
+                FEST
+              </span>
+            )}
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
@@ -91,17 +99,19 @@ export function SiteHeader({
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button
-              asChild
-              size="sm"
-              variant={scrolled ? "default" : "gold"}
-              className="hidden sm:inline-flex"
-            >
-              <Link href={`${base}/program`}>
-                <CalendarDays className="h-4 w-4" />
-                {ctaLabel}
-              </Link>
-            </Button>
+            {isFestival && (
+              <Button
+                asChild
+                size="sm"
+                variant={scrolled ? "default" : "gold"}
+                className="hidden sm:inline-flex"
+              >
+                <Link href={`${base}/program`}>
+                  <CalendarDays className="h-4 w-4" />
+                  {ctaLabel}
+                </Link>
+              </Button>
+            )}
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -147,16 +157,18 @@ export function SiteHeader({
                       </SheetClose>
                     ))}
                   </nav>
-                  <div className="border-t border-border p-4">
-                    <SheetClose asChild>
-                      <Button asChild className="w-full">
-                        <Link href={`${base}/program`}>
-                          <CalendarDays className="h-4 w-4" />
-                          {ctaLabel}
-                        </Link>
-                      </Button>
-                    </SheetClose>
-                  </div>
+                  {isFestival && (
+                    <div className="border-t border-border p-4">
+                      <SheetClose asChild>
+                        <Button asChild className="w-full">
+                          <Link href={`${base}/program`}>
+                            <CalendarDays className="h-4 w-4" />
+                            {ctaLabel}
+                          </Link>
+                        </Button>
+                      </SheetClose>
+                    </div>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
