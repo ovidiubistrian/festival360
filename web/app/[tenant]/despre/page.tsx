@@ -19,13 +19,13 @@ export async function generateMetadata({
   const t = await getTenantBundle(tenant);
   if (!t) return {};
   const { info } = t.config;
-  const title = "Despre festival";
+  const title = `Despre ${info.name}`;
   const description = info.shortDescription;
   return {
     title,
     description,
     openGraph: {
-      title: `${title} · ${info.name}`,
+      title,
       description,
       images: [info.heroImage],
     },
@@ -37,25 +37,25 @@ const VALUES = [
     icon: Heart,
     title: "Autenticitate",
     description:
-      "Aducem în festival doar producători reali, cu produse făcute după rețete și meșteșuguri moștenite.",
+      "Rămânem fideli locului și poveștii lui, cu grijă pentru detalii și pentru ceea ce ne face aparte.",
   },
   {
     icon: Leaf,
     title: "Sustenabilitate",
     description:
-      "Susținem economia locală și consumul responsabil, direct de la producător la vizitator.",
+      "Ne pasă de comunitatea din jur și de mediul în care ne desfășurăm, cu respect pentru resurse.",
   },
   {
     icon: ShieldCheck,
     title: "Încredere",
     description:
-      "Fiecare expozant este verificat, iar produsele certificate sunt marcate transparent.",
+      "Ținem la relații corecte și transparente, ca fiecare vizitator să știe la ce să se aștepte.",
   },
   {
     icon: Sparkles,
     title: "Bucurie",
     description:
-      "Festivalul este o sărbătoare: gust, muzică, meșteșug și povești pentru întreaga familie.",
+      "Ne dorim ca fiecare experiență să lase în urmă o amintire bună și dorința de a reveni.",
   },
 ];
 
@@ -70,6 +70,17 @@ export default async function AboutPage({
 
   const { config, slug } = t;
   const { info, stats, experiences } = config;
+  const L = (k: string, fb: string) => config.labels?.[k] ?? fb;
+
+  const aboutImage = info.aboutImage?.trim() || info.heroImage;
+  const place = [info.locationName?.trim(), info.city?.trim()]
+    .filter(Boolean)
+    .join(", ");
+  const dates =
+    info.startDate && info.endDate
+      ? formatDateRange(info.startDate, info.endDate)
+      : "";
+  const locationLine = [place, dates].filter(Boolean).join(" · ");
 
   return (
     <>
@@ -87,25 +98,24 @@ export default async function AboutPage({
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <Reveal>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-terracotta">
-                Despre festival
+                {L("aboutEyebrow", "Despre")}
               </p>
               <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
-                Un sat întreg, adus în inima orașului
+                {L("aboutTitle", info.name)}
               </h2>
               <p className="mt-5 text-base leading-relaxed text-charcoal/75">
                 {info.longDescription}
               </p>
-              <p className="mt-4 text-base leading-relaxed text-charcoal/75">
-                {formatDateRange(info.startDate, info.endDate)}, la{" "}
-                {info.locationName} din {info.city}, {info.county}, VATRA
-                transformă orașul într-o vatră mare, unde satul românesc își
-                spune povestea prin gust, meșteșug și muzică.
-              </p>
+              {locationLine && (
+                <p className="mt-4 text-base leading-relaxed text-charcoal/75">
+                  {locationLine}
+                </p>
+              )}
             </Reveal>
             <Reveal delayIndex={1} className="relative">
               <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
                 <ImageWithFallback
-                  src={info.heroImage}
+                  src={aboutImage}
                   alt={info.name}
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -119,14 +129,15 @@ export default async function AboutPage({
       </section>
 
       {/* Stats */}
-      <section className="bg-secondary py-20 sm:py-24">
-        <Container>
-          <SectionHeading
-            align="center"
-            eyebrow="Festivalul în cifre"
-            title="VATRA, dintr-o privire"
-          />
-          <dl className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4">
+      {stats.length > 0 && (
+        <section className="bg-secondary py-20 sm:py-24">
+          <Container>
+            <SectionHeading
+              align="center"
+              eyebrow="În cifre"
+              title={`${info.name}, dintr-o privire`}
+            />
+            <dl className="mt-12 grid grid-cols-2 gap-6 lg:grid-cols-4">
             {stats.map((s, i) => (
               <Reveal
                 key={s.label}
@@ -142,9 +153,10 @@ export default async function AboutPage({
                 <dt className="text-sm text-muted-foreground">{s.label}</dt>
               </Reveal>
             ))}
-          </dl>
-        </Container>
-      </section>
+            </dl>
+          </Container>
+        </section>
+      )}
 
       {/* Misiune & valori */}
       <section className="bg-warm-white py-20 sm:py-28">
@@ -155,17 +167,14 @@ export default async function AboutPage({
                 Misiunea noastră
               </p>
               <h2 className="mt-3 font-serif text-3xl font-semibold text-primary sm:text-4xl">
-                Să ținem satul viu, printr-o sărbătoare
+                Să avem grijă de acest loc și de oamenii lui
               </h2>
               <p className="mt-5 text-base leading-relaxed text-charcoal/75">
-                Credem că tradiția nu se conservă în muzee, ci în oameni, în
-                gesturi și în gust. VATRA aduce producătorii, meșteșugarii și
-                comunitățile rurale mai aproape de public, oferindu-le o scenă și
-                un public care apreciază munca din spatele fiecărui produs.
+                {info.shortDescription}
               </p>
               <p className="mt-4 text-base leading-relaxed text-charcoal/75">
-                Ne dorim ca fiecare vizitator să plece cu un gust bun, o poveste
-                nouă și dorința de a redescoperi România autentică.
+                Ne dorim ca fiecare vizitator să plece cu o amintire bună, o
+                poveste nouă și dorința de a reveni.
               </p>
             </Reveal>
             <div className="grid gap-6 sm:grid-cols-2">
@@ -192,15 +201,16 @@ export default async function AboutPage({
       </section>
 
       {/* Experiences grid */}
-      <section className="bg-secondary py-20 sm:py-28">
-        <Container>
-          <SectionHeading
-            align="center"
-            eyebrow="Zone și experiențe"
-            title="Șase lumi, într-un singur festival"
-            description="De la gustul preparatelor gătite pe loc, la gesturile meșterilor și liniștea muntelui — VATRA este o experiență completă."
-          />
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {experiences.length > 0 && (
+        <section className="bg-secondary py-20 sm:py-28">
+          <Container>
+            <SectionHeading
+              align="center"
+              eyebrow={L("experiencesEyebrow", "Experiențe")}
+              title={L("experiencesTitle", "Ce te așteaptă")}
+              description={L("experiencesDescription", info.shortDescription)}
+            />
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {experiences.map((exp, i) => (
               <Reveal
                 key={exp.id}
@@ -231,9 +241,10 @@ export default async function AboutPage({
                 </div>
               </Reveal>
             ))}
-          </div>
-        </Container>
-      </section>
+            </div>
+          </Container>
+        </section>
+      )}
 
       {/* Termeni și confidențialitate */}
       <section id="termeni" className="bg-warm-white py-20 sm:py-24">
@@ -246,9 +257,9 @@ export default async function AboutPage({
             />
             <div className="mt-8 space-y-4 rounded-2xl border border-border bg-card p-6 text-sm leading-relaxed text-charcoal/70 sm:p-8">
               <p>
-                Această platformă este o prezentare demonstrativă a festivalului{" "}
-                {info.name}. Conținutul (producători, produse, program și
-                imagini) are rol ilustrativ și poate fi actualizat pe parcurs.
+                Această platformă este o prezentare demonstrativă pentru{" "}
+                {info.name}. Conținutul (informații, imagini și program) are rol
+                ilustrativ și poate fi actualizat pe parcurs.
               </p>
               <p>
                 <span className="font-semibold text-primary">
@@ -260,9 +271,8 @@ export default async function AboutPage({
               </p>
               <p>
                 <span className="font-semibold text-primary">Termeni.</span>{" "}
-                Prezența la festival, orarul și lista expozanților se pot
-                modifica. Pentru informații oficiale și confirmări, te rugăm să
-                ne contactezi direct.
+                Programul și informațiile afișate se pot modifica. Pentru detalii
+                oficiale și confirmări, te rugăm să ne contactezi direct.
               </p>
             </div>
           </div>
