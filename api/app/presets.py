@@ -215,9 +215,9 @@ _MODULES: dict[str, list[str]] = {
         "gallery", "media", "news", "messages", "newsletter", "analytics", "settings",
     ],
     "resort": [
-        "dashboard", "pages", "accommodations", "destinations", "products", "program",
-        "partners", "gallery", "media", "news", "messages", "newsletter", "analytics",
-        "settings",
+        "dashboard", "pages", "accommodations", "campinguri", "destinations",
+        "products", "program", "partners", "gallery", "media", "news", "messages",
+        "newsletter", "analytics", "settings",
     ],
     "museum": [
         "dashboard", "pages", "exhibitors", "program", "gallery", "media", "news",
