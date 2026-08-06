@@ -14,6 +14,7 @@ import {
   BedDouble,
   Tent,
   Utensils,
+  Ticket,
   MapPin,
   Handshake,
   Image as ImageIcon,
@@ -139,6 +140,13 @@ const CONTENT_MODULE_DEFS: ContentModuleDef[] = [
     icon: Utensils,
   },
   {
+    key: "events",
+    labelKey: "navEvents",
+    label: "Evenimente",
+    href: "/admin/events",
+    icon: Ticket,
+  },
+  {
     key: "program",
     labelKey: "navProgram",
     label: "Program",
@@ -237,6 +245,7 @@ const DEFAULT_CONTENT_NAV: NavLink[] = CONTENT_MODULE_DEFS.filter(
     d.key !== "accommodations" &&
     d.key !== "campinguri" &&
     d.key !== "restaurants" &&
+    d.key !== "events" &&
     d.key !== "marketing"
 ).map((d) => ({ label: d.label, href: d.href, icon: d.icon }));
 

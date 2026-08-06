@@ -8,6 +8,7 @@ import type {
   Conditions,
   ContactMessage,
   Destination,
+  Event,
   Experience,
   Exhibitor,
   GalleryImage,
@@ -85,6 +86,7 @@ export interface AdminData {
   products: Product[];
   accommodations: Accommodation[];
   restaurants: Restaurant[];
+  events: Event[];
   destinations: Destination[];
   program: ProgramEvent[];
   partners: Partner[];
@@ -121,6 +123,7 @@ function seed(): AdminData {
     products: structuredClone(c.products),
     accommodations: structuredClone(c.accommodations),
     restaurants: structuredClone(c.restaurants ?? []),
+    events: structuredClone(c.events ?? []),
     destinations: structuredClone(c.destinations),
     program: structuredClone(c.program),
     partners: structuredClone(c.partners),
@@ -178,6 +181,7 @@ function bundleToAdminData(bundle: Tenant): AdminData {
     products: content.products ?? [],
     accommodations: content.accommodations ?? [],
     restaurants: content.restaurants ?? [],
+    events: content.events ?? [],
     destinations: content.destinations ?? [],
     program: content.program ?? [],
     partners: content.partners ?? [],
@@ -228,6 +232,7 @@ function emptyData(): AdminData {
     products: [],
     accommodations: [],
     restaurants: [],
+    events: [],
     destinations: [],
     program: [],
     partners: [],
@@ -334,6 +339,7 @@ export type CollectionKey =
   | "products"
   | "accommodations"
   | "restaurants"
+  | "events"
   | "destinations"
   | "program"
   | "partners"

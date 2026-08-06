@@ -99,7 +99,8 @@ export type CustomSectionSource =
   | "exhibitors"
   | "gallery"
   | "news"
-  | "program";
+  | "program"
+  | "events";
 
 /** Section visibility + ordering, editable from the demo admin. */
 export interface SectionConfig {
@@ -353,6 +354,41 @@ export interface Restaurant {
   sortOrder: number;
 }
 
+/** A single line in an event's mini-program (schedule). */
+export interface EventProgramItem {
+  /** Ora, ex: "18:00" sau "18:00–19:30". */
+  time: string;
+  title: string;
+  description: string;
+}
+
+export interface Event {
+  id: string;
+  slug: string;
+  title: string;
+  /** Imagine principală (cover). */
+  coverImage: string;
+  gallery: string[];
+  shortDescription: string;
+  description: string;
+  /** ISO date, ex: "2026-08-14". Gol → nespecificat. */
+  startDate: string;
+  /** ISO date, ex: "2026-08-16". Gol → nespecificat. */
+  endDate: string;
+  /** Interval orar liber, ex: "18:00–23:00". */
+  timeLabel: string;
+  location: string;
+  /** Mini-program pe momente. */
+  program: EventProgramItem[];
+  /** Link extern de bilete (Eventbrite, iaBilet…). */
+  ticketUrl: string;
+  /** Text buton bilete; UI folosește „Cumpără bilete” când e gol. */
+  ticketLabel: string;
+  featured: boolean;
+  status: PublishStatus;
+  sortOrder: number;
+}
+
 export type ProgramCategory =
   | "Gastronomie"
   | "Muzică"
@@ -457,6 +493,7 @@ export interface TenantContent {
   products: Product[];
   accommodations: Accommodation[];
   restaurants: Restaurant[];
+  events: Event[];
   destinations: Destination[];
   program: ProgramEvent[];
   partners: Partner[];

@@ -18,6 +18,7 @@ import { ProgramSchedule } from "@/components/public/program-schedule";
 import { ExhibitorCard } from "@/components/public/cards/exhibitor-card";
 import { AccommodationCard } from "@/components/public/cards/accommodation-card";
 import { RestaurantCard } from "@/components/public/cards/restaurant-card";
+import { EventCard } from "@/components/public/cards/event-card";
 import { ProductCard } from "@/components/public/cards/product-card";
 import { ArticleCard } from "@/components/public/cards/article-card";
 import { Carousel } from "@/components/public/carousel";
@@ -55,6 +56,11 @@ export default async function TenantHome({
   // Resort "Restaurante" zone shows featured/published restaurants.
   const featuredRestaurants = (content.restaurants ?? [])
     .filter((r) => r.status === "published")
+    .sort((a, b) => Number(b.featured) - Number(a.featured))
+    .slice(0, 6);
+  // Resort "Evenimente" zone shows featured/published events.
+  const featuredEvents = (content.events ?? [])
+    .filter((e) => e.status === "published")
     .sort((a, b) => Number(b.featured) - Number(a.featured))
     .slice(0, 6);
   const homePartners = content.partners
@@ -270,6 +276,42 @@ export default async function TenantHome({
                 >
                   {featuredRestaurants.map((r) => (
                     <RestaurantCard key={r.id} restaurant={r} slug={slug} />
+                  ))}
+                </Carousel>
+              </Reveal>
+            </Container>
+          </section>
+        ) : null;
+
+      // Resort-only events zone.
+      case "events":
+        if (!isResort) return null;
+        return featuredEvents.length > 0 ? (
+          <section id="evenimente" className="bg-secondary py-16 sm:py-24">
+            <Container>
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+                <SectionHeading
+                  eyebrow={L("eventsEyebrow", "Ce se întâmplă")}
+                  title={L("eventsTitle", "Evenimente")}
+                  description={L(
+                    "eventsDescription",
+                    "Evenimentele din stațiune."
+                  )}
+                />
+                <Button asChild variant="outline">
+                  <Link href={`/${slug}/evenimente`}>
+                    Vezi toate
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <Reveal className="mt-10">
+                <Carousel
+                  ariaLabel="Evenimente evidențiate"
+                  slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
+                >
+                  {featuredEvents.map((e) => (
+                    <EventCard key={e.id} event={e} slug={slug} />
                   ))}
                 </Carousel>
               </Reveal>

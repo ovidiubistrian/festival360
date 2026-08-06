@@ -103,6 +103,12 @@ const MODULE_LINKS: Record<
     explanation:
       "Această secțiune afișează restaurantele și localurile. Ele se administrează din modulul Restaurante.",
   },
+  events: {
+    href: "/admin/events",
+    cta: "Gestionează evenimentele",
+    explanation:
+      "Această secțiune afișează evenimentele din stațiune. Ele se administrează din modulul Evenimente.",
+  },
   products: {
     href: "/admin/products",
     cta: "Gestionează produsele",
@@ -1405,6 +1411,7 @@ const CUSTOM_SOURCES: {
 }[] = [
   { value: "accommodations", label: "Cazări", defaultHref: "cazari" },
   { value: "restaurants", label: "Restaurante", defaultHref: "restaurante" },
+  { value: "events", label: "Evenimente", defaultHref: "evenimente" },
   { value: "products", label: "Produse", defaultHref: "produse" },
   { value: "destinations", label: "Atracții", defaultHref: "destinatii" },
   { value: "exhibitors", label: "Expozanți", defaultHref: "expozanti" },

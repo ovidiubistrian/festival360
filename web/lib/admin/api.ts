@@ -43,6 +43,7 @@ export type ApiCollection =
   | "products"
   | "accommodations"
   | "restaurants"
+  | "events"
   | "destinations"
   | "program"
   | "partners"
