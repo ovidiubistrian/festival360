@@ -66,7 +66,7 @@ export default function PagesPage() {
   return (
     <AdminShell
       title="Pagini și secțiuni"
-      description="Fiecare rând este o zonă de pe pagina principală. Comutatorul o arată sau o ascunde, iar săgețile îi schimbă ordinea pe site."
+      description="Fiecare rând este o zonă de pe pagina principală. Comutatorul o arată sau o ascunde — inclusiv din meniul de sus și din footer — iar săgețile îi schimbă ordinea pe site."
       actions={<AddSectionButton />}
     >
       <Card>

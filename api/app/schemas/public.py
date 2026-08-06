@@ -410,6 +410,7 @@ class TenantConfigOut(CamelModel):
 
     @classmethod
     def from_model(cls, t: Tenant) -> "TenantConfigOut":
+        sections = reconcile_sections(t.sections, t.event_type)
         return cls(
             event_type=t.event_type,
             labels=t.labels or {},
@@ -440,7 +441,7 @@ class TenantConfigOut(CamelModel):
                 charcoal=t.theme_charcoal,
                 background=t.theme_background,
             ),
-            navigation=navigation_for(t.event_type),
+            navigation=navigation_for(t.event_type, sections),
             social=SocialOut(
                 facebook=t.social_facebook or None,
                 instagram=t.social_instagram or None,
@@ -455,7 +456,7 @@ class TenantConfigOut(CamelModel):
                 county=t.contact_county,
                 map_embed_query=t.contact_map_query,
             ),
-            sections=reconcile_sections(t.sections, t.event_type),
+            sections=sections,
             stats=t.stats,
             experiences=t.experiences,
             conditions=t.conditions or {},

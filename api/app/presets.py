@@ -27,6 +27,26 @@ def _nav(items: list[tuple[str, str]]) -> list[dict[str, str]]:
     return [{"label": label, "href": href} for label, href in items]
 
 
+# Pagina de meniu ↔ secțiunea de homepage care o susține. Folosit de
+# `navigation_for` ca să scoată din meniu paginile ale căror secțiuni au fost
+# dezactivate din admin. Un href poate fi susținut de aceeași secțiune în
+# verticale diferite (ex. „exhibitors" = expozanți la festival, cazări la
+# stațiune). Ce nu apare aici (ex. /contact) e mereu în meniu.
+_NAV_SECTION_BY_HREF: dict[str, str] = {
+    "/despre": "about",
+    "/program": "program",
+    "/expozanti": "exhibitors",
+    "/cazari": "exhibitors",
+    "/restaurante": "restaurants",
+    "/produse": "products",
+    "/destinatii": "destinations",
+    "/evenimente": "events",
+    "/parteneri": "partners",
+    "/galerie": "gallery",
+    "/noutati": "news",
+}
+
+
 _SECTION_IDS = [
     ("hero", "Hero"),
     ("about", "Despre"),
@@ -291,12 +311,30 @@ def modules_for(event_type: str) -> list[str]:
     return list(preset.get("modules") or _MODULES["festival"])
 
 
-def navigation_for(event_type: str) -> list[dict[str, str]]:
+def navigation_for(
+    event_type: str, sections: list[dict[str, Any]] | None = None
+) -> list[dict[str, str]]:
     """Public site nav for a vertical, derived from the preset (not stored), so
     it always matches the current terminology/structure (e.g. resort → Cazări,
-    Restaurante) even for tenants seeded before a preset change."""
+    Restaurante) even for tenants seeded before a preset change.
+
+    Când primește secțiunile tenantului, intrările de meniu ale secțiunilor
+    ascunse din admin sunt eliminate: un link către o zonă dezactivată e o
+    fundătură. Intrările fără secțiune corespondentă (ex. Contact) rămân."""
     preset = PRESETS.get(event_type) or PRESETS["festival"]
-    return [dict(item) for item in preset["navigation"]]
+    items = [dict(item) for item in preset["navigation"]]
+    if sections is None:
+        return items
+    hidden = {
+        s.get("id")
+        for s in sections
+        if s.get("id") and not s.get("visible", True)
+    }
+    return [
+        item
+        for item in items
+        if _NAV_SECTION_BY_HREF.get(item.get("href", "")) not in hidden
+    ]
 
 
 def list_presets() -> list[dict[str, Any]]:
