@@ -125,6 +125,15 @@ export default async function TenantHome({
           />
         ) : null;
 
+      // Resort-only widgets, ordered + toggled like every other section.
+      case "conditions":
+        return isResort ? (
+          <ConditionsWidget conditions={config.conditions} />
+        ) : null;
+
+      case "trails":
+        return isResort ? <TrailsMap trails={config.trails} /> : null;
+
       case "program":
         return content.program.length > 0 ? (
           <section id="program" className="bg-warm-white py-16 sm:py-24">
@@ -472,14 +481,7 @@ export default async function TenantHome({
         }
         const node = renderSection(s.id);
         if (!node) return null;
-        return (
-          <Fragment key={s.id}>
-            {node}
-            {/* Resort-only decorative widgets anchored to their sibling zones. */}
-            {isResort && s.id === "about" && <ConditionsWidget />}
-            {isResort && s.id === "experiences" && <TrailsMap />}
-          </Fragment>
-        );
+        return <Fragment key={s.id}>{node}</Fragment>;
       })}
     </>
   );

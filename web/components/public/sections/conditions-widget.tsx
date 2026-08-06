@@ -7,71 +7,88 @@ import {
   Thermometer,
   Layers,
   Droplets,
+  Wind,
+  Mountain,
   CheckCircle2,
   Info,
 } from "lucide-react";
 import { Container } from "@/components/shared/container";
+import type {
+  ConditionMetric,
+  ConditionSeason,
+  Conditions,
+} from "@/lib/tenants/types";
 import { cn } from "@/lib/utils";
 
 type Season = "winter" | "summer";
 
-interface Metric {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}
-
-const DATA: Record<
-  Season,
-  { icon: React.ReactNode; headline: string; metrics: Metric[] }
-> = {
+/** Frontend fallback defaults — used when the config object is empty. */
+const DEFAULTS: Record<Season, Required<ConditionSeason>> = {
   winter: {
-    icon: <Snowflake className="h-6 w-6" />,
     headline: "Condiții de iarnă",
     metrics: [
-      {
-        icon: <Thermometer className="h-5 w-5" />,
-        label: "Temperatură",
-        value: "-3°C",
-      },
-      {
-        icon: <Layers className="h-5 w-5" />,
-        label: "Strat de zăpadă",
-        value: "45 cm",
-      },
-      {
-        icon: <CheckCircle2 className="h-5 w-5" />,
-        label: "Stare pârtii",
-        value: "Pârtii deschise",
-      },
+      { label: "Temperatură", value: "-3°C" },
+      { label: "Strat de zăpadă", value: "45 cm" },
+      { label: "Stare pârtii", value: "Pârtii deschise" },
     ],
   },
   summer: {
-    icon: <Sun className="h-6 w-6" />,
     headline: "Condiții de vară",
     metrics: [
-      {
-        icon: <Thermometer className="h-5 w-5" />,
-        label: "Temperatură",
-        value: "21°C",
-      },
-      {
-        icon: <Droplets className="h-5 w-5" />,
-        label: "Temperatura apei lacului",
-        value: "18°C",
-      },
-      {
-        icon: <CheckCircle2 className="h-5 w-5" />,
-        label: "Stare trasee",
-        value: "Trasee deschise",
-      },
+      { label: "Temperatură", value: "21°C" },
+      { label: "Temperatura apei lacului", value: "18°C" },
+      { label: "Stare trasee", value: "Trasee deschise" },
     ],
   },
 };
 
-export function ConditionsWidget() {
-  const [season, setSeason] = React.useState<Season>("winter");
-  const current = DATA[season];
+const DEFAULT_NOTE = "Date orientative, cu titlu demonstrativ.";
+
+const SEASON_ICON: Record<Season, React.ReactNode> = {
+  winter: <Snowflake className="h-6 w-6" />,
+  summer: <Sun className="h-6 w-6" />,
+};
+
+/** Pick a sensible card icon for a metric based on its label (diacritics-aware). */
+function metricIcon(label: string): React.ReactNode {
+  const l = label.toLowerCase();
+  if (l.includes("temperatur")) return <Thermometer className="h-5 w-5" />;
+  if (l.includes("zăpad") || l.includes("zapad") || l.includes("strat"))
+    return <Layers className="h-5 w-5" />;
+  if (l.includes("apă") || l.includes("apa") || l.includes("lac") || l.includes("umid"))
+    return <Droplets className="h-5 w-5" />;
+  if (l.includes("vânt") || l.includes("vant"))
+    return <Wind className="h-5 w-5" />;
+  if (l.includes("altitud") || l.includes("nivel") || l.includes("vârf"))
+    return <Mountain className="h-5 w-5" />;
+  return <CheckCircle2 className="h-5 w-5" />;
+}
+
+/** Resolve a season's content, falling back to defaults when unconfigured. */
+function resolveSeason(
+  season: Season,
+  config?: ConditionSeason
+): { headline: string; metrics: ConditionMetric[] } {
+  return {
+    headline: config?.headline?.trim() || DEFAULTS[season].headline,
+    metrics: config?.metrics ?? DEFAULTS[season].metrics,
+  };
+}
+
+export function ConditionsWidget({ conditions }: { conditions?: Conditions }) {
+  const seasons: Season[] =
+    conditions?.seasons && conditions.seasons.length > 0
+      ? conditions.seasons
+      : ["winter", "summer"];
+  const note = conditions?.note?.trim() || DEFAULT_NOTE;
+
+  const [season, setSeason] = React.useState<Season>(seasons[0]);
+  // Keep the active tab valid if the configured season list changes.
+  const active = seasons.includes(season) ? season : seasons[0];
+  const current = resolveSeason(
+    active,
+    active === "winter" ? conditions?.winter : conditions?.summer
+  );
 
   return (
     <section id="conditii" className="bg-warm-white py-12 sm:py-16">
@@ -81,7 +98,7 @@ export function ConditionsWidget() {
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <div className="flex items-center gap-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary">
-                  {current.icon}
+                  {SEASON_ICON[active]}
                 </span>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-terracotta">
@@ -93,36 +110,42 @@ export function ConditionsWidget() {
                 </div>
               </div>
 
-              <div
-                className="inline-flex rounded-full border border-border bg-warm-white p-1"
-                role="group"
-                aria-label="Alege sezonul"
-              >
-                <SeasonToggle
-                  active={season === "winter"}
-                  onClick={() => setSeason("winter")}
+              {seasons.length > 1 ? (
+                <div
+                  className="inline-flex rounded-full border border-border bg-warm-white p-1"
+                  role="group"
+                  aria-label="Alege sezonul"
                 >
-                  <Snowflake className="h-4 w-4" />
-                  Iarnă
-                </SeasonToggle>
-                <SeasonToggle
-                  active={season === "summer"}
-                  onClick={() => setSeason("summer")}
-                >
-                  <Sun className="h-4 w-4" />
-                  Vară
-                </SeasonToggle>
-              </div>
+                  {seasons.includes("winter") ? (
+                    <SeasonToggle
+                      active={active === "winter"}
+                      onClick={() => setSeason("winter")}
+                    >
+                      <Snowflake className="h-4 w-4" />
+                      Iarnă
+                    </SeasonToggle>
+                  ) : null}
+                  {seasons.includes("summer") ? (
+                    <SeasonToggle
+                      active={active === "summer"}
+                      onClick={() => setSeason("summer")}
+                    >
+                      <Sun className="h-4 w-4" />
+                      Vară
+                    </SeasonToggle>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             <dl className="grid gap-4 sm:grid-cols-3">
-              {current.metrics.map((m) => (
+              {current.metrics.map((m, i) => (
                 <div
-                  key={m.label}
+                  key={`${m.label}-${i}`}
                   className="flex items-center gap-4 rounded-xl border border-border bg-warm-white p-4"
                 >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
-                    {m.icon}
+                    {metricIcon(m.label)}
                   </span>
                   <div>
                     <dt className="text-xs text-muted-foreground">{m.label}</dt>
@@ -134,10 +157,12 @@ export function ConditionsWidget() {
               ))}
             </dl>
 
-            <p className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Info className="h-3.5 w-3.5 shrink-0" />
-              Date orientative, cu titlu demonstrativ.
-            </p>
+            {note ? (
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Info className="h-3.5 w-3.5 shrink-0" />
+                {note}
+              </p>
+            ) : null}
           </div>
         </div>
       </Container>

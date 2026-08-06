@@ -128,6 +128,58 @@ export interface SectionConfig {
   limit?: number;
 }
 
+/** A single seasonal metric card in the "Condiții" widget. */
+export interface ConditionMetric {
+  label: string;
+  value: string;
+}
+
+/** One season's content in the "Condiții" widget. */
+export interface ConditionSeason {
+  headline?: string;
+  metrics?: ConditionMetric[];
+}
+
+/**
+ * "Condiții în stațiune" widget config (resort-only). An empty object falls
+ * back to the frontend's hardcoded defaults so nothing looks broken.
+ */
+export interface Conditions {
+  /** Which season tabs to show; defaults to both. */
+  seasons?: ("winter" | "summer")[];
+  winter?: ConditionSeason;
+  summer?: ConditionSeason;
+  /** Small footnote under the cards. */
+  note?: string;
+}
+
+export type TrailDifficulty = "Ușor" | "Mediu" | "Dificil";
+
+/** A single trail in the "Trasee & hartă" widget. */
+export interface Trail {
+  name: string;
+  difficulty: TrailDifficulty;
+  length: string;
+  /** Diferență de nivel, ex: "620 m". */
+  elevation: string;
+  duration: string;
+  /** Uploaded GPX track URL, ex: "/media/xxx.gpx". */
+  gpx?: string;
+}
+
+/**
+ * "Trasee & hartă" widget config (resort-only). An empty object falls back to
+ * the frontend's hardcoded defaults so nothing looks broken.
+ */
+export interface Trails {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  /** Free-text place used to center the map when no GPX tracks exist. */
+  mapQuery?: string;
+  items?: Trail[];
+}
+
 /** Per-tenant display copy overriding festival defaults (terminology system). */
 export type TenantLabels = Record<string, string>;
 
@@ -150,6 +202,10 @@ export interface TenantConfig {
   sections: SectionConfig[];
   stats: Stat[];
   experiences: Experience[];
+  /** Resort-only "Condiții" widget config; empty → frontend defaults. */
+  conditions?: Conditions;
+  /** Resort-only "Trasee & hartă" widget config; empty → frontend defaults. */
+  trails?: Trails;
 }
 
 export type ExhibitorCategory =

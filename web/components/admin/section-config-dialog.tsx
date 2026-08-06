@@ -12,6 +12,8 @@ import {
   Trash2,
   ArrowRight,
   Info,
+  FileUp,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,12 +42,15 @@ import {
   updateSection,
   useAdminData,
 } from "@/lib/admin/store";
-import { uploadMedia } from "@/lib/admin/media";
+import { uploadGpx, uploadMedia } from "@/lib/admin/media";
 import { GalleryManager } from "@/components/admin/gallery-manager";
 import type {
+  ConditionMetric,
   CustomSectionSource,
   Experience,
   SectionConfig,
+  Trail,
+  TrailDifficulty,
 } from "@/lib/tenants/types";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -61,7 +66,13 @@ import { toast } from "sonner";
  * (never a setState-in-effect) to respect the repo's strict hooks lint.
  */
 
-const INLINE_EDITORS = new Set(["hero", "about", "experiences"]);
+const INLINE_EDITORS = new Set([
+  "hero",
+  "about",
+  "experiences",
+  "conditions",
+  "trails",
+]);
 
 /** Content-backed zones → the admin module that manages their content. */
 const MODULE_LINKS: Record<
@@ -729,6 +740,619 @@ function ExperiencesEditor({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ----------------------------------------------------------- Conditions editor
+
+type SeasonKey = "winter" | "summer";
+
+const CONDITION_DEFAULTS: Record<
+  SeasonKey,
+  { headline: string; metrics: ConditionMetric[] }
+> = {
+  winter: {
+    headline: "Condiții de iarnă",
+    metrics: [
+      { label: "Temperatură", value: "-3°C" },
+      { label: "Strat de zăpadă", value: "45 cm" },
+      { label: "Stare pârtii", value: "Pârtii deschise" },
+    ],
+  },
+  summer: {
+    headline: "Condiții de vară",
+    metrics: [
+      { label: "Temperatură", value: "21°C" },
+      { label: "Temperatura apei lacului", value: "18°C" },
+      { label: "Stare trasee", value: "Trasee deschise" },
+    ],
+  },
+};
+
+const CONDITION_DEFAULT_NOTE = "Date orientative, cu titlu demonstrativ.";
+
+interface SeasonForm {
+  headline: string;
+  metrics: ConditionMetric[];
+}
+
+function MetricsEditor({
+  season,
+  form,
+  onChange,
+}: {
+  season: SeasonKey;
+  form: SeasonForm;
+  onChange: (patch: Partial<SeasonForm>) => void;
+}) {
+  function updateMetric(index: number, patch: Partial<ConditionMetric>) {
+    onChange({
+      metrics: form.metrics.map((m, i) =>
+        i === index ? { ...m, ...patch } : m
+      ),
+    });
+  }
+  function addMetric() {
+    onChange({ metrics: [...form.metrics, { label: "", value: "" }] });
+  }
+  function removeMetric(index: number) {
+    onChange({ metrics: form.metrics.filter((_, i) => i !== index) });
+  }
+
+  return (
+    <div className="space-y-3 rounded-xl border border-border p-4">
+      <div className="space-y-1.5">
+        <Label htmlFor={`cond-headline-${season}`}>Titlu sezon</Label>
+        <Input
+          id={`cond-headline-${season}`}
+          value={form.headline}
+          onChange={(e) => onChange({ headline: e.target.value })}
+          placeholder={CONDITION_DEFAULTS[season].headline}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <Label>Indicatori</Label>
+        <Button variant="outline" size="sm" onClick={addMetric}>
+          <Plus className="h-4 w-4" />
+          Adaugă
+        </Button>
+      </div>
+      {form.metrics.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-sm text-muted-foreground">
+          Niciun indicator. Sezonul nu va afișa carduri.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {form.metrics.map((m, i) => (
+            <li
+              key={i}
+              className="flex flex-wrap items-end gap-2 rounded-lg border border-border p-3 sm:flex-nowrap"
+            >
+              <div className="min-w-0 flex-1 space-y-1">
+                <Label
+                  htmlFor={`cond-${season}-label-${i}`}
+                  className="text-xs text-muted-foreground"
+                >
+                  Etichetă
+                </Label>
+                <Input
+                  id={`cond-${season}-label-${i}`}
+                  value={m.label}
+                  onChange={(e) => updateMetric(i, { label: e.target.value })}
+                  placeholder="Temperatură"
+                />
+              </div>
+              <div className="w-full space-y-1 sm:w-40">
+                <Label
+                  htmlFor={`cond-${season}-value-${i}`}
+                  className="text-xs text-muted-foreground"
+                >
+                  Valoare
+                </Label>
+                <Input
+                  id={`cond-${season}-value-${i}`}
+                  value={m.value}
+                  onChange={(e) => updateMetric(i, { value: e.target.value })}
+                  placeholder="-3°C"
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0 text-muted-foreground hover:text-destructive"
+                onClick={() => removeMetric(i)}
+                aria-label="Șterge indicatorul"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function ConditionsEditor({ onClose }: { onClose: () => void }) {
+  const data = useAdminData();
+  const config = data.conditions;
+  const configured =
+    !!config && (config.seasons || config.winter || config.summer || config.note);
+
+  const [seasons, setSeasons] = React.useState<SeasonKey[]>(() =>
+    config?.seasons && config.seasons.length > 0
+      ? config.seasons
+      : ["winter", "summer"]
+  );
+  const [winter, setWinter] = React.useState<SeasonForm>(() => ({
+    headline: config?.winter?.headline ?? CONDITION_DEFAULTS.winter.headline,
+    metrics: config?.winter?.metrics ?? CONDITION_DEFAULTS.winter.metrics,
+  }));
+  const [summer, setSummer] = React.useState<SeasonForm>(() => ({
+    headline: config?.summer?.headline ?? CONDITION_DEFAULTS.summer.headline,
+    metrics: config?.summer?.metrics ?? CONDITION_DEFAULTS.summer.metrics,
+  }));
+  const [note, setNote] = React.useState<string>(() =>
+    configured ? config?.note ?? "" : CONDITION_DEFAULT_NOTE
+  );
+  const [saving, setSaving] = React.useState(false);
+
+  function toggleSeason(key: SeasonKey) {
+    setSeasons((prev) => {
+      if (prev.includes(key)) {
+        // Keep at least one season enabled.
+        if (prev.length === 1) return prev;
+        return prev.filter((s) => s !== key);
+      }
+      // Preserve winter-before-summer order.
+      return key === "winter" ? ["winter", ...prev] : [...prev, "summer"];
+    });
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    const clean = (form: SeasonForm) => ({
+      headline: form.headline.trim(),
+      metrics: form.metrics
+        .filter((m) => m.label.trim() || m.value.trim())
+        .map((m) => ({ label: m.label.trim(), value: m.value.trim() })),
+    });
+    await persist(
+      {
+        conditions: {
+          seasons,
+          winter: clean(winter),
+          summer: clean(summer),
+          note: note.trim(),
+        },
+      },
+      onClose
+    );
+    setSaving(false);
+  }
+
+  return (
+    <>
+      <div className="space-y-5 py-2">
+        <div className="space-y-2">
+          <Label>Sezoane afișate</Label>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={seasons.includes("winter") ? "gold" : "outline"}
+              size="sm"
+              onClick={() => toggleSeason("winter")}
+              aria-pressed={seasons.includes("winter")}
+            >
+              Iarnă
+            </Button>
+            <Button
+              variant={seasons.includes("summer") ? "gold" : "outline"}
+              size="sm"
+              onClick={() => toggleSeason("summer")}
+              aria-pressed={seasons.includes("summer")}
+            >
+              Vară
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Cel puțin un sezon rămâne activ. Butonul de comutare din pagină apare
+            doar când sunt afișate ambele.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-foreground">Iarnă</p>
+          <MetricsEditor
+            season="winter"
+            form={winter}
+            onChange={(patch) => setWinter((prev) => ({ ...prev, ...patch }))}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-foreground">Vară</p>
+          <MetricsEditor
+            season="summer"
+            form={summer}
+            onChange={(patch) => setSummer((prev) => ({ ...prev, ...patch }))}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="cond-note">Notă (opțional)</Label>
+          <Input
+            id="cond-note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={CONDITION_DEFAULT_NOTE}
+          />
+        </div>
+      </div>
+      <SaveFooter
+        saving={saving}
+        onCancel={onClose}
+        onSave={() => void handleSave()}
+      />
+    </>
+  );
+}
+
+// --------------------------------------------------------------- Trails editor
+
+const TRAIL_DIFFICULTIES: TrailDifficulty[] = ["Ușor", "Mediu", "Dificil"];
+
+const TRAIL_DEFAULTS: {
+  eyebrow: string;
+  title: string;
+  description: string;
+  mapQuery: string;
+  items: Trail[];
+} = {
+  eyebrow: "Explorează zona",
+  title: "Trasee & hartă",
+  description:
+    "Descoperă potecile din jurul stațiunii — de la plimbări ușoare pe malul lacului până la ture montane pentru cei experimentați.",
+  mapQuery: "Poiana Mărului",
+  items: [
+    {
+      name: "Traseul Lacului Verde",
+      difficulty: "Ușor",
+      length: "4,2 km",
+      elevation: "120 m",
+      duration: "1h 30m",
+    },
+    {
+      name: "Creasta Muntele Mic",
+      difficulty: "Mediu",
+      length: "9,5 km",
+      elevation: "540 m",
+      duration: "3h 30m",
+    },
+  ],
+};
+
+/** Basename of a /media/xxx.gpx URL, for display next to the remove button. */
+function gpxFilename(url: string): string {
+  try {
+    return decodeURIComponent(url.split("/").pop() || url);
+  } catch {
+    return url;
+  }
+}
+
+function GpxField({
+  value,
+  onChange,
+}: {
+  value: string | undefined;
+  onChange: (url: string | undefined) => void;
+}) {
+  const [uploading, setUploading] = React.useState(false);
+
+  async function handleUpload(file: File | undefined) {
+    if (!file) return;
+    setUploading(true);
+    const url = await uploadGpx(file);
+    setUploading(false);
+    if (!url) {
+      toast.error("Încărcarea traseului GPX a eșuat.");
+      return;
+    }
+    onChange(url);
+    toast.success("Traseu GPX încărcat.");
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <Label>Traseu GPX (opțional)</Label>
+      {value ? (
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2">
+          <FileUp className="h-4 w-4 shrink-0 text-primary" />
+          <span className="min-w-0 flex-1 truncate text-sm text-foreground">
+            {gpxFilename(value)}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
+            onClick={() => onChange(undefined)}
+            aria-label="Elimină traseul GPX"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <label
+          className={cn(
+            "inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary",
+            uploading && "pointer-events-none opacity-70"
+          )}
+        >
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Upload className="h-4 w-4" />
+          )}
+          {uploading ? "Se încarcă…" : "Încarcă GPX"}
+          <input
+            type="file"
+            accept=".gpx,application/gpx+xml,application/xml,text/xml"
+            className="hidden"
+            disabled={uploading}
+            onChange={(e) => {
+              void handleUpload(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      )}
+      <p className="text-xs text-muted-foreground">
+        Traseul se desenează pe hartă, colorat după dificultate.
+      </p>
+    </div>
+  );
+}
+
+interface TrailsForm {
+  eyebrow: string;
+  title: string;
+  description: string;
+  mapQuery: string;
+  items: Trail[];
+}
+
+function TrailsEditor({ onClose }: { onClose: () => void }) {
+  const data = useAdminData();
+  const config = data.trails;
+  const [form, setForm] = React.useState<TrailsForm>(() => ({
+    eyebrow: config?.eyebrow ?? TRAIL_DEFAULTS.eyebrow,
+    title: config?.title ?? TRAIL_DEFAULTS.title,
+    description: config?.description ?? TRAIL_DEFAULTS.description,
+    mapQuery: config?.mapQuery ?? TRAIL_DEFAULTS.mapQuery,
+    items:
+      config?.items && config.items.length > 0
+        ? config.items.map((t) => ({ ...t }))
+        : TRAIL_DEFAULTS.items.map((t) => ({ ...t })),
+  }));
+  const [saving, setSaving] = React.useState(false);
+
+  function set<K extends keyof TrailsForm>(key: K, value: TrailsForm[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+  function updateItem(index: number, patch: Partial<Trail>) {
+    setForm((prev) => ({
+      ...prev,
+      items: prev.items.map((it, i) =>
+        i === index ? { ...it, ...patch } : it
+      ),
+    }));
+  }
+  function addItem() {
+    setForm((prev) => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        {
+          name: "",
+          difficulty: "Ușor",
+          length: "",
+          elevation: "",
+          duration: "",
+        },
+      ],
+    }));
+  }
+  function removeItem(index: number) {
+    setForm((prev) => ({
+      ...prev,
+      items: prev.items.filter((_, i) => i !== index),
+    }));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    await persist(
+      {
+        trails: {
+          eyebrow: form.eyebrow.trim(),
+          title: form.title.trim(),
+          description: form.description.trim(),
+          mapQuery: form.mapQuery.trim(),
+          items: form.items
+            .filter((t) => t.name.trim())
+            .map((t) => ({
+              name: t.name.trim(),
+              difficulty: t.difficulty,
+              length: t.length.trim(),
+              elevation: t.elevation.trim(),
+              duration: t.duration.trim(),
+              gpx: t.gpx || undefined,
+            })),
+        },
+      },
+      onClose
+    );
+    setSaving(false);
+  }
+
+  return (
+    <>
+      <div className="space-y-5 py-2">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="trails-eyebrow">Etichetă</Label>
+            <Input
+              id="trails-eyebrow"
+              value={form.eyebrow}
+              onChange={(e) => set("eyebrow", e.target.value)}
+              placeholder={TRAIL_DEFAULTS.eyebrow}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="trails-title">Titlu</Label>
+            <Input
+              id="trails-title"
+              value={form.title}
+              onChange={(e) => set("title", e.target.value)}
+              placeholder={TRAIL_DEFAULTS.title}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="trails-description">Descriere</Label>
+          <Textarea
+            id="trails-description"
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="trails-mapquery">Localitate hartă (fallback)</Label>
+          <Input
+            id="trails-mapquery"
+            value={form.mapQuery}
+            onChange={(e) => set("mapQuery", e.target.value)}
+            placeholder={TRAIL_DEFAULTS.mapQuery}
+          />
+          <p className="text-xs text-muted-foreground">
+            Centrează harta când niciun traseu nu are fișier GPX încărcat.
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Label>Trasee</Label>
+          <Button variant="outline" size="sm" onClick={addItem}>
+            <Plus className="h-4 w-4" />
+            Adaugă
+          </Button>
+        </div>
+
+        {form.items.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground">
+            Niciun traseu adăugat încă.
+          </p>
+        ) : (
+          <ul className="space-y-4">
+            {form.items.map((it, i) => (
+              <li
+                key={i}
+                className="space-y-3 rounded-xl border border-border p-4"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-medium text-foreground">
+                    Traseul {i + 1}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => removeItem(i)}
+                    aria-label="Șterge traseul"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`trail-name-${i}`}>Nume</Label>
+                    <Input
+                      id={`trail-name-${i}`}
+                      value={it.name}
+                      onChange={(e) => updateItem(i, { name: e.target.value })}
+                      placeholder="Traseul Lacului Verde"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`trail-diff-${i}`}>Dificultate</Label>
+                    <Select
+                      value={it.difficulty}
+                      onValueChange={(v) =>
+                        updateItem(i, { difficulty: v as TrailDifficulty })
+                      }
+                    >
+                      <SelectTrigger id={`trail-diff-${i}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TRAIL_DIFFICULTIES.map((d) => (
+                          <SelectItem key={d} value={d}>
+                            {d}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`trail-length-${i}`}>Lungime</Label>
+                    <Input
+                      id={`trail-length-${i}`}
+                      value={it.length}
+                      onChange={(e) =>
+                        updateItem(i, { length: e.target.value })
+                      }
+                      placeholder="4,2 km"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`trail-elev-${i}`}>Diferență nivel</Label>
+                    <Input
+                      id={`trail-elev-${i}`}
+                      value={it.elevation}
+                      onChange={(e) =>
+                        updateItem(i, { elevation: e.target.value })
+                      }
+                      placeholder="540 m"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor={`trail-duration-${i}`}>Durată</Label>
+                    <Input
+                      id={`trail-duration-${i}`}
+                      value={it.duration}
+                      onChange={(e) =>
+                        updateItem(i, { duration: e.target.value })
+                      }
+                      placeholder="1h 30m"
+                    />
+                  </div>
+                </div>
+                <GpxField
+                  value={it.gpx}
+                  onChange={(url) => updateItem(i, { gpx: url })}
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <SaveFooter
+        saving={saving}
+        onCancel={onClose}
+        onSave={() => void handleSave()}
+      />
+    </>
+  );
+}
+
 // -------------------------------------------------- Content-backed / generic
 
 function ContentBackedBody({
@@ -1169,6 +1793,10 @@ export function SectionConfigButton({ section }: { section: SectionConfig }) {
               <AboutEditor key="about" onClose={close} />
             ) : section.id === "experiences" ? (
               <ExperiencesEditor key="experiences" onClose={close} />
+            ) : section.id === "conditions" ? (
+              <ConditionsEditor key="conditions" onClose={close} />
+            ) : section.id === "trails" ? (
+              <TrailsEditor key="trails" onClose={close} />
             ) : (
               <ContentBackedBody sectionId={section.id} onClose={close} />
             )

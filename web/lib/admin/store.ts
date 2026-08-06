@@ -5,6 +5,7 @@ import { prispaTenant } from "@/lib/tenants/prispa";
 import type {
   Accommodation,
   Article,
+  Conditions,
   ContactMessage,
   Destination,
   Experience,
@@ -18,6 +19,7 @@ import type {
   SectionConfig,
   Stat,
   Tenant,
+  Trails,
 } from "@/lib/tenants/types";
 import {
   apiAddSubscriber,
@@ -95,6 +97,10 @@ export interface AdminData {
   stats: Stat[];
   /** Homepage "Zone și experiențe" grid. */
   experiences: Experience[];
+  /** Resort-only "Condiții" widget config. */
+  conditions?: Conditions;
+  /** Resort-only "Trasee & hartă" widget config. */
+  trails?: Trails;
   settings: AdminSettings;
   /** Vertical preset key (festival | resort | museum | …). */
   eventType?: string;
@@ -125,6 +131,12 @@ function seed(): AdminData {
     sections: structuredClone(prispaTenant.config.sections),
     stats: structuredClone(prispaTenant.config.stats),
     experiences: structuredClone(prispaTenant.config.experiences),
+    conditions: prispaTenant.config.conditions
+      ? structuredClone(prispaTenant.config.conditions)
+      : {},
+    trails: prispaTenant.config.trails
+      ? structuredClone(prispaTenant.config.trails)
+      : {},
     settings: {
       name: info.name,
       tagline: info.tagline,
@@ -176,6 +188,8 @@ function bundleToAdminData(bundle: Tenant): AdminData {
     sections: config.sections ?? [],
     stats: config.stats ?? [],
     experiences: config.experiences ?? [],
+    conditions: config.conditions ?? {},
+    trails: config.trails ?? {},
     settings: {
       name: info.name,
       tagline: info.tagline,
@@ -224,6 +238,8 @@ function emptyData(): AdminData {
     sections: [],
     stats: [],
     experiences: [],
+    conditions: {},
+    trails: {},
     settings: {
       name: "",
       tagline: "",

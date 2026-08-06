@@ -72,6 +72,32 @@ export async function uploadMedia(file: File): Promise<MediaAsset | null> {
   }
 }
 
+/**
+ * Upload a single GPX track file (multipart/form-data, field name `file`).
+ * Returns the stored `/media/xxx.gpx` URL, or null on failure. Like
+ * `uploadMedia`, never set Content-Type by hand — the browser adds the
+ * multipart boundary; only the Authorization header is sent.
+ */
+export async function uploadGpx(file: File): Promise<string | null> {
+  const base = mediaBase();
+  if (!base) return null;
+  try {
+    const body = new FormData();
+    body.append("file", file);
+    const res = await fetch(`${base}/gpx`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${getToken() ?? ""}` },
+      body,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { url?: string };
+    return data?.url ?? null;
+  } catch (err) {
+    console.error("uploadGpx failed", err);
+    return null;
+  }
+}
+
 /** Delete a media asset by id. Returns true on success (204). */
 export async function deleteMedia(id: string): Promise<boolean> {
   const base = mediaBase();
