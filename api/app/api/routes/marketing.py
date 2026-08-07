@@ -60,6 +60,9 @@ class CampaignIn(CamelModel):
     # "text" = mesajul de mai sus ca atare; "invitation" = șablonul de invitație
     # construit din datele site-ului, cu `body` drept introducere.
     template: str = "text"
+    # Gol = toți abonații. Altfel doar adresele astea (probă, listă scurtă,
+    # invitați care nu sunt abonați) — numele se ia din abonați, dacă există.
+    recipients: list[str] = []
 
 
 class PreviewIn(CamelModel):
@@ -315,18 +318,39 @@ def send_campaign(
             "error": "SMTP nu este configurat/activat. Vezi tab-ul Configurare.",
         }
 
-    # Câte un destinatar per adresă, cu numele lui (prima apariție câștigă).
-    recipients: dict[str, str] = {}
+    # Numele abonaților, ca personalizarea să meargă și când se trimite doar
+    # către câteva adrese alese.
+    known: dict[str, str] = {}
     for row in session.exec(
         select(NewsletterSubscriber).where(
             NewsletterSubscriber.tenant_id == tenant.id
         )
     ).all():
-        addr = (row.email or "").strip()
-        if addr and addr.lower() not in recipients:
-            recipients[addr.lower()] = row.name or ""
-    if not recipients:
-        return {"ok": False, "error": "Nu ai niciun abonat la newsletter.", "total": 0}
+        addr = (row.email or "").strip().lower()
+        if addr and addr not in known:
+            known[addr] = row.name or ""
+
+    # Câte un destinatar per adresă, în ordinea primei apariții.
+    recipients: dict[str, str] = {}
+    if payload.recipients:
+        for raw in payload.recipients:
+            addr = (raw or "").strip().lower()
+            if EMAIL_RE.match(addr) and addr not in recipients:
+                recipients[addr] = known.get(addr, "")
+        if not recipients:
+            return {
+                "ok": False,
+                "error": "Niciuna dintre adresele indicate nu e validă.",
+                "total": 0,
+            }
+    else:
+        recipients = dict(known)
+        if not recipients:
+            return {
+                "ok": False,
+                "error": "Nu ai niciun abonat la newsletter.",
+                "total": 0,
+            }
 
     if payload.template == "invitation":
         html_tpl, text_tpl = invitation.build_invitation(session, tenant, body)

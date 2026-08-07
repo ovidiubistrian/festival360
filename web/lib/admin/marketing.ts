@@ -186,7 +186,9 @@ export async function getSubscribers(): Promise<Subscriber[]> {
 export async function sendCampaign(
   subject: string,
   body: string,
-  template: CampaignTemplate = "text"
+  template: CampaignTemplate = "text",
+  /** Gol = toți abonații; altfel doar adresele astea. */
+  recipients: string[] = []
 ): Promise<SendResult> {
   const base = marketingBase();
   if (!base) {
@@ -196,7 +198,7 @@ export async function sendCampaign(
     const res = await fetch(`${base}/send`, {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ subject, body, template }),
+      body: JSON.stringify({ subject, body, template, recipients }),
     });
     if (!res.ok) {
       return { ok: false, error: `Eroare server (${res.status}).` };

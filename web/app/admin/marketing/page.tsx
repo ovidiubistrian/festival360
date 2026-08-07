@@ -138,6 +138,13 @@ export default function MarketingPage() {
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [sending, setSending] = React.useState(false);
 
+  // Cui pleacă: toți abonații sau o listă scrisă de mână (probă, invitați care
+  // nu sunt în listă).
+  const [audience, setAudience] = React.useState<"all" | "manual">("all");
+  const [manualList, setManualList] = React.useState("");
+  const [probeEmail, setProbeEmail] = React.useState("");
+  const [sendingProbe, setSendingProbe] = React.useState(false);
+
   const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
   const [previewing, setPreviewing] = React.useState(false);
   const [importOpen, setImportOpen] = React.useState(false);
@@ -218,18 +225,32 @@ export default function MarketingPage() {
     }
   }
 
+  /** Adresele valide dintr-un text lipit (separate prin virgulă, ; sau enter). */
+  function parseAddresses(text: string): string[] {
+    const found = text
+      .split(/[\s,;]+/)
+      .map((a) => a.trim().toLowerCase())
+      .filter((a) => EMAIL_RE.test(a));
+    return Array.from(new Set(found));
+  }
+
   async function handleSend() {
     setConfirmOpen(false);
     setSending(true);
-    const result = await sendCampaign(subject.trim(), campaignBody, template);
+    const result = await sendCampaign(
+      subject.trim(),
+      campaignBody,
+      template,
+      audience === "manual" ? manualAddresses : []
+    );
     setSending(false);
     if (!result.ok) {
       toast.error(result.error ?? "Trimiterea campaniei a eșuat.");
       return;
     }
     const sent = result.sent ?? 0;
-    const total = result.total ?? subscribers.length;
-    toast.success(`Campanie trimisă către ${sent}/${total} abonați.`);
+    const total = result.total ?? targetCount;
+    toast.success(`Campanie trimisă către ${sent}/${total} destinatari.`);
     if (result.failed && result.failed > 0) {
       const first = result.errors?.slice(0, 3).join(" · ");
       toast.error(
@@ -238,6 +259,27 @@ export default function MarketingPage() {
     }
     setSubject("");
     setCampaignBody("");
+  }
+
+  /** Trimite campania, așa cum e, doar la o adresă — proba dinaintea listei. */
+  async function handleProbe() {
+    const to = probeEmail.trim().toLowerCase();
+    if (!EMAIL_RE.test(to)) {
+      toast.error("Introdu o adresă validă pentru probă.");
+      return;
+    }
+    if (!subject.trim() || !campaignBody.trim()) {
+      toast.error("Completează subiectul și mesajul înainte de probă.");
+      return;
+    }
+    setSendingProbe(true);
+    const result = await sendCampaign(subject.trim(), campaignBody, template, [to]);
+    setSendingProbe(false);
+    if (!result.ok) {
+      toast.error(result.error ?? "Trimiterea probei a eșuat.");
+      return;
+    }
+    toast.success(`Probă trimisă către ${to}.`);
   }
 
   async function reloadSubscribers() {
@@ -279,9 +321,12 @@ export default function MarketingPage() {
 
   const configured = settings?.configured === true;
   const subscriberCount = subscribers.length;
+  const manualAddresses = parseAddresses(manualList);
+  const targetCount =
+    audience === "manual" ? manualAddresses.length : subscriberCount;
   const canSend =
     configured &&
-    subscriberCount > 0 &&
+    targetCount > 0 &&
     subject.trim().length > 0 &&
     campaignBody.trim().length > 0;
 
@@ -348,7 +393,7 @@ export default function MarketingPage() {
                     </p>
                   </div>
                 ) : null}
-                {configured && subscriberCount === 0 ? (
+                {configured && subscriberCount === 0 && audience === "all" ? (
                   <div className="flex items-start gap-3 rounded-xl border border-border bg-secondary p-4 text-sm text-muted-foreground">
                     <Users className="mt-0.5 h-4 w-4 shrink-0" />
                     <p>Nu ai încă niciun abonat căruia să-i trimiți campania.</p>
@@ -414,9 +459,103 @@ export default function MarketingPage() {
                   />
                 </Field>
 
+                {/* Cui pleacă emailul — altfel nu se vede de nicăieri. */}
+                <Field
+                  label="Destinatari"
+                  hint={
+                    audience === "all"
+                      ? "Toți abonații din fila „Abonați”, unde poți importa o listă din CSV."
+                      : "Trimite doar către adresele scrise aici; nu se adaugă la abonați."
+                  }
+                >
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        variant={audience === "all" ? "gold" : "outline"}
+                        size="sm"
+                        onClick={() => setAudience("all")}
+                      >
+                        <Users className="h-4 w-4" />
+                        Toți abonații ({subscriberCount})
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={audience === "manual" ? "gold" : "outline"}
+                        size="sm"
+                        onClick={() => setAudience("manual")}
+                      >
+                        <Mail className="h-4 w-4" />
+                        Doar anumite adrese
+                      </Button>
+                    </div>
+
+                    {audience === "manual" ? (
+                      <>
+                        <Textarea
+                          value={manualList}
+                          onChange={(e) => setManualList(e.target.value)}
+                          placeholder="ana@exemplu.ro, ion@exemplu.ro"
+                          rows={3}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          {manualAddresses.length} adrese valide. Le poți separa
+                          prin virgulă, punct și virgulă sau enter.
+                        </p>
+                      </>
+                    ) : subscriberCount > 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        Către:{" "}
+                        {subscribers
+                          .slice(0, 3)
+                          .map((s) => s.email)
+                          .join(", ")}
+                        {subscriberCount > 3
+                          ? ` și încă ${subscriberCount - 3}`
+                          : ""}
+                        .
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Nu ai niciun abonat. Importă o listă din fila „Abonați”
+                        sau trimite deocamdată către adrese alese.
+                      </p>
+                    )}
+                  </div>
+                </Field>
+
+                {/* Proba: același email, o singură adresă, înainte de listă. */}
+                <Field
+                  label="Trimite o probă"
+                  hint="Vezi emailul în căsuța ta înainte să plece la toată lista."
+                >
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Input
+                      type="email"
+                      value={probeEmail}
+                      onChange={(e) => setProbeEmail(e.target.value)}
+                      placeholder="adresa@ta.ro"
+                      className="sm:max-w-72"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => void handleProbe()}
+                      disabled={sendingProbe || !configured}
+                    >
+                      {sendingProbe ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                      Trimite proba
+                    </Button>
+                  </div>
+                </Field>
+
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-muted-foreground">
-                    Se va trimite către {subscriberCount} abonați.
+                    Se va trimite către {targetCount}{" "}
+                    {audience === "manual" ? "adrese alese" : "abonați"}.
                   </p>
                   <div className="flex items-center gap-2">
                     <Button
@@ -740,7 +879,8 @@ export default function MarketingPage() {
             <DialogDescription>
               Trimiți această campanie către{" "}
               <span className="font-medium text-foreground">
-                {subscriberCount} abonați
+                {targetCount}{" "}
+                {audience === "manual" ? "adrese alese" : "abonați"}
               </span>
               ? Acțiunea nu poate fi anulată.
             </DialogDescription>
