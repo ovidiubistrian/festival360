@@ -172,13 +172,14 @@ export async function submitForm(
 export async function subscribeNewsletter(
   slug: string,
   email: string,
-  source = "Website"
+  source = "Website",
+  name = ""
 ): Promise<boolean> {
   try {
     const res = await fetch(`${API}/tenants/${slug}/newsletter/subscribe`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, source }),
+      body: JSON.stringify({ email, source, name }),
     });
     return res.ok;
   } catch {

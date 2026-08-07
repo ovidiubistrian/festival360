@@ -423,4 +423,5 @@ class MessageReadIn(CamelModel):
 
 class NewsletterIn(CamelModel):
     email: str
+    name: str = ""
     source: str = "Website"

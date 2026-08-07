@@ -42,11 +42,11 @@ const contactMessages: ContactMessage[] = [
 ];
 
 const newsletter: NewsletterSubscriber[] = [
-  { id: "ns-1", email: "maria.ionescu@example.com", date: "2025-07-15", source: "Homepage" },
-  { id: "ns-2", email: "vlad.dumitru@example.com", date: "2025-07-19", source: "Homepage" },
-  { id: "ns-3", email: "elena.stan@example.com", date: "2025-07-24", source: "Articol" },
-  { id: "ns-4", email: "george.pop@example.com", date: "2025-08-01", source: "Homepage" },
-  { id: "ns-5", email: "raluca.matei@example.com", date: "2025-08-03", source: "Contact" },
+  { id: "ns-1", email: "maria.ionescu@example.com", name: "Maria Ionescu", date: "2025-07-15", source: "Homepage" },
+  { id: "ns-2", email: "vlad.dumitru@example.com", name: "Vlad Dumitru", date: "2025-07-19", source: "Homepage" },
+  { id: "ns-3", email: "elena.stan@example.com", name: "Elena Stan", date: "2025-07-24", source: "Articol" },
+  { id: "ns-4", email: "george.pop@example.com", name: "", date: "2025-08-01", source: "Homepage" },
+  { id: "ns-5", email: "raluca.matei@example.com", name: "Raluca Matei", date: "2025-08-03", source: "Contact" },
 ];
 
 export const prispaTenant: Tenant = {

@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Trash2, Download, Users } from "lucide-react";
+import { Plus, Trash2, Download, Upload, Users } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { DataToolbar } from "@/components/admin/data-toolbar";
 import { ConfirmDelete } from "@/components/admin/confirm-delete";
 import { StatCard } from "@/components/admin/stat-card";
+import { SubscriberImportDialog } from "@/components/admin/subscriber-import";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +31,7 @@ import {
 import {
   addSubscriber,
   deleteSubscriber,
+  refresh,
   useAdminData,
 } from "@/lib/admin/store";
 import type { NewsletterSubscriber } from "@/lib/tenants/types";
@@ -42,12 +44,17 @@ export default function NewsletterPage() {
   const data = useAdminData();
   const [query, setQuery] = React.useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [importOpen, setImportOpen] = React.useState(false);
   const [email, setEmail] = React.useState("");
+  const [name, setName] = React.useState("");
 
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     return data.newsletter.filter(
-      (s) => !q || s.email.toLowerCase().includes(q)
+      (s) =>
+        !q ||
+        s.email.toLowerCase().includes(q) ||
+        (s.name ?? "").toLowerCase().includes(q)
     );
   }, [data.newsletter, query]);
 
@@ -61,9 +68,10 @@ export default function NewsletterPage() {
       toast.error("Această adresă este deja înscrisă.");
       return;
     }
-    addSubscriber(value, "Admin");
+    addSubscriber(value, "Admin", name.trim());
     toast.success("Abonat adăugat.");
     setEmail("");
+    setName("");
     setDialogOpen(false);
   }
 
@@ -72,8 +80,22 @@ export default function NewsletterPage() {
     toast.success("Abonat șters.");
   }
 
-  function exportDemo() {
-    toast.success("Export generat (demo) — fără descărcare reală.");
+  /** Aceleași coloane ca la import, ca fișierul să poată fi reîncărcat. */
+  function exportCsv() {
+    const cell = (value: string) =>
+      /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+    const rows = data.newsletter.map((s) =>
+      [cell(s.name ?? ""), cell(s.email), cell(s.date), cell(s.source)].join(",")
+    );
+    const csv = ["nume,email,data,sursa", ...rows].join("\n");
+    const url = URL.createObjectURL(
+      new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8;" })
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "abonati-newsletter.csv";
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -82,9 +104,18 @@ export default function NewsletterPage() {
       description="Abonații înscriși prin secțiunea Newsletter de pe site. Lista nu apare public — o gestionezi doar de aici."
       actions={
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={exportDemo}>
+          <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4" />
+            Importă CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportCsv}
+            disabled={data.newsletter.length === 0}
+          >
             <Download className="h-4 w-4" />
-            Exportă (demo)
+            Exportă CSV
           </Button>
           <Button variant="gold" size="sm" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -104,7 +135,7 @@ export default function NewsletterPage() {
       <DataToolbar
         query={query}
         onQuery={setQuery}
-        placeholder="Caută după email..."
+        placeholder="Caută după nume sau email..."
       />
 
       <Card>
@@ -112,6 +143,7 @@ export default function NewsletterPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Nume</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Sursă</TableHead>
                 <TableHead>Dată înscriere</TableHead>
@@ -121,7 +153,7 @@ export default function NewsletterPage() {
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="py-12 text-center">
+                  <TableCell colSpan={5} className="py-12 text-center">
                     <p className="text-sm text-muted-foreground">
                       Niciun abonat găsit.
                     </p>
@@ -131,6 +163,9 @@ export default function NewsletterPage() {
                 filtered.map((s) => (
                   <TableRow key={s.id}>
                     <TableCell className="font-medium text-foreground">
+                      {s.name || "—"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
                       {s.email}
                     </TableCell>
                     <TableCell>
@@ -173,7 +208,7 @@ export default function NewsletterPage() {
           <DialogHeader>
             <DialogTitle>Adaugă abonat</DialogTitle>
             <DialogDescription>
-              Introdu adresa de email a noului abonat.
+              Numele e opțional — îl folosim ca să personalizăm campaniile.
             </DialogDescription>
           </DialogHeader>
           <form
@@ -183,7 +218,16 @@ export default function NewsletterPage() {
               addNew();
             }}
           >
-            <Label htmlFor="sub-email">Email</Label>
+            <Label htmlFor="sub-name">Nume</Label>
+            <Input
+              id="sub-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ana Popescu"
+            />
+            <Label htmlFor="sub-email" className="block pt-3">
+              Email
+            </Label>
             <Input
               id="sub-email"
               type="email"
@@ -202,6 +246,12 @@ export default function NewsletterPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <SubscriberImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImported={() => void refresh()}
+      />
     </AdminShell>
   );
 }

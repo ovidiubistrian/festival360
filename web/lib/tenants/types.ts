@@ -635,6 +635,8 @@ export interface ContactMessage {
 export interface NewsletterSubscriber {
   id: string;
   email: string;
+  /** Numele abonatului; gol la înscrierile fără nume. */
+  name: string;
   date: string;
   source: string;
 }

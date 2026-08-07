@@ -438,12 +438,19 @@ class FormSubmissionOut(CamelModel):
 class NewsletterSubscriberOut(CamelModel):
     id: str
     email: str
+    name: str
     date: str | None
     source: str
 
     @classmethod
     def from_model(cls, m: NewsletterSubscriber) -> "NewsletterSubscriberOut":
-        return cls(id=m.id, email=m.email, date=_iso(m.date), source=m.source)
+        return cls(
+            id=m.id,
+            email=m.email,
+            name=m.name,
+            date=_iso(m.date),
+            source=m.source,
+        )
 
 
 # --- Tenant config (nested, mirrors TenantConfig) ----------------------------

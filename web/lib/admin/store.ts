@@ -584,17 +584,18 @@ export function deleteMessage(id: string) {
   void sync(() => apiDeleteMessage(id));
 }
 
-export function addSubscriber(email: string, source = "Admin") {
+export function addSubscriber(email: string, source = "Admin", name = "") {
   apply((draft) => {
     if (draft.newsletter.some((s) => s.email === email)) return;
     draft.newsletter.unshift({
       id: `ns-${Date.now()}`,
       email,
+      name,
       date: new Date().toISOString().slice(0, 10),
       source,
     });
   });
-  void sync(() => apiAddSubscriber(email, source || "Admin"));
+  void sync(() => apiAddSubscriber(email, source || "Admin", name));
 }
 
 export function deleteSubscriber(id: string) {

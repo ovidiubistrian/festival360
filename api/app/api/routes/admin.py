@@ -855,6 +855,7 @@ def add_subscriber(
         id=new_id("ns"),
         tenant_id=tenant.id,
         email=payload.email,
+        name=(payload.name or "").strip(),
         source=payload.source,
         date=utcnow().date(),
     )

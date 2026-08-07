@@ -336,7 +336,8 @@ export async function apiDeleteMessage(id: string): Promise<boolean> {
 
 export async function apiAddSubscriber(
   email: string,
-  source: string
+  source: string,
+  name = ""
 ): Promise<unknown> {
   const base = adminBase();
   if (!base) {
@@ -347,7 +348,7 @@ export async function apiAddSubscriber(
     const res = await fetch(`${base}/newsletter`, {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ email, source }),
+      body: JSON.stringify({ email, source, name }),
     });
     if (!res.ok) return null;
     return await res.json();

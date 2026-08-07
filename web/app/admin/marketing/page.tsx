@@ -7,8 +7,10 @@ import {
   Send,
   Users,
   Download,
+  Eye,
   Mail,
   Server,
+  Upload,
   AlertTriangle,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
@@ -46,13 +48,16 @@ import {
 import {
   getEmailSettings,
   getSubscribers,
+  previewCampaign,
   saveEmailSettings,
   sendCampaign,
   sendTestEmail,
+  type CampaignTemplate,
   type EmailSettings,
   type EmailSettingsPatch,
   type Subscriber,
 } from "@/lib/admin/marketing";
+import { SubscriberImportDialog } from "@/components/admin/subscriber-import";
 import { getCurrentTenant, useSession } from "@/lib/admin/session";
 import { formatDate } from "@/lib/utils";
 import { toast } from "sonner";
@@ -129,8 +134,13 @@ export default function MarketingPage() {
 
   const [subject, setSubject] = React.useState("");
   const [campaignBody, setCampaignBody] = React.useState("");
+  const [template, setTemplate] = React.useState<CampaignTemplate>("invitation");
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [sending, setSending] = React.useState(false);
+
+  const [previewHtml, setPreviewHtml] = React.useState<string | null>(null);
+  const [previewing, setPreviewing] = React.useState(false);
+  const [importOpen, setImportOpen] = React.useState(false);
 
   // Load settings + subscribers for the active tenant — via a render-phase
   // guard keyed on the tenant, never a setState-in-effect. Re-runs when the
@@ -211,7 +221,7 @@ export default function MarketingPage() {
   async function handleSend() {
     setConfirmOpen(false);
     setSending(true);
-    const result = await sendCampaign(subject.trim(), campaignBody);
+    const result = await sendCampaign(subject.trim(), campaignBody, template);
     setSending(false);
     if (!result.ok) {
       toast.error(result.error ?? "Trimiterea campaniei a eșuat.");
@@ -230,10 +240,27 @@ export default function MarketingPage() {
     setCampaignBody("");
   }
 
+  async function reloadSubscribers() {
+    setSubscribers(await getSubscribers());
+  }
+
+  async function openPreview() {
+    setPreviewing(true);
+    const html = await previewCampaign(campaignBody, template);
+    setPreviewing(false);
+    if (!html) {
+      toast.error("Nu am putut genera previzualizarea.");
+      return;
+    }
+    setPreviewHtml(html);
+  }
+
   function exportCsv() {
-    const header = "email,date,source";
+    const header = "nume,email,date,source";
     const rows = subscribers.map((s) =>
-      [csvCell(s.email), csvCell(s.date), csvCell(s.source)].join(",")
+      [csvCell(s.name), csvCell(s.email), csvCell(s.date), csvCell(s.source)].join(
+        ","
+      )
     );
     const csv = [header, ...rows].join("\n");
     const blob = new Blob([`﻿${csv}`], {
@@ -328,38 +355,95 @@ export default function MarketingPage() {
                   </div>
                 ) : null}
 
+                {/* Șablonul decide ce se trimite: mesajul ca atare sau
+                    invitația construită din datele site-ului. */}
+                <Field
+                  label="Șablon"
+                  hint={
+                    template === "invitation"
+                      ? "Invitația se completează automat cu numele festivalului, perioada, fotografiile din edițiile trecute, cifrele și ce propunem — din datele site-ului."
+                      : "Mesajul se trimite ca text simplu, fără imagini."
+                  }
+                >
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant={template === "invitation" ? "gold" : "outline"}
+                      size="sm"
+                      onClick={() => setTemplate("invitation")}
+                    >
+                      Invitație
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={template === "text" ? "gold" : "outline"}
+                      size="sm"
+                      onClick={() => setTemplate("text")}
+                    >
+                      Text simplu
+                    </Button>
+                  </div>
+                </Field>
+
                 <Field label="Subiect">
                   <Input
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    placeholder="Noutăți și oferte"
+                    placeholder={
+                      template === "invitation"
+                        ? "Te invităm la ediția din acest an"
+                        : "Noutăți și oferte"
+                    }
                   />
                 </Field>
-                <Field label="Mesaj">
+                <Field
+                  label={
+                    template === "invitation" ? "Mesaj de introducere" : "Mesaj"
+                  }
+                  hint="Scrie {{nume}} oriunde vrei numele abonatului; pentru cei fără nume salvat devine „prieteni”."
+                >
                   <Textarea
                     value={campaignBody}
                     onChange={(e) => setCampaignBody(e.target.value)}
-                    placeholder="Scrie conținutul emailului…"
-                    rows={10}
+                    placeholder={
+                      template === "invitation"
+                        ? "Ne bucurăm să te invităm din nou alături de noi…"
+                        : "Scrie conținutul emailului…"
+                    }
+                    rows={template === "invitation" ? 6 : 10}
                   />
                 </Field>
 
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-muted-foreground">
                     Se va trimite către {subscriberCount} abonați.
                   </p>
-                  <Button
-                    variant="gold"
-                    disabled={!canSend || sending}
-                    onClick={() => setConfirmOpen(true)}
-                  >
-                    {sending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                    Trimite
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => void openPreview()}
+                      disabled={previewing}
+                    >
+                      {previewing ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                      Previzualizează
+                    </Button>
+                    <Button
+                      variant="gold"
+                      disabled={!canSend || sending}
+                      onClick={() => setConfirmOpen(true)}
+                    >
+                      {sending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                      Trimite
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -375,23 +459,35 @@ export default function MarketingPage() {
                     Abonați
                   </CardTitle>
                   <CardDescription>
-                    {subscriberCount} abonați înscriși la newsletter.
+                    {subscriberCount} abonați — înscriși de pe site sau importați
+                    din CSV.
                   </CardDescription>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={exportCsv}
-                  disabled={subscriberCount === 0}
-                >
-                  <Download className="h-4 w-4" />
-                  Exportă CSV
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setImportOpen(true)}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Importă CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={exportCsv}
+                    disabled={subscriberCount === 0}
+                  >
+                    <Download className="h-4 w-4" />
+                    Exportă CSV
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Nume</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Dată înscriere</TableHead>
                       <TableHead>Sursă</TableHead>
@@ -400,9 +496,10 @@ export default function MarketingPage() {
                   <TableBody>
                     {subscriberCount === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={3} className="py-12 text-center">
+                        <TableCell colSpan={4} className="py-12 text-center">
                           <p className="text-sm text-muted-foreground">
-                            Niciun abonat încă.
+                            Niciun abonat încă. Importă o listă din CSV sau
+                            așteaptă înscrierile de pe site.
                           </p>
                         </TableCell>
                       </TableRow>
@@ -410,6 +507,9 @@ export default function MarketingPage() {
                       subscribers.map((s) => (
                         <TableRow key={s.id}>
                           <TableCell className="font-medium text-foreground">
+                            {s.name || "—"}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
                             {s.email}
                           </TableCell>
                           <TableCell className="whitespace-nowrap text-muted-foreground">
@@ -598,6 +698,34 @@ export default function MarketingPage() {
           </TabsContent>
         </Tabs>
       )}
+
+      {/* Previzualizarea campaniei — HTML-ul vine gata randat de la API și e
+          afișat izolat, într-un iframe, ca stilurile de email să nu se
+          amestece cu cele ale adminului. */}
+      <Dialog
+        open={previewHtml !== null}
+        onOpenChange={(open) => !open && setPreviewHtml(null)}
+      >
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Previzualizare</DialogTitle>
+            <DialogDescription>
+              Așa arată emailul pentru un abonat pe nume Ana.
+            </DialogDescription>
+          </DialogHeader>
+          <iframe
+            title="Previzualizare campanie"
+            srcDoc={previewHtml ?? ""}
+            className="h-[64vh] w-full rounded-lg border border-border bg-white"
+          />
+        </DialogContent>
+      </Dialog>
+
+      <SubscriberImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImported={() => void reloadSubscribers()}
+      />
 
       {/* Confirm send */}
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>

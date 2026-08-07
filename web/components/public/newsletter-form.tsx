@@ -19,16 +19,18 @@ export function NewsletterForm({
   compact?: boolean;
 }) {
   const [email, setEmail] = React.useState("");
+  const [name, setName] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    const ok = await subscribeNewsletter(slug, email);
+    const ok = await subscribeNewsletter(slug, email, "Website", name.trim());
     setLoading(false);
     if (ok) {
       setEmail("");
+      setName("");
       toast.success("Te-ai abonat cu succes!", {
         description: "Vei primi noutățile despre festival pe email.",
       });
@@ -44,6 +46,20 @@ export function NewsletterForm({
       onSubmit={onSubmit}
       className={compact ? "flex flex-col gap-2 sm:flex-row" : "flex flex-col gap-3 sm:flex-row"}
     >
+      {/* Numele e opțional: îl folosim doar ca să personalizăm campaniile
+          („Bună, Ana”), deci nu blocăm abonarea pentru el. */}
+      <label htmlFor="newsletter-name" className="sr-only">
+        Numele tău (opțional)
+      </label>
+      <Input
+        id="newsletter-name"
+        type="text"
+        autoComplete="name"
+        placeholder="Numele tău (opțional)"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="bg-warm-white sm:max-w-44"
+      />
       <label htmlFor="newsletter-email" className="sr-only">
         Adresa de email
       </label>

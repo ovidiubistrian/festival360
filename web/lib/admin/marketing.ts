@@ -55,9 +55,30 @@ export interface EmailSettingsPatch {
 export interface Subscriber {
   id: string;
   email: string;
+  /** Numele abonatului; gol pentru înscrierile vechi sau fără nume. */
+  name: string;
   date: string;
   source: string;
 }
+
+/** Un rând din CSV-ul de import, deja curățat în pagină. */
+export interface ImportRow {
+  name: string;
+  email: string;
+}
+
+export interface ImportResult {
+  added: number;
+  updated: number;
+  duplicates: number;
+  invalid: number;
+  invalidSamples: string[];
+  /** Completat doar la eșec de rețea/server. */
+  error?: string;
+}
+
+/** Șabloanele de campanie: text simplu sau invitația construită din date. */
+export type CampaignTemplate = "text" | "invitation";
 
 export interface SendResult {
   ok: boolean;
@@ -164,7 +185,8 @@ export async function getSubscribers(): Promise<Subscriber[]> {
 /** Send a plain-text campaign to ALL subscribers. Returns the send report. */
 export async function sendCampaign(
   subject: string,
-  body: string
+  body: string,
+  template: CampaignTemplate = "text"
 ): Promise<SendResult> {
   const base = marketingBase();
   if (!base) {
@@ -174,7 +196,7 @@ export async function sendCampaign(
     const res = await fetch(`${base}/send`, {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ subject, body }),
+      body: JSON.stringify({ subject, body, template }),
     });
     if (!res.ok) {
       return { ok: false, error: `Eroare server (${res.status}).` };
@@ -183,6 +205,59 @@ export async function sendCampaign(
   } catch (err) {
     console.error("sendCampaign failed", err);
     return { ok: false, error: "Trimiterea a eșuat." };
+  }
+}
+
+/**
+ * Adaugă abonați dintr-un CSV. Adresa e cheia: cele existente nu se dublează,
+ * li se completează doar numele, dacă lipsea.
+ */
+export async function importSubscribers(
+  rows: ImportRow[],
+  source = "Import CSV"
+): Promise<ImportResult> {
+  const empty: ImportResult = {
+    added: 0,
+    updated: 0,
+    duplicates: 0,
+    invalid: 0,
+    invalidSamples: [],
+  };
+  const base = marketingBase();
+  if (!base) return { ...empty, error: "Niciun site selectat." };
+  try {
+    const res = await fetch(`${base}/subscribers/import`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ rows, source }),
+    });
+    if (!res.ok) return { ...empty, error: `Eroare server (${res.status}).` };
+    return (await res.json()) as ImportResult;
+  } catch (err) {
+    console.error("importSubscribers failed", err);
+    return { ...empty, error: "Importul a eșuat." };
+  }
+}
+
+/** HTML-ul campaniei, exact cum îl primește un abonat (nume de exemplu: Ana). */
+export async function previewCampaign(
+  body: string,
+  template: CampaignTemplate
+): Promise<string | null> {
+  const base = marketingBase();
+  if (!base) return null;
+  try {
+    const res = await fetch(`${base}/preview`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ body, template }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { html?: string };
+    return data.html ?? null;
+  } catch (err) {
+    console.error("previewCampaign failed", err);
+    return null;
   }
 }
 

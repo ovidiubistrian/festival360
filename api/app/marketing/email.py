@@ -103,6 +103,35 @@ def send_bulk(
     return sent, failed, errors
 
 
+def send_bulk_each(
+    cfg: TenantEmailSettings,
+    messages: list[tuple[str, str, str]],
+    subject: str,
+) -> tuple[int, int, list[str]]:
+    """Ca `send_bulk`, dar cu conținut diferit per destinatar.
+
+    `messages` = [(email, html, text)] — folosit de campaniile personalizate
+    („Bună, Ana”). Tot o singură conexiune, tot fără abandon la o eroare.
+    """
+    if not is_configured(cfg):
+        raise EmailNotConfigured("SMTP nu este configurat sau activat.")
+    sent = failed = 0
+    errors: list[str] = []
+    with _connect(cfg) as server:
+        for to_email, html, text in messages:
+            addr = (to_email or "").strip()
+            if not addr:
+                continue
+            try:
+                server.send_message(_build_message(cfg, addr, subject, html, text))
+                sent += 1
+            except Exception as exc:  # noqa: BLE001 — record & continue
+                failed += 1
+                if len(errors) < 10:
+                    errors.append(f"{addr}: {exc}")
+    return sent, failed, errors
+
+
 def html_from_plaintext(body: str) -> str:
     """Very small plaintext → HTML (paragraphs + line breaks), escaped."""
     from html import escape

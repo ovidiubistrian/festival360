@@ -180,6 +180,9 @@ class NewsletterSubscriber(SQLModel, table=True):
     id: str = Field(primary_key=True)
     tenant_id: str = Field(foreign_key="tenant.id", index=True)
     email: str = ""
+    # Optional: completat la import CSV sau la înscrierea de pe site; folosit
+    # ca „Bună, {nume}” în campanii.
+    name: str = ""
     date: dt.date | None = None
     source: str = ""
     created_at: dt.datetime = Field(default_factory=utcnow)
