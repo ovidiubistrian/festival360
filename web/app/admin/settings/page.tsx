@@ -20,12 +20,13 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageWithFallback } from "@/components/shared/image-with-fallback";
 import {
+  updateOrganization,
   updateSeo,
   updateSettings,
   useAdminData,
   type AdminSettings,
 } from "@/lib/admin/store";
-import type { SeoConfig } from "@/lib/tenants/types";
+import type { OrganizationInfo, SeoConfig } from "@/lib/tenants/types";
 import { toast } from "sonner";
 
 const PLATFORM_DOMAIN =
@@ -72,6 +73,16 @@ export default function SettingsPage() {
     setForm(data.settings);
   }
 
+  // Datele organizatorului — sincronizate la fel ca SEO.
+  const [orgForm, setOrgForm] = React.useState<OrganizationInfo>(
+    data.organization
+  );
+  const [syncedOrg, setSyncedOrg] = React.useState(data.organization);
+  if (data.organization !== syncedOrg) {
+    setSyncedOrg(data.organization);
+    setOrgForm(data.organization);
+  }
+
   // SEO form — synced against the stored `seo` reference the same way.
   const [seoForm, setSeoForm] = React.useState<SeoConfig>(data.seo);
   const [syncedSeo, setSyncedSeo] = React.useState(data.seo);
@@ -86,6 +97,18 @@ export default function SettingsPage() {
 
   function setSeo<K extends keyof SeoConfig>(key: K, value: SeoConfig[K]) {
     setSeoForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function setOrg<K extends keyof OrganizationInfo>(
+    key: K,
+    value: OrganizationInfo[K]
+  ) {
+    setOrgForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function saveOrganization() {
+    updateOrganization(orgForm);
+    toast.success("Datele organizatorului au fost salvate.");
   }
 
   function saveSeo() {
@@ -123,6 +146,7 @@ export default function SettingsPage() {
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="contact">Contact & social</TabsTrigger>
           <TabsTrigger value="brand">Identitate vizuală</TabsTrigger>
+          <TabsTrigger value="organizer">Organizator</TabsTrigger>
           <TabsTrigger value="seo">SEO</TabsTrigger>
         </TabsList>
 
@@ -377,6 +401,134 @@ export default function SettingsPage() {
                     )
                   }
                 >
+                  <Save className="h-4 w-4" />
+                  Salvează
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Organizator (datele juridice folosite în formulare) */}
+        <TabsContent value="organizer">
+          <Card>
+            <CardHeader>
+              <CardTitle>Datele organizatorului</CardTitle>
+              <CardDescription>
+                Entitatea juridică din spatele evenimentului (asociație,
+                fundație, primărie). Se completează o singură dată și apare ca
+                subsol în fiecare formular publicat — cerere de înscriere,
+                parteneriat și așa mai departe.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Denumire" className="sm:col-span-2">
+                  <Input
+                    value={orgForm.name ?? ""}
+                    onChange={(e) => setOrg("name", e.target.value)}
+                    placeholder="ex. Asociația Construim o Țară"
+                  />
+                </Field>
+                <Field label="CIF / CUI">
+                  <Input
+                    value={orgForm.cif ?? ""}
+                    onChange={(e) => setOrg("cif", e.target.value)}
+                    placeholder="ex. 50649579"
+                  />
+                </Field>
+                <Field label="Nr. Reg. Com. / Reg. asociații">
+                  <Input
+                    value={orgForm.regCom ?? ""}
+                    onChange={(e) => setOrg("regCom", e.target.value)}
+                  />
+                </Field>
+                <Field label="Adresă" className="sm:col-span-2">
+                  <Input
+                    value={orgForm.address ?? ""}
+                    onChange={(e) => setOrg("address", e.target.value)}
+                    placeholder="ex. Str. Mr. Ion Racoțeanu nr. 10, Sector 3"
+                  />
+                </Field>
+                <Field label="Localitate">
+                  <Input
+                    value={orgForm.city ?? ""}
+                    onChange={(e) => setOrg("city", e.target.value)}
+                    placeholder="ex. București"
+                  />
+                </Field>
+                <Field label="Județ">
+                  <Input
+                    value={orgForm.county ?? ""}
+                    onChange={(e) => setOrg("county", e.target.value)}
+                  />
+                </Field>
+                <Field label="IBAN">
+                  <Input
+                    value={orgForm.iban ?? ""}
+                    onChange={(e) => setOrg("iban", e.target.value)}
+                    placeholder="RO70BREL0002004727700100"
+                  />
+                </Field>
+                <Field label="Bancă">
+                  <Input
+                    value={orgForm.bank ?? ""}
+                    onChange={(e) => setOrg("bank", e.target.value)}
+                    placeholder="ex. Libra Bank"
+                  />
+                </Field>
+                <Field label="Email de contact">
+                  <Input
+                    type="email"
+                    value={orgForm.email ?? ""}
+                    onChange={(e) => setOrg("email", e.target.value)}
+                    placeholder="office@exemplu.ro"
+                  />
+                </Field>
+                <Field label="Telefon">
+                  <Input
+                    value={orgForm.phone ?? ""}
+                    onChange={(e) => setOrg("phone", e.target.value)}
+                  />
+                </Field>
+                <Field
+                  label="Mențiuni suplimentare"
+                  className="sm:col-span-2"
+                  hint="Rând liber sub restul datelor (cod TVA, mențiuni legale)."
+                >
+                  <Textarea
+                    rows={2}
+                    value={orgForm.note ?? ""}
+                    onChange={(e) => setOrg("note", e.target.value)}
+                  />
+                </Field>
+              </div>
+
+              {/* Previzualizarea subsolului, exact cum apare în formulare */}
+              <div className="rounded-xl border border-border bg-secondary/40 p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Așa apare în subsolul formularelor
+                </p>
+                <p className="text-sm text-charcoal/80">
+                  {[
+                    orgForm.name,
+                    [orgForm.address, orgForm.city, orgForm.county]
+                      .filter(Boolean)
+                      .join(", "),
+                    orgForm.cif ? `CIF: ${orgForm.cif}` : "",
+                    orgForm.regCom,
+                    [orgForm.iban, orgForm.bank].filter(Boolean).join(" – "),
+                    orgForm.email,
+                    orgForm.phone,
+                    orgForm.note,
+                  ]
+                    .filter((part) => part && String(part).trim())
+                    .join(" | ") || "Completează datele de mai sus."}
+                </p>
+              </div>
+
+              <div className="flex justify-end">
+                <Button variant="gold" onClick={saveOrganization}>
                   <Save className="h-4 w-4" />
                   Salvează
                 </Button>

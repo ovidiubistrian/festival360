@@ -22,6 +22,7 @@ import {
   AddSectionButton,
   SectionConfigButton,
 } from "@/components/admin/section-config-dialog";
+import { NavMenuCard } from "@/components/admin/nav-menu-card";
 import { toast } from "sonner";
 
 /**
@@ -66,9 +67,11 @@ export default function PagesPage() {
   return (
     <AdminShell
       title="Pagini și secțiuni"
-      description="Fiecare rând este o zonă de pe pagina principală. Comutatorul o arată sau o ascunde — inclusiv din meniul de sus și din footer — iar săgețile îi schimbă ordinea pe site."
+      description="Sus alegi ce intră în meniul site-ului; mai jos, ce zone apar pe pagina principală și în ce ordine. Ascunderea unei secțiuni îi scoate și intrarea din meniu."
       actions={<AddSectionButton />}
     >
+      <NavMenuCard />
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between gap-4">

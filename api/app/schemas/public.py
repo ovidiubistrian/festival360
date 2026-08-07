@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from pathlib import Path
 from typing import Any
 
 from app.schemas.common import CamelModel
@@ -10,6 +11,8 @@ from app.models import (
     ContactMessage,
     Destination,
     Exhibitor,
+    FormDefinition,
+    FormSubmission,
     GalleryImage,
     NewsletterSubscriber,
     Partner,
@@ -19,7 +22,31 @@ from app.models import (
     TenantEvent,
     Tenant,
 )
-from app.presets import modules_for, navigation_for, reconcile_sections
+from app.core.config import settings
+from app.core.image_meta import image_dimensions
+from app.presets import (
+    modules_for,
+    navigation_for,
+    reconcile_navigation,
+    reconcile_sections,
+)
+
+
+def _seo_with_og_size(seo: dict[str, Any]) -> dict[str, Any]:
+    """Adaugă dimensiunile imaginii de share, când e un fișier încărcat la noi.
+
+    Fără `og:image:width/height`, Facebook nu afișează poza la prima accesare a
+    linkului. Pentru imagini externe (ex. Unsplash) nu avem fișierul, deci le
+    lăsăm așa cum sunt.
+    """
+    og = str(seo.get("ogImage") or "").strip()
+    prefix = f"{settings.MEDIA_URL_PREFIX}/"
+    if not og.startswith(prefix):
+        return seo
+    dims = image_dimensions(Path(settings.MEDIA_DIR) / og[len(prefix) :])
+    if not dims:
+        return seo
+    return {**seo, "ogImageWidth": dims[0], "ogImageHeight": dims[1]}
 
 
 def _iso(d: dt.date | None) -> str | None:
@@ -334,6 +361,80 @@ class ContactMessageOut(CamelModel):
         )
 
 
+class FormOut(CamelModel):
+    """A form as the public page needs it (no organiser-only settings)."""
+
+    id: str
+    slug: str
+    title: str
+    description: str
+    fields: list[dict[str, Any]]
+    submit_label: str
+    success_message: str
+    show_organization: bool
+    status: str
+
+    @classmethod
+    def from_model(cls, m: FormDefinition) -> "FormOut":
+        return cls(
+            id=m.id,
+            slug=m.slug,
+            title=m.title,
+            description=m.description,
+            fields=m.fields or [],
+            submit_label=m.submit_label,
+            success_message=m.success_message,
+            show_organization=m.show_organization,
+            status=m.status,
+        )
+
+
+class FormAdminOut(FormOut):
+    """The same form plus the organiser-only bits (notification + counters)."""
+
+    notify_email: str
+    submission_count: int = 0
+    unread_count: int = 0
+
+    @classmethod
+    def from_model(  # type: ignore[override]
+        cls, m: FormDefinition, counts: tuple[int, int] = (0, 0)
+    ) -> "FormAdminOut":
+        base = FormOut.from_model(m)
+        return cls(
+            **base.model_dump(),
+            notify_email=m.notify_email,
+            submission_count=counts[0],
+            unread_count=counts[1],
+        )
+
+
+class FormSubmissionOut(CamelModel):
+    id: str
+    form_id: str
+    form_title: str
+    answers: list[dict[str, Any]]
+    total: float
+    summary: str
+    email: str
+    read: bool
+    created_at: str
+
+    @classmethod
+    def from_model(cls, m: FormSubmission) -> "FormSubmissionOut":
+        return cls(
+            id=m.id,
+            form_id=m.form_id,
+            form_title=m.form_title,
+            answers=m.answers or [],
+            total=m.total,
+            summary=m.summary,
+            email=m.email,
+            read=m.read,
+            created_at=m.created_at.isoformat(),
+        )
+
+
 class NewsletterSubscriberOut(CamelModel):
     id: str
     email: str
@@ -399,6 +500,10 @@ class TenantConfigOut(CamelModel):
     info: FestivalInfoOut
     theme: ThemeOut
     navigation: list[dict[str, Any]]
+    # Meniul așa cum îl vede adminul: TOATE intrările, inclusiv cele ascunse,
+    # cu `visible` / `custom` / `sectionHidden`. `navigation` de mai sus rămâne
+    # doar ce se afișează public (header, meniu mobil, footer, sitemap).
+    navigation_config: list[dict[str, Any]]
     social: SocialOut
     contact: ContactInfoOut
     sections: list[dict[str, Any]]
@@ -407,10 +512,13 @@ class TenantConfigOut(CamelModel):
     conditions: dict[str, Any]
     trails: dict[str, Any]
     seo: dict[str, Any]
+    # Datele asociației/organizatorului — subsolul formularelor.
+    organization: dict[str, Any]
 
     @classmethod
     def from_model(cls, t: Tenant) -> "TenantConfigOut":
         sections = reconcile_sections(t.sections, t.event_type)
+        seo = _seo_with_og_size(t.seo or {})
         return cls(
             event_type=t.event_type,
             labels=t.labels or {},
@@ -441,7 +549,10 @@ class TenantConfigOut(CamelModel):
                 charcoal=t.theme_charcoal,
                 background=t.theme_background,
             ),
-            navigation=navigation_for(t.event_type, sections),
+            navigation=navigation_for(t.event_type, sections, t.navigation),
+            navigation_config=reconcile_navigation(
+                t.navigation, t.event_type, sections
+            ),
             social=SocialOut(
                 facebook=t.social_facebook or None,
                 instagram=t.social_instagram or None,
@@ -461,7 +572,8 @@ class TenantConfigOut(CamelModel):
             experiences=t.experiences,
             conditions=t.conditions or {},
             trails=t.trails or {},
-            seo=t.seo or {},
+            seo=seo,
+            organization=t.organization or {},
         )
 
 

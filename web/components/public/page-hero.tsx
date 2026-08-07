@@ -22,7 +22,21 @@ export function PageHero({
   eyebrow?: string;
 }) {
   return (
-    <section className="relative flex min-h-[46vh] items-end overflow-hidden pt-20">
+    <section className="relative flex min-h-[46vh] items-end overflow-hidden pt-20 lg:min-h-[58vh]">
+      {/* Fundal: aceeași imagine, tăiată și blurată, doar ca să umple banda lată
+          a hero-ului. Fără ea, o poză pătrată ar lăsa margini goale. */}
+      <ImageWithFallback
+        src={image}
+        alt=""
+        aria-hidden
+        fill
+        sizes="100vw"
+        fallbackLabel=""
+        className="scale-110 object-cover blur-2xl"
+      />
+      {/* Imaginea propriu-zisă: încadrată întreagă, nu mărită ca să acopere.
+          Pozele verticale sau pătrate (majoritatea celor încărcate din admin)
+          apăreau altfel ca un decupaj uriaș din mijloc. */}
       <ImageWithFallback
         src={image}
         alt={title}
@@ -30,7 +44,7 @@ export function PageHero({
         priority
         sizes="100vw"
         fallbackLabel={title}
-        className="object-cover"
+        className="object-contain object-center"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/50 to-charcoal/30" />
       <Container className="relative z-10 pb-12 pt-10">

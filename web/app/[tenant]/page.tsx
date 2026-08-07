@@ -173,11 +173,27 @@ export default async function TenantHome({
                     </Link>
                   </Button>
                 </div>
+                {/* Pe telefon rămâne caruselul (se trage cu degetul). Pe
+                    desktop devine grilă pe două rânduri: caruselul arăta trei
+                    cazări o dată, deși secțiunea are șase. Se randează ambele
+                    și se comută din CSS — cardurile ascunse au imagini lazy,
+                    deci varianta nefolosită nu descarcă nimic. */}
                 <Reveal className="mt-10">
-                  <Carousel
-                    ariaLabel="Cazări evidențiate"
-                    slideClassName="basis-[80%] sm:basis-[47%] lg:basis-1/3"
-                  >
+                  <div className="lg:hidden">
+                    <Carousel
+                      ariaLabel="Cazări evidențiate"
+                      slideClassName="basis-[80%] sm:basis-[47%]"
+                    >
+                      {featuredAccommodations.map((a) => (
+                        <AccommodationCard
+                          key={a.id}
+                          accommodation={a}
+                          slug={slug}
+                        />
+                      ))}
+                    </Carousel>
+                  </div>
+                  <div className="hidden gap-6 lg:grid lg:grid-cols-3">
                     {featuredAccommodations.map((a) => (
                       <AccommodationCard
                         key={a.id}
@@ -185,7 +201,7 @@ export default async function TenantHome({
                         slug={slug}
                       />
                     ))}
-                  </Carousel>
+                  </div>
                 </Reveal>
               </Container>
             </section>
@@ -476,7 +492,7 @@ export default async function TenantHome({
         ) : null;
 
       case "newsletter":
-        return <NewsletterSection labels={config.labels} />;
+        return <NewsletterSection slug={slug} labels={config.labels} />;
 
       default:
         return null;

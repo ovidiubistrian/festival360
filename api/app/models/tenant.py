@@ -82,6 +82,10 @@ class Tenant(SQLModel, table=True):
     # SEO controls (admin-editable): {title, description, keywords, ogImage,
     # googleSiteVerification, noindex}. Empty keys fall back to sensible defaults.
     seo: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    # Legal/organiser identity (asociația din spatele evenimentului): {name,
+    # cif, regCom, address, city, county, iban, bank, email, phone, note}.
+    # Set once in Setări, printed as the footer of every form the tenant builds.
+    organization: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
 
     created_at: dt.datetime = Field(default_factory=utcnow)
     updated_at: dt.datetime = Field(default_factory=utcnow)

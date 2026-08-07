@@ -273,6 +273,27 @@ export async function apiUpdateSections(sections: unknown): Promise<boolean> {
   }
 }
 
+export async function apiUpdateNavigation(
+  navigation: unknown
+): Promise<boolean> {
+  const base = adminBase();
+  if (!base) {
+    console.warn("apiUpdateNavigation: no tenant selected — skipping");
+    return false;
+  }
+  try {
+    const res = await fetch(`${base}/navigation`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({ navigation }),
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("apiUpdateNavigation failed", err);
+    return false;
+  }
+}
+
 export async function apiSetMessageRead(
   id: string,
   read: boolean

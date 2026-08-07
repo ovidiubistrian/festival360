@@ -1,18 +1,25 @@
 "use client";
 
 import * as React from "react";
-import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { subscribeNewsletter } from "@/lib/api";
 
-export function NewsletterForm({ compact = false }: { compact?: boolean }) {
+/**
+ * `slug` vine explicit de la server: pe un domeniu custom site-ul stă în
+ * rădăcină, deci nu poate fi dedus din URL (acolo abonarea eșua mereu).
+ */
+export function NewsletterForm({
+  slug,
+  compact = false,
+}: {
+  slug: string;
+  compact?: boolean;
+}) {
   const [email, setEmail] = React.useState("");
   const [loading, setLoading] = React.useState(false);
-  const pathname = usePathname();
-  const slug = pathname.split("/").filter(Boolean)[0] ?? "";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

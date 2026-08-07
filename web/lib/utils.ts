@@ -38,6 +38,15 @@ export function formatNumber(value: number): string {
   return new Intl.NumberFormat("ro-RO").format(value);
 }
 
+/**
+ * True when a menu href points outside the site (custom links added from the
+ * admin). Those are rendered as plain `<a>` and left out of the sitemap, while
+ * internal ones get prefixed with the tenant base path.
+ */
+export function isExternalHref(href: string): boolean {
+  return /^(https?:)?\/\//i.test(href) || /^(mailto|tel):/i.test(href);
+}
+
 /** Deterministic slugify for Romanian text. */
 export function slugify(input: string): string {
   return input

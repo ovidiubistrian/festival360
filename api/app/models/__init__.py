@@ -19,6 +19,7 @@ from app.models.content import (
     Restaurant,
     TenantEvent,
 )
+from app.models.forms import FormDefinition, FormSubmission
 from app.models.analytics import PageView
 from app.models.marketing import TenantEmailSettings
 from app.models.user import AdminUser
@@ -55,6 +56,8 @@ __all__ = [
     "Accommodation",
     "Restaurant",
     "TenantEvent",
+    "FormDefinition",
+    "FormSubmission",
     "PageView",
     "TenantEmailSettings",
     "AdminUser",

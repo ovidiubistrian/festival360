@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSlugByDomain, getTenantBundle, getTenantSlugs } from "@/lib/api";
 import { isPlatformHost, requestHost } from "@/lib/seo";
+import { isExternalHref } from "@/lib/utils";
 import type { PublishStatus, Tenant } from "@/lib/tenants/types";
 
 /**
@@ -39,7 +40,8 @@ function tenantEntries(t: Tenant, origin: string): MetadataRoute.Sitemap {
 
   // Section pages come from the tenant's own (vertical-aware) navigation.
   for (const item of config.navigation) {
-    if (item.href && item.href !== "/") {
+    // Linkurile personalizate pot duce în afara site-ului — nu au ce căuta aici.
+    if (item.href && item.href !== "/" && !isExternalHref(item.href)) {
       entries.push({
         url: url(item.href),
         changeFrequency: "weekly",

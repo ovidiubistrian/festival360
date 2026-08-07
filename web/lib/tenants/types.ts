@@ -26,8 +26,24 @@ export interface TenantTheme {
 
 export interface NavItem {
   label: string;
-  /** Path relative to the tenant root, e.g. "/program". */
+  /**
+   * Path relative to the tenant root, e.g. "/program", or an absolute
+   * `http(s)://…` URL for a custom link added from the admin.
+   */
   href: string;
+}
+
+/** A menu entry as the admin editor sees it — including the hidden ones. */
+export interface NavItemConfig extends NavItem {
+  /** Shown in the header / mobile menu / footer. */
+  visible: boolean;
+  /** Added by the tenant (not part of the vertical preset) — can be deleted. */
+  custom: boolean;
+  /**
+   * Forced out of the menu because the homepage section behind it is disabled
+   * in „Pagini și secțiuni". Read-only signal from the API.
+   */
+  sectionHidden: boolean;
 }
 
 export interface SocialLinks {
@@ -189,6 +205,107 @@ export interface Trails {
 export type TenantLabels = Record<string, string>;
 
 /**
+ * Datele juridice ale organizatorului (asociație, ONG, primărie…). Se setează o
+ * singură dată în Setări → Organizator și se tipăresc ca subsol în fiecare
+ * formular construit de tenant.
+ */
+export interface OrganizationInfo {
+  /** Denumirea juridică, ex. „Asociația Construim o Țară”. */
+  name?: string;
+  cif?: string;
+  regCom?: string;
+  address?: string;
+  city?: string;
+  county?: string;
+  iban?: string;
+  bank?: string;
+  email?: string;
+  phone?: string;
+  /** Rând liber sub restul datelor (mențiuni, cod TVA, etc.). */
+  note?: string;
+}
+
+/** Tipurile de câmp pe care le poate adăuga organizatorul într-un formular. */
+export type FormFieldType =
+  | "text"
+  | "textarea"
+  | "email"
+  | "tel"
+  | "number"
+  | "date"
+  | "select"
+  | "radio"
+  | "checkbox"
+  | "checkboxGroup"
+  /** Titlu de grup (ex. „DATE EXPOZANT”) — nu se completează. */
+  | "section"
+  /** Paragraf informativ (ex. condițiile financiare) — nu se completează. */
+  | "info";
+
+/** O opțiune de listă/bifă, cu preț opțional (pavilioane, servicii extra). */
+export interface FormFieldOption {
+  label: string;
+  /** Preț în lei; 0 = fără preț. Totalul cererii se însumează din acestea. */
+  price?: number;
+}
+
+export interface FormField {
+  id: string;
+  type: FormFieldType;
+  label: string;
+  placeholder?: string;
+  /** Text ajutător sub câmp. */
+  help?: string;
+  required?: boolean;
+  /** Lățimea în grila formularului. */
+  width?: "full" | "half";
+  options?: FormFieldOption[];
+}
+
+/** Un formular construit din admin, publicat la `/{tenant}/formular/{slug}`. */
+export interface FormDefinition {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  fields: FormField[];
+  /** Textul butonului; gol → „Trimite cererea”. */
+  submitLabel: string;
+  /** Mesajul după trimitere; gol → text implicit. */
+  successMessage: string;
+  /** Tipărește datele organizatorului la finalul formularului. */
+  showOrganization: boolean;
+  status: PublishStatus;
+  /** Adresa notificată la fiecare cerere nouă (doar în admin). */
+  notifyEmail?: string;
+  submissionCount?: number;
+  unreadCount?: number;
+}
+
+/** Un răspuns salvat, cu eticheta câmpului de la momentul trimiterii. */
+export interface FormAnswer {
+  id: string;
+  label: string;
+  type: FormFieldType;
+  value: string;
+}
+
+/** O cerere primită prin formular. */
+export interface FormSubmission {
+  id: string;
+  formId: string;
+  formTitle: string;
+  answers: FormAnswer[];
+  /** Suma opțiunilor cu preț bifate; 0 când formularul n-are prețuri. */
+  total: number;
+  summary: string;
+  email: string;
+  read: boolean;
+  /** ISO datetime. */
+  createdAt: string;
+}
+
+/**
  * Per-tenant SEO overrides. Every field is optional — empty keys fall back to
  * sensible defaults (name/tagline/shortDescription/heroImage) so an unconfigured
  * site still ships solid metadata.
@@ -202,6 +319,9 @@ export interface SeoConfig {
   keywords?: string;
   /** Open Graph / social share image; empty → heroImage. */
   ogImage?: string;
+  /** Dimensiunile lui `ogImage`, completate de API când e un fișier încărcat. */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
   /** Google Search Console `google-site-verification` content value. */
   googleSiteVerification?: string;
   /** When true, the whole site is excluded from search engines. */
@@ -221,7 +341,10 @@ export interface TenantConfig {
   modules?: string[];
   info: FestivalInfo;
   theme: TenantTheme;
+  /** Menu entries actually shown on the site (visible ones only). */
   navigation: NavItem[];
+  /** Full menu incl. hidden entries — the admin editor's source of truth. */
+  navigationConfig?: NavItemConfig[];
   social: SocialLinks;
   contact: ContactInfo;
   sections: SectionConfig[];
@@ -233,6 +356,8 @@ export interface TenantConfig {
   trails?: Trails;
   /** Per-tenant SEO overrides; empty keys fall back to sensible defaults. */
   seo?: SeoConfig;
+  /** Datele juridice ale organizatorului — subsolul formularelor. */
+  organization?: OrganizationInfo;
 }
 
 export type ExhibitorCategory =

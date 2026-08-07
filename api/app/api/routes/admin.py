@@ -13,6 +13,8 @@ from app.models import (
     ContactMessage,
     Destination,
     Exhibitor,
+    FormDefinition,
+    FormSubmission,
     GalleryImage,
     NewsletterSubscriber,
     Partner,
@@ -23,13 +25,15 @@ from app.models import (
     Tenant,
 )
 from app.models.base import new_id, utcnow
-from app.services import crud
+from app.services import crud, forms_service
 from app.schemas.public import (
     AccommodationOut,
     ArticleOut,
     DestinationOut,
     EventOut,
     ExhibitorOut,
+    FormAdminOut,
+    FormSubmissionOut,
     GalleryImageOut,
     PartnerOut,
     ProductOut,
@@ -43,9 +47,11 @@ from app.schemas.write import (
     DestinationIn,
     EventIn,
     ExhibitorIn,
+    FormIn,
     GalleryImageIn,
     MessageReadIn,
     MoveIn,
+    NavigationIn,
     NewsletterIn,
     PartnerIn,
     ProductIn,
@@ -53,6 +59,7 @@ from app.schemas.write import (
     RestaurantIn,
     SectionsIn,
     SettingsIn,
+    SubmissionReadIn,
 )
 
 # Every route here requires a valid admin token.
@@ -91,6 +98,124 @@ def update_exhibitor(
     if not obj:
         raise _notfound("Expozant")
     return ExhibitorOut.from_model(crud.update(session, obj, payload.to_kwargs(tenant.id)))
+
+
+# =========================================================================
+# Forms (formulare construite de organizator) + cererile primite
+# =========================================================================
+def _form_or_404(session: Session, item_id: str, tenant_id: str) -> FormDefinition:
+    obj = crud.get_owned(session, FormDefinition, item_id, tenant_id)
+    if not obj:
+        raise _notfound("Formular")
+    return obj
+
+
+def _check_slug_free(
+    session: Session, tenant_id: str, slug: str, exclude_id: str | None = None
+) -> None:
+    """Slugul e linkul public — două formulare cu același slug s-ar acoperi."""
+    existing = forms_service.form_by_slug(session, tenant_id, slug)
+    if existing and existing.id != exclude_id:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Există deja un formular cu adresa „{slug}”.",
+        )
+
+
+@router.get("/forms", response_model=list[FormAdminOut])
+def list_forms(
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    counts = forms_service.submission_counts(session, tenant.id)
+    return [
+        FormAdminOut.from_model(f, counts.get(f.id, (0, 0)))
+        for f in forms_service.forms_for(session, tenant.id)
+    ]
+
+
+@router.post("/forms", response_model=FormAdminOut, status_code=201)
+def create_form(
+    payload: FormIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    _check_slug_free(session, tenant.id, payload.slug)
+    obj = crud.create(session, FormDefinition, payload.to_kwargs(tenant.id), "fo")
+    return FormAdminOut.from_model(obj)
+
+
+@router.put("/forms/{item_id}", response_model=FormAdminOut)
+def update_form(
+    item_id: str,
+    payload: FormIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    obj = _form_or_404(session, item_id, tenant.id)
+    _check_slug_free(session, tenant.id, payload.slug, exclude_id=item_id)
+    updated = crud.update(session, obj, payload.to_kwargs(tenant.id))
+    counts = forms_service.submission_counts(session, tenant.id)
+    return FormAdminOut.from_model(updated, counts.get(item_id, (0, 0)))
+
+
+@router.delete("/forms/{item_id}", status_code=204)
+def delete_form(
+    item_id: str,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    """Șterge formularul împreună cu cererile lui (altfel rămân orfane)."""
+    obj = _form_or_404(session, item_id, tenant.id)
+    for sub in forms_service.submissions_for(session, tenant.id, item_id):
+        session.delete(sub)
+    session.commit()
+    crud.delete(session, obj)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get("/forms/{item_id}/submissions", response_model=list[FormSubmissionOut])
+def list_form_submissions(
+    item_id: str,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    _form_or_404(session, item_id, tenant.id)
+    return [
+        FormSubmissionOut.from_model(s)
+        for s in forms_service.submissions_for(session, tenant.id, item_id)
+    ]
+
+
+@router.patch("/forms/{item_id}/submissions/{sub_id}")
+def set_submission_read(
+    item_id: str,
+    sub_id: str,
+    payload: SubmissionReadIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    obj = crud.get_owned(session, FormSubmission, sub_id, tenant.id)
+    if not obj or obj.form_id != item_id:
+        raise _notfound("Cerere")
+    obj.read = payload.read
+    session.add(obj)
+    session.commit()
+    return {"id": sub_id, "read": obj.read}
+
+
+@router.delete("/forms/{item_id}/submissions/{sub_id}", status_code=204)
+def delete_submission(
+    item_id: str,
+    sub_id: str,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    obj = crud.get_owned(session, FormSubmission, sub_id, tenant.id)
+    if not obj or obj.form_id != item_id:
+        raise _notfound("Cerere")
+    crud.delete(session, obj)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 # =========================================================================
@@ -398,6 +523,7 @@ _MODELS: dict[str, type] = {
     "partners": Partner,
     "gallery": GalleryImage,
     "articles": Article,
+    "forms": FormDefinition,
 }
 _STATUS_MODELS = {
     "exhibitors",
@@ -408,6 +534,7 @@ _STATUS_MODELS = {
     "destinations",
     "partners",
     "articles",
+    "forms",
 }
 
 
@@ -628,6 +755,31 @@ def update_settings(
     patch = payload.to_tenant_patch()
     for col, val in patch.items():
         setattr(tenant, col, val)
+    tenant.updated_at = utcnow()
+    session.add(tenant)
+    session.commit()
+    session.refresh(tenant)
+    return TenantConfigOut.from_model(tenant)
+
+
+@router.put("/navigation", response_model=TenantConfigOut)
+def update_navigation(
+    payload: NavigationIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    """Salvează meniul de sus. Stocăm doar `href/label/visible` — restul
+    (`custom`, `sectionHidden`) se recalculează din preset la citire, ca o
+    schimbare de preset să nu rămână „înghețată" în baza de date."""
+    tenant.navigation = [
+        {
+            "href": str(item.get("href") or "").strip(),
+            "label": str(item.get("label") or "").strip(),
+            "visible": bool(item.get("visible", True)),
+        }
+        for item in payload.navigation
+        if str(item.get("href") or "").strip()
+    ]
     tenant.updated_at = utcnow()
     session.add(tenant)
     session.commit()

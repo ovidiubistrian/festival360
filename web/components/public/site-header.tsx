@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, CalendarDays } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, isExternalHref } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
 import {
@@ -15,6 +15,39 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import type { NavItem } from "@/lib/tenants/types";
+
+/**
+ * O intrare de meniu. Paginile site-ului trec prin `Link` și se prefixează cu
+ * baza tenantului; linkurile personalizate adăugate din admin pot fi adrese
+ * externe, care se deschid într-o filă nouă. `forwardRef` pentru că
+ * `SheetClose asChild` îi pasează un ref.
+ */
+const NavLink = React.forwardRef<
+  HTMLAnchorElement,
+  Omit<React.ComponentPropsWithoutRef<"a">, "href"> & {
+    base: string;
+    href: string;
+  }
+>(function NavLink({ base, href, children, ...props }, ref) {
+  if (isExternalHref(href)) {
+    return (
+      <a
+        ref={ref}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        {...props}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link ref={ref} href={`${base}${href}`} {...props}>
+      {children}
+    </Link>
+  );
+});
 
 export function SiteHeader({
   slug,
@@ -65,39 +98,41 @@ export function SiteHeader({
           <Link
             href={base}
             className={cn(
-              "font-serif text-2xl font-semibold tracking-tight transition-colors",
+              "flex items-center gap-2.5 font-serif text-2xl font-semibold tracking-tight transition-colors sm:gap-3",
               scrolled ? "text-primary" : "text-warm-white"
             )}
           >
+            {/* Logo-ul stă LA STÂNGA numelui, nu în locul lui: sigla singură
+                rareori spune cum se cheamă locul. */}
             {logoImage?.trim() ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={logoImage}
-                alt={logoText}
-                className="h-9 w-auto object-contain sm:h-10"
+                alt=""
+                className="h-9 w-auto shrink-0 object-contain sm:h-10"
               />
-            ) : (
-              <>
-                {logoText}
-                {isFestival && (
-                  <span
-                    className={cn(
-                      "ml-1 align-super text-[10px] font-sans font-medium tracking-widest",
-                      scrolled ? "text-terracotta" : "text-gold"
-                    )}
-                  >
-                    FEST
-                  </span>
-                )}
-              </>
-            )}
+            ) : null}
+            <span className="truncate">
+              {logoText}
+              {isFestival && (
+                <span
+                  className={cn(
+                    "ml-1 align-super text-[10px] font-sans font-medium tracking-widest",
+                    scrolled ? "text-terracotta" : "text-gold"
+                  )}
+                >
+                  FEST
+                </span>
+              )}
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex">
             {navigation.map((item) => (
-              <Link
+              <NavLink
                 key={item.href}
-                href={`${base}${item.href}`}
+                base={base}
+                href={item.href}
                 className={cn(
                   "rounded-full px-3 py-2 text-sm font-medium transition-colors",
                   scrolled
@@ -108,7 +143,7 @@ export function SiteHeader({
                 )}
               >
                 {item.label}
-              </Link>
+              </NavLink>
             ))}
           </nav>
 
@@ -159,15 +194,16 @@ export function SiteHeader({
                     </SheetClose>
                     {navigation.map((item) => (
                       <SheetClose asChild key={item.href}>
-                        <Link
-                          href={`${base}${item.href}`}
+                        <NavLink
+                          base={base}
+                          href={item.href}
                           className={cn(
                             "rounded-xl px-4 py-3 text-base font-medium hover:bg-secondary",
                             isActive(item.href) && "bg-secondary text-primary"
                           )}
                         >
                           {item.label}
-                        </Link>
+                        </NavLink>
                       </SheetClose>
                     ))}
                   </nav>

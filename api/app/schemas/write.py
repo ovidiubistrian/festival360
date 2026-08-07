@@ -261,12 +261,77 @@ class ArticleIn(CamelModel):
         return d
 
 
+class FormOptionIn(CamelModel):
+    label: str = ""
+    # Optional price in lei attached to the option (pavilioane, servicii extra);
+    # 0 = no price. The total of a submission is summed server-side from these.
+    price: float = 0
+
+
+class FormFieldIn(CamelModel):
+    id: str = ""
+    # text | textarea | email | tel | number | date | select | radio |
+    # checkbox | checkboxGroup | section | info
+    type: str = "text"
+    label: str = ""
+    placeholder: str = ""
+    help: str = ""
+    required: bool = False
+    width: str = "full"  # full | half
+    options: list[FormOptionIn] = []
+
+
+class FormIn(CamelModel):
+    id: str | None = None
+    slug: str
+    title: str
+    description: str = ""
+    fields: list[FormFieldIn] = []
+    submit_label: str = ""
+    success_message: str = ""
+    notify_email: str = ""
+    show_organization: bool = True
+    status: str = "draft"
+
+    def to_kwargs(self, tenant_id: str) -> dict[str, Any]:
+        return {
+            "tenant_id": tenant_id,
+            "slug": self.slug,
+            "title": self.title,
+            "description": self.description,
+            # Stored in camelCase so the builder and the public renderer read
+            # the JSON as-is, with no key translation.
+            "fields": [f.model_dump(by_alias=True) for f in self.fields],
+            "submit_label": self.submit_label,
+            "success_message": self.success_message,
+            "notify_email": self.notify_email,
+            "show_organization": self.show_organization,
+            "status": self.status,
+        }
+
+
+class FormSubmissionIn(CamelModel):
+    """Public payload: `{fieldId: value}` — value is a string, bool or list."""
+
+    values: dict[str, Any] = {}
+
+
+class SubmissionReadIn(CamelModel):
+    read: bool = True
+
+
 class MoveIn(CamelModel):
     direction: int  # -1 (up) or 1 (down)
 
 
 class SectionsIn(CamelModel):
     sections: list[dict[str, Any]]
+
+
+class NavigationIn(CamelModel):
+    """Meniul de sus, în ordinea dorită. O listă goală = revenire la preset."""
+
+    navigation: list[dict[str, Any]]
 
 
 class SettingsIn(CamelModel):
@@ -300,6 +365,8 @@ class SettingsIn(CamelModel):
     conditions: dict[str, Any] | None = None
     trails: dict[str, Any] | None = None
     seo: dict[str, Any] | None = None
+    # Datele asociației/organizatorului, folosite ca subsol în formulare.
+    organization: dict[str, Any] | None = None
 
     def to_tenant_patch(self) -> dict[str, Any]:
         m = {
@@ -329,6 +396,7 @@ class SettingsIn(CamelModel):
             "conditions": "conditions",
             "trails": "trails",
             "seo": "seo",
+            "organization": "organization",
         }
         patch: dict[str, Any] = {}
         for field, col in m.items():

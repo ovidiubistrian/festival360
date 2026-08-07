@@ -276,28 +276,28 @@ PRESETS: dict[str, dict[str, Any]] = {
 _MODULES: dict[str, list[str]] = {
     "festival": [
         "dashboard", "pages", "program", "exhibitors", "products", "partners",
-        "gallery", "media", "news", "messages", "newsletter", "marketing", "analytics", "settings",
+        "gallery", "media", "news", "forms", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "resort": [
         "dashboard", "pages", "accommodations", "campinguri", "restaurants",
         "destinations", "products", "events", "partners", "gallery", "media",
-        "news", "messages", "newsletter", "marketing", "analytics", "settings",
+        "news", "forms", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "museum": [
         "dashboard", "pages", "exhibitors", "program", "gallery", "media", "news",
-        "messages", "newsletter", "marketing", "analytics", "settings",
+        "forms", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "conference": [
         "dashboard", "pages", "program", "exhibitors", "partners", "gallery", "media",
-        "news", "messages", "newsletter", "marketing", "analytics", "settings",
+        "news", "forms", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "institution": [
         "dashboard", "pages", "program", "partners", "gallery", "media", "news",
-        "messages", "newsletter", "marketing", "analytics", "settings",
+        "forms", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
     "experience": [
         "dashboard", "pages", "destinations", "program", "products", "partners",
-        "gallery", "media", "news", "messages", "newsletter", "marketing", "analytics", "settings",
+        "gallery", "media", "news", "forms", "messages", "newsletter", "marketing", "analytics", "settings",
     ],
 }
 
@@ -311,29 +311,98 @@ def modules_for(event_type: str) -> list[str]:
     return list(preset.get("modules") or _MODULES["festival"])
 
 
-def navigation_for(
-    event_type: str, sections: list[dict[str, Any]] | None = None
-) -> list[dict[str, str]]:
-    """Public site nav for a vertical, derived from the preset (not stored), so
-    it always matches the current terminology/structure (e.g. resort → Cazări,
-    Restaurante) even for tenants seeded before a preset change.
-
-    Când primește secțiunile tenantului, intrările de meniu ale secțiunilor
-    ascunse din admin sunt eliminate: un link către o zonă dezactivată e o
-    fundătură. Intrările fără secțiune corespondentă (ex. Contact) rămân."""
-    preset = PRESETS.get(event_type) or PRESETS["festival"]
-    items = [dict(item) for item in preset["navigation"]]
-    if sections is None:
-        return items
-    hidden = {
+def _hidden_section_ids(sections: list[dict[str, Any]] | None) -> set[str]:
+    return {
         s.get("id")
-        for s in sections
+        for s in (sections or [])
         if s.get("id") and not s.get("visible", True)
     }
+
+
+def _edited_in_admin(stored: list[dict[str, Any]] | None) -> bool:
+    """Meniul stocat vine din editorul de meniu, nu din seed-ul inițial?
+
+    Coloana `tenant.navigation` era populată la crearea tenantului cu meniul
+    presetului de ATUNCI și de atunci nu mai era citită — ex. Poiana Mărului
+    are salvat „Cazare → /expozanti”, un link care nu mai există în presetul
+    `resort`. Dacă am lua acele rânduri drept preferințe ale tenantului, am
+    învia meniuri moarte la primul deploy.
+
+    Editorul scrie mereu și `visible` pe fiecare intrare; seed-ul vechi are
+    doar `label` + `href`. Deci: până când cineva chiar editează meniul din
+    admin, presetul rămâne singura sursă — comportamentul de până acum.
+    """
+    return any("visible" in item for item in stored or [])
+
+
+def reconcile_navigation(
+    stored: list[dict[str, Any]] | None,
+    event_type: str,
+    sections: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """Meniul complet al tenantului: intrările presetului + personalizările lui.
+
+    Presetul rămâne sursa intrărilor *disponibile* (ca terminologia să urmeze
+    verticala), dar tenantul își poate reordena meniul, redenumi sau ascunde
+    intrări și adăuga linkuri proprii — toate salvate în `tenant.navigation`.
+    Ce e stocat dictează ordinea; intrările noi apărute în preset se adaugă la
+    final, deci un tenant vechi le primește automat.
+
+    Rezultatul e lista de administrare (cu `visible` / `custom` /
+    `sectionHidden`); `navigation_for` scoate din ea meniul public.
+    """
+    preset = PRESETS.get(event_type) or PRESETS["festival"]
+    preset_items: dict[str, str] = {
+        str(i["href"]): str(i["label"]) for i in preset["navigation"]
+    }
+    hidden = _hidden_section_ids(sections)
+
+    def entry(href: str, label: str, visible: bool, custom: bool) -> dict[str, Any]:
+        return {
+            "href": href,
+            "label": label,
+            "visible": visible,
+            "custom": custom,
+            # Informativ pentru admin: intrarea e scoasă din meniu pentru că
+            # secțiunea care o susține e dezactivată, nu pentru că a ascuns-o
+            # cineva din editorul de meniu.
+            "sectionHidden": _NAV_SECTION_BY_HREF.get(href) in hidden,
+        }
+
+    out: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for item in stored if _edited_in_admin(stored) else []:
+        href = str(item.get("href") or "").strip()
+        if not href or href in seen:
+            continue
+        custom = href not in preset_items
+        label = str(item.get("label") or "").strip() or preset_items.get(href, href)
+        out.append(entry(href, label, bool(item.get("visible", True)), custom))
+        seen.add(href)
+
+    for href, label in preset_items.items():
+        if href not in seen:
+            out.append(entry(href, label, True, False))
+
+    return out
+
+
+def navigation_for(
+    event_type: str,
+    sections: list[dict[str, Any]] | None = None,
+    stored: list[dict[str, Any]] | None = None,
+) -> list[dict[str, str]]:
+    """Public site nav for a vertical: preset + personalizările tenantului.
+
+    Intrările ascunse din editorul de meniu dispar, iar cele ale secțiunilor
+    dezactivate din admin la fel — un link către o zonă dezactivată e o
+    fundătură. Intrările fără secțiune corespondentă (ex. Contact, linkurile
+    personalizate) rămân."""
+    items = reconcile_navigation(stored, event_type, sections)
     return [
-        item
+        {"label": item["label"], "href": item["href"]}
         for item in items
-        if _NAV_SECTION_BY_HREF.get(item.get("href", "")) not in hidden
+        if item["visible"] and not item["sectionHidden"]
     ]
 
 

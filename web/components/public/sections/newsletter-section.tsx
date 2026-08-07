@@ -4,7 +4,13 @@ import { NewsletterForm } from "@/components/public/newsletter-form";
 import { Reveal } from "@/components/shared/reveal";
 import type { TenantLabels } from "@/lib/tenants/types";
 
-export function NewsletterSection({ labels }: { labels?: TenantLabels }) {
+export function NewsletterSection({
+  slug,
+  labels,
+}: {
+  slug: string;
+  labels?: TenantLabels;
+}) {
   const L = (k: string, fb: string) => labels?.[k] ?? fb;
   return (
     <section className="bg-secondary py-20 sm:py-24">
@@ -23,7 +29,7 @@ export function NewsletterSection({ labels }: { labels?: TenantLabels }) {
             )}
           </p>
           <div className="mx-auto mt-7 max-w-md">
-            <NewsletterForm />
+            <NewsletterForm slug={slug} />
           </div>
         </Reveal>
       </Container>

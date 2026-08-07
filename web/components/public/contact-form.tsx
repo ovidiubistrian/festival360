@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { Send } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -19,11 +18,11 @@ interface FormState {
 
 const INITIAL: FormState = { nume: "", email: "", subiect: "", mesaj: "" };
 
-export function ContactForm() {
+/** `slug` explicit — vezi nota din NewsletterForm: pe domeniu custom site-ul e
+ *  în rădăcină, deci URL-ul nu-l conține și mesajele se pierdeau. */
+export function ContactForm({ slug }: { slug: string }) {
   const [values, setValues] = React.useState<FormState>(INITIAL);
   const [loading, setLoading] = React.useState(false);
-  const pathname = usePathname();
-  const slug = pathname.split("/").filter(Boolean)[0] ?? "";
 
   function update<K extends keyof FormState>(key: K, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));

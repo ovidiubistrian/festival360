@@ -28,6 +28,20 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ro_RO",
     siteName: "Siteora",
+    // Lățimea/înălțimea contează: fără ele Facebook nu redă poza la prima
+    // accesare a linkului. Imaginea e generată de `app/og.png`.
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Siteora",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og.png"],
   },
 };
 

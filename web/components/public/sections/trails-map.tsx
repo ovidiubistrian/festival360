@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Images,
   MapPin,
+  Download,
 } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { SectionHeading } from "@/components/shared/section-heading";
@@ -81,6 +82,30 @@ const DEFAULTS = {
   ] as Trail[],
 } satisfies Required<Omit<Trails, "items">> & { items: Trail[] };
 
+/**
+ * Descărcarea urmei GPX, pentru încărcat în ceas sau aplicația de navigație.
+ * Fișierul e servit same-origin (Caddy proxiază /media), deci atributul
+ * `download` chiar forțează descărcarea și îi dă un nume citibil.
+ */
+function TrailGpxButton({ trail }: { trail: Trail }) {
+  const fileName = `${
+    trail.name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase() || "traseu"
+  }.gpx`;
+  return (
+    <Button asChild variant="ghost" size="sm">
+      <a href={trail.gpx} download={fileName}>
+        <Download className="h-4 w-4" />
+        Descarcă GPX
+      </a>
+    </Button>
+  );
+}
+
 /** One metric line inside a trail card / the details dialog. */
 function TrailMeta({ trail }: { trail: Trail }) {
   return (
@@ -132,8 +157,16 @@ export function TrailsMap({ trails }: { trails?: Trails }) {
           description={description}
         />
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
-          <div className="aspect-video overflow-hidden rounded-2xl border border-border">
+        {/* Pe desktop harta rămâne lipită în timp ce derulezi lista: cu multe
+            trasee, altfel ajungeai să citești o coloană lungă de carduri lângă
+            un dreptunghi gol. `lg:items-start` e obligatoriu — altfel coloana
+            hărții s-ar întinde pe toată înălțimea rândului și `sticky` n-ar
+            mai avea pe ce aluneca. Pe telefon rămâne stivuit, ca până acum. */}
+        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,1fr)] lg:items-start lg:gap-10">
+          {/* `isolate` ține z-index-urile interne ale Leaflet (panouri 400,
+              controale 1000) într-un context de stivuire propriu. Fără el,
+              harta se desena PESTE dialogul de detalii, care e pe z-50. */}
+          <div className="relative isolate aspect-video overflow-hidden rounded-2xl border border-border lg:sticky lg:top-24 lg:aspect-auto lg:h-[calc(100vh_-_8rem)] lg:max-h-[44rem] lg:min-h-[30rem]">
             <TrailsLeafletMap
               trails={items}
               mapQuery={mapQuery}
@@ -204,6 +237,7 @@ export function TrailsMap({ trails }: { trails?: Trails }) {
                         Detalii
                       </Button>
                     ) : null}
+                    {trail.gpx?.trim() ? <TrailGpxButton trail={trail} /> : null}
                   </div>
                 </li>
               );
@@ -242,6 +276,10 @@ export function TrailsMap({ trails }: { trails?: Trails }) {
                   {detailTrail.difficulty}
                 </span>
                 <TrailMeta trail={detailTrail} />
+
+                {detailTrail.gpx?.trim() ? (
+                  <TrailGpxButton trail={detailTrail} />
+                ) : null}
 
                 {detailPhotos.length > 0 ? (
                   <AccommodationGallery

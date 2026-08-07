@@ -12,7 +12,10 @@ import type {
   Experience,
   Exhibitor,
   GalleryImage,
+  NavItem,
+  NavItemConfig,
   NewsletterSubscriber,
+  OrganizationInfo,
   Partner,
   ProgramEvent,
   Product,
@@ -35,6 +38,7 @@ import {
   apiSetMessageRead,
   apiToggleStatus,
   apiUpdate,
+  apiUpdateNavigation,
   apiUpdateSections,
   apiUpdateSettings,
   fetchBundle,
@@ -96,6 +100,8 @@ export interface AdminData {
   contactMessages: ContactMessage[];
   newsletter: NewsletterSubscriber[];
   sections: SectionConfig[];
+  /** Top menu, including hidden entries (see `NavItemConfig`). */
+  navigation: NavItemConfig[];
   /** Homepage "Despre" stats (about-section). */
   stats: Stat[];
   /** Homepage "Zone și experiențe" grid. */
@@ -106,6 +112,8 @@ export interface AdminData {
   trails?: Trails;
   /** Per-tenant SEO overrides (title, description, OG image, verification…). */
   seo: SeoConfig;
+  /** Datele juridice ale organizatorului — subsolul formularelor. */
+  organization: OrganizationInfo;
   settings: AdminSettings;
   /** Vertical preset key (festival | resort | museum | …). */
   eventType?: string;
@@ -113,6 +121,19 @@ export interface AdminData {
   modules?: string[];
   /** Per-tenant label overrides (terminology system). */
   labels?: Record<string, string>;
+}
+
+/**
+ * Lift plain `{label, href}` entries to the editor shape. Only used for the
+ * static demo bundle — the API already sends `navigationConfig`.
+ */
+function asNavConfig(items: NavItem[] | undefined): NavItemConfig[] {
+  return (items ?? []).map((item) => ({
+    ...item,
+    visible: true,
+    custom: false,
+    sectionHidden: false,
+  }));
 }
 
 function seed(): AdminData {
@@ -135,6 +156,7 @@ function seed(): AdminData {
     contactMessages: structuredClone(c.contactMessages),
     newsletter: structuredClone(c.newsletter),
     sections: structuredClone(prispaTenant.config.sections),
+    navigation: asNavConfig(prispaTenant.config.navigation),
     stats: structuredClone(prispaTenant.config.stats),
     experiences: structuredClone(prispaTenant.config.experiences),
     conditions: prispaTenant.config.conditions
@@ -145,6 +167,9 @@ function seed(): AdminData {
       : {},
     seo: prispaTenant.config.seo
       ? structuredClone(prispaTenant.config.seo)
+      : {},
+    organization: prispaTenant.config.organization
+      ? structuredClone(prispaTenant.config.organization)
       : {},
     settings: {
       name: info.name,
@@ -196,11 +221,13 @@ function bundleToAdminData(bundle: Tenant): AdminData {
     contactMessages: content.contactMessages ?? [],
     newsletter: content.newsletter ?? [],
     sections: config.sections ?? [],
+    navigation: config.navigationConfig ?? asNavConfig(config.navigation),
     stats: config.stats ?? [],
     experiences: config.experiences ?? [],
     conditions: config.conditions ?? {},
     trails: config.trails ?? {},
     seo: config.seo ?? {},
+    organization: config.organization ?? {},
     settings: {
       name: info.name,
       tagline: info.tagline,
@@ -248,11 +275,13 @@ function emptyData(): AdminData {
     contactMessages: [],
     newsletter: [],
     sections: [],
+    navigation: [],
     stats: [],
     experiences: [],
     conditions: {},
     trails: {},
     seo: {},
+    organization: {},
     settings: {
       name: "",
       tagline: "",
@@ -424,6 +453,14 @@ export function updateSeo(seo: SeoConfig) {
   void sync(() => apiUpdateSettings({ seo }));
 }
 
+/** Persistă datele organizatorului (asociație, CIF, adresă, IBAN). */
+export function updateOrganization(organization: OrganizationInfo) {
+  apply((draft) => {
+    draft.organization = { ...organization };
+  });
+  void sync(() => apiUpdateSettings({ organization }));
+}
+
 export function toggleSection(id: string) {
   apply((draft) => {
     const s = draft.sections.find((x) => x.id === id);
@@ -465,6 +502,71 @@ export function moveSection(id: string, dir: -1 | 1) {
     ];
   });
   void sync(() => apiUpdateSections(memory.sections));
+}
+
+// --- Top menu ----------------------------------------------------------------
+// Intrările se identifică prin `href` (unic în meniu — API-ul deduplică).
+
+function syncNavigation() {
+  void sync(() => apiUpdateNavigation(memory.navigation));
+}
+
+export function toggleNavItem(href: string) {
+  apply((draft) => {
+    const item = draft.navigation.find((x) => x.href === href);
+    if (item) item.visible = !item.visible;
+  });
+  syncNavigation();
+}
+
+export function renameNavItem(href: string, label: string) {
+  apply((draft) => {
+    const item = draft.navigation.find((x) => x.href === href);
+    if (item) item.label = label;
+  });
+  syncNavigation();
+}
+
+export function moveNavItem(href: string, dir: -1 | 1) {
+  apply((draft) => {
+    const idx = draft.navigation.findIndex((x) => x.href === href);
+    const next = idx + dir;
+    if (idx < 0 || next < 0 || next >= draft.navigation.length) return;
+    [draft.navigation[idx], draft.navigation[next]] = [
+      draft.navigation[next],
+      draft.navigation[idx],
+    ];
+  });
+  syncNavigation();
+}
+
+export function addNavItem(label: string, href: string) {
+  apply((draft) => {
+    if (draft.navigation.some((x) => x.href === href)) return;
+    draft.navigation.push({
+      label,
+      href,
+      visible: true,
+      custom: true,
+      sectionHidden: false,
+    });
+  });
+  syncNavigation();
+}
+
+export function removeNavItem(href: string) {
+  apply((draft) => {
+    draft.navigation = draft.navigation.filter((x) => x.href !== href);
+  });
+  syncNavigation();
+}
+
+/** Golește personalizarea: serverul recompune meniul din presetul verticalei. */
+export function resetNavigation() {
+  apply((draft) => {
+    draft.navigation = [];
+  });
+  void sync(() => apiUpdateNavigation([]));
 }
 
 export function markMessageRead(id: string, read: boolean) {

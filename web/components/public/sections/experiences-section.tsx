@@ -21,7 +21,7 @@ export function ExperiencesSection({
           title={L("experiencesTitle", "Șase lumi, într-un singur festival")}
           description={L(
             "experiencesDescription",
-            "De la gustul preparatelor gătite pe loc, la gesturile meșterilor și liniștea muntelui — VATRA este o experiență completă."
+            "De la gustul preparatelor gătite pe loc, la gesturile meșterilor și liniștea muntelui — totul, într-o singură experiență."
           )}
         />
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

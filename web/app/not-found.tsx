@@ -20,7 +20,7 @@ export default function NotFound() {
           </Link>
         </Button>
         <Button asChild variant="outline">
-          <Link href="/prispa">Festivalul VATRA</Link>
+          <Link href="/#pachete">Vezi pachetele</Link>
         </Button>
       </div>
     </div>

@@ -5,13 +5,8 @@ import Link from "next/link";
 import {
   Users,
   Eye,
-  Store,
-  ShoppingBasket,
-  MapPin,
-  Handshake,
   Mail,
   Send,
-  Newspaper,
   ExternalLink,
   ArrowRight,
   BarChart3,
@@ -19,6 +14,10 @@ import {
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { StatCard } from "@/components/admin/stat-card";
+import {
+  contentStats,
+  quickShortcuts,
+} from "@/components/admin/dashboard-stats";
 import { VisitorsChart } from "@/components/admin/visitors-chart";
 import {
   Card,
@@ -37,13 +36,6 @@ import {
   type Analytics,
 } from "@/lib/admin/analytics";
 import { formatDate, formatNumber } from "@/lib/utils";
-
-const SHORTCUTS = [
-  { label: "Adaugă expozant", href: "/admin/exhibitors", icon: Store },
-  { label: "Adaugă produs", href: "/admin/products", icon: ShoppingBasket },
-  { label: "Publică o noutate", href: "/admin/news", icon: Newspaper },
-  { label: "Editează programul", href: "/admin/program", icon: MapPin },
-];
 
 /**
  * Build a StatCard trend from a current/previous pair. Returns `undefined` when
@@ -100,15 +92,10 @@ export default function DashboardPage() {
     })();
   }
 
-  const publishedExhibitors = data.exhibitors.filter(
-    (e) => e.status === "published"
-  ).length;
-  const publishedProducts = data.products.filter(
-    (p) => p.status === "published"
-  ).length;
-  const publishedDestinations = data.destinations.filter(
-    (d) => d.status === "published"
-  ).length;
+  // Cardurile de conținut urmează secțiunile active ale site-ului, nu un set
+  // fix de festival — vezi `dashboard-stats`.
+  const stats = contentStats(data);
+  const shortcuts = quickShortcuts(data);
 
   const recentMessages = data.contactMessages
     .slice()
@@ -174,40 +161,9 @@ export default function DashboardPage() {
           trend={totals ? trendFrom(totals.views, totals.viewsPrev) : undefined}
           hint="ultimele 7 zile"
         />
-        <StatCard
-          label="Expozanți activi"
-          value={publishedExhibitors}
-          icon={<Store />}
-          hint={`din ${data.exhibitors.length} total`}
-        />
-        <StatCard
-          label="Produse publicate"
-          value={publishedProducts}
-          icon={<ShoppingBasket />}
-          hint={`din ${data.products.length} total`}
-        />
-        <StatCard
-          label="Destinații promovate"
-          value={publishedDestinations}
-          icon={<MapPin />}
-          hint={`din ${data.destinations.length} total`}
-        />
-        <StatCard
-          label="Parteneri"
-          value={data.partners.length}
-          icon={<Handshake />}
-        />
-        <StatCard
-          label="Înscrieri newsletter"
-          value={data.newsletter.length}
-          icon={<Send />}
-        />
-        <StatCard
-          label="Mesaje necitite"
-          value={data.contactMessages.filter((m) => !m.read).length}
-          icon={<Mail />}
-          hint={`din ${data.contactMessages.length} mesaje`}
-        />
+        {stats.map(({ key, ...card }) => (
+          <StatCard key={key} {...card} />
+        ))}
       </div>
 
       {/* Chart + activity */}
@@ -295,24 +251,21 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {SHORTCUTS.map((s) => {
-                const ShortcutIcon = s.icon;
-                return (
-                  <Link
-                    key={s.href}
-                    href={s.href}
-                    className="group flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:bg-secondary"
-                  >
-                    <span className="flex items-center gap-3 text-sm font-medium text-foreground">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary [&_svg]:size-4">
-                        <ShortcutIcon />
-                      </span>
-                      {s.label}
+              {shortcuts.map((s) => (
+                <Link
+                  key={s.href}
+                  href={s.href}
+                  className="group flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:bg-secondary"
+                >
+                  <span className="flex items-center gap-3 text-sm font-medium text-foreground">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary [&_svg]:size-4">
+                      {s.icon}
                     </span>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                );
-              })}
+                    {s.label}
+                  </span>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              ))}
             </div>
           </CardContent>
         </Card>

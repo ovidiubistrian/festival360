@@ -42,7 +42,7 @@ export default async function PartnersPage({
       <PageHero
         eyebrow="Alături de noi"
         title="Parteneri și sponsori"
-        description="Festivalul VATRA este posibil datorită celor care cred în satul românesc și în producătorii lui."
+        description={`${config.info.name} este posibil datorită celor care cred în satul românesc și în producătorii lui.`}
         image={config.info.heroImage}
         crumbs={[{ label: "Acasă", href: `/${slug}` }, { label: "Parteneri" }]}
       />
@@ -50,7 +50,7 @@ export default async function PartnersPage({
       <section className="bg-warm-white py-20 sm:py-28">
         <Container>
           <SectionHeading
-            eyebrow="Comunitatea VATRA"
+            eyebrow="Comunitatea noastră"
             title="Împreună pentru tradiție"
             description="De la organizatori și parteneri instituționali, la sponsori și parteneri media — fiecare are un rol în festival."
           />

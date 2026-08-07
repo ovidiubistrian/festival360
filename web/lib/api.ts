@@ -1,6 +1,7 @@
 import type {
   Tenant,
   Exhibitor,
+  FormDefinition,
   Product,
   Accommodation,
   Destination,
@@ -88,6 +89,16 @@ export function getArticle(
   });
 }
 
+/** A published form by its slug; null when missing or still a draft. */
+export function getForm(
+  slug: string,
+  formSlug: string
+): Promise<FormDefinition | null> {
+  return apiGet<FormDefinition>(`/tenants/${slug}/forms/${formSlug}`, {
+    noStore: true,
+  });
+}
+
 /** Known tenant slugs (used for routing / static params). */
 export async function getTenantSlugs(): Promise<string[]> {
   const list = await apiGet<{ slug: string }[]>("/tenants", { revalidate: 300 });
@@ -122,6 +133,39 @@ export async function submitContactMessage(
     return res.ok;
   } catch {
     return false;
+  }
+}
+
+/** Rezultatul trimiterii unui formular construit din admin. */
+export type FormSubmitResult = { ok: boolean; error?: string };
+
+/**
+ * Trimite un formular. Valorile sunt `{idCâmp: valoare}` — validarea „serioasă”
+ * (obligatorii, opțiuni permise, total) se face pe server, care întoarce 422 cu
+ * un mesaj gata de afișat.
+ */
+export async function submitForm(
+  slug: string,
+  formSlug: string,
+  values: Record<string, string | boolean | string[]>
+): Promise<FormSubmitResult> {
+  try {
+    const res = await fetch(
+      `${API}/tenants/${slug}/forms/${formSlug}/submissions`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ values }),
+      }
+    );
+    if (res.ok) return { ok: true };
+    const detail = await res
+      .json()
+      .then((d: { detail?: string }) => d?.detail)
+      .catch(() => undefined);
+    return { ok: false, error: typeof detail === "string" ? detail : undefined };
+  } catch {
+    return { ok: false };
   }
 }
 

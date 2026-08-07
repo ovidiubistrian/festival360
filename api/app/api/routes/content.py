@@ -5,8 +5,15 @@ from sqlmodel import Session
 
 from app.api.deps import tenant_or_404
 from app.core.db import get_session
-from app.models import ContactMessage, NewsletterSubscriber, Tenant
+from app.models import (
+    ContactMessage,
+    FormDefinition,
+    FormSubmission,
+    NewsletterSubscriber,
+    Tenant,
+)
 from app.models.base import new_id, utcnow
+from app.services import forms_service
 from app.services import tenant_service as svc
 from app.schemas.public import (
     AccommodationOut,
@@ -14,13 +21,14 @@ from app.schemas.public import (
     DestinationOut,
     EventOut,
     ExhibitorOut,
+    FormOut,
     GalleryImageOut,
     PartnerOut,
     ProductOut,
     ProgramEventOut,
     RestaurantOut,
 )
-from app.schemas.write import ContactMessageIn, NewsletterIn
+from app.schemas.write import ContactMessageIn, FormSubmissionIn, NewsletterIn
 
 router = APIRouter(prefix="/tenants/{slug}", tags=["content"])
 
@@ -196,6 +204,98 @@ def get_article(
         if x.slug == item_slug:
             return ArticleOut.from_model(x)
     raise _not_found("Articol")
+
+
+# --- Forms (public: published only) ---
+@router.get("/forms", response_model=list[FormOut])
+def list_forms(
+    tenant: Tenant = Depends(tenant_or_404), session: Session = Depends(get_session)
+):
+    return [
+        FormOut.from_model(f) for f in forms_service.published_forms_for(session, tenant.id)
+    ]
+
+
+@router.get("/forms/{form_slug}", response_model=FormOut)
+def get_form(
+    form_slug: str,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    form = forms_service.form_by_slug(session, tenant.id, form_slug)
+    # Un formular nepublicat nu există pentru vizitator — linkul lui e „mort”
+    # până când organizatorul îl publică.
+    if not form or form.status != "published":
+        raise _not_found("Formular")
+    return FormOut.from_model(form)
+
+
+@router.post("/forms/{form_slug}/submissions", status_code=201)
+def submit_form(
+    form_slug: str,
+    payload: FormSubmissionIn,
+    tenant: Tenant = Depends(tenant_or_404),
+    session: Session = Depends(get_session),
+):
+    form = forms_service.form_by_slug(session, tenant.id, form_slug)
+    if not form or form.status != "published":
+        raise _not_found("Formular")
+
+    try:
+        answers, total, summary, email = forms_service.build_answers(
+            form, payload.values
+        )
+    except forms_service.ValidationError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    sub = FormSubmission(
+        id=new_id("fs"),
+        tenant_id=tenant.id,
+        form_id=form.id,
+        form_title=form.title,
+        answers=answers,
+        total=total,
+        summary=summary,
+        email=email,
+    )
+    session.add(sub)
+    session.commit()
+
+    _notify_submission(session, tenant, form, sub)
+    return {"ok": True, "id": sub.id}
+
+
+def _notify_submission(
+    session: Session,
+    tenant: Tenant,
+    form: FormDefinition,
+    sub: FormSubmission,
+) -> None:
+    """Anunță organizatorul pe email, dacă are SMTP configurat și o adresă.
+
+    Cererea e deja salvată — o eroare de trimitere nu are voie să întoarcă
+    eroare vizitatorului, deci o înghițim (logat de SMTP-ul de sub).
+    """
+    to = (form.notify_email or "").strip()
+    if not to:
+        return
+    from app.marketing import email as mail
+    from app.models import TenantEmailSettings
+
+    cfg = session.get(TenantEmailSettings, tenant.id)
+    if not mail.is_configured(cfg):
+        return
+    body = forms_service.notification_body(form, sub)
+    try:
+        mail.send_one(
+            cfg,  # type: ignore[arg-type]
+            to,
+            f"[{tenant.name}] Cerere nouă: {form.title}",
+            mail.html_from_plaintext(body),
+            body,
+        )
+    except Exception as exc:  # noqa: BLE001 — notificarea e best-effort
+        print(f"[forms] notificare eșuată pentru {form.slug}: {exc}")
 
 
 # --- Public actions (no auth) ---

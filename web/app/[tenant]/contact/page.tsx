@@ -146,7 +146,7 @@ export default async function ContactPage({
                 description="Completează formularul și revenim către tine cât mai curând posibil."
               />
               <div className="mt-8 rounded-2xl border border-border bg-card p-6 sm:p-8">
-                <ContactForm />
+                <ContactForm slug={slug} />
               </div>
             </div>
           </div>

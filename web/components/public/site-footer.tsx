@@ -6,7 +6,7 @@ import {
   YoutubeIcon,
 } from "@/components/shared/social-icons";
 import { Container } from "@/components/shared/container";
-import { formatDateRange } from "@/lib/utils";
+import { formatDateRange, isExternalHref } from "@/lib/utils";
 import type { TenantConfig } from "@/lib/tenants/types";
 
 export function SiteFooter({
@@ -72,16 +72,29 @@ export function SiteFooter({
               Navigare
             </h3>
             <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 text-sm">
-              {navigation.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={`${base}${item.href}`}
-                    className="text-cream/70 transition-colors hover:text-warm-white"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              {navigation.map((item) => {
+                const cls =
+                  "text-cream/70 transition-colors hover:text-warm-white";
+                return (
+                  <li key={item.href}>
+                    {/* Linkurile personalizate pot ieși în afara site-ului. */}
+                    {isExternalHref(item.href) ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cls}
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link href={`${base}${item.href}`} className={cls}>
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
 

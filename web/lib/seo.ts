@@ -145,7 +145,24 @@ export async function tenantMetadata(
       siteName: info.name,
       locale: "ro_RO",
       type: opts.ogType ?? "website",
-      ...(image ? { images: [{ url: image }] } : {}),
+      // Lățimea/înălțimea contează: fără ele Facebook nu redă poza la prima
+      // accesare a linkului. Le știm doar pentru imaginea de share încărcată
+      // în admin (API-ul le citește din fișier), nu și pentru cele externe.
+      ...(image
+        ? {
+            images: [
+              {
+                url: image,
+                alt: title,
+                ...(image === seo.ogImage?.trim() &&
+                seo.ogImageWidth &&
+                seo.ogImageHeight
+                  ? { width: seo.ogImageWidth, height: seo.ogImageHeight }
+                  : {}),
+              },
+            ],
+          }
+        : {}),
     },
     twitter: {
       card: "summary_large_image",
@@ -163,7 +180,16 @@ export async function tenantMetadata(
     metadata.keywords = keywords;
   }
   if (seo.googleSiteVerification?.trim()) {
-    metadata.verification = { google: seo.googleSiteVerification.trim() };
+    // Din Search Console se copiază adesea tot tag-ul sau perechea
+    // `google-site-verification=TOKEN`; Google așteaptă în `content` DOAR
+    // tokenul, altfel verificarea eșuează.
+    const token = seo.googleSiteVerification
+      .trim()
+      .replace(/^<meta[^>]*content=["']?/i, "")
+      .replace(/^google-site-verification[=:]\s*/i, "")
+      .replace(/["'\s/>]+$/g, "")
+      .trim();
+    if (token) metadata.verification = { google: token };
   }
 
   return metadata;

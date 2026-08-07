@@ -20,6 +20,7 @@ import {
   Image as ImageIcon,
   Images,
   Newspaper,
+  ClipboardList,
   Mail,
   Send,
   Megaphone,
@@ -199,6 +200,13 @@ const CONTENT_MODULE_DEFS: ContentModuleDef[] = [
     label: "Noutăți",
     href: "/admin/news",
     icon: Newspaper,
+  },
+  {
+    key: "forms",
+    labelKey: "navForms",
+    label: "Formulare",
+    href: "/admin/forms",
+    icon: ClipboardList,
   },
   {
     key: "messages",
